@@ -1,0 +1,17 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://d04d0dtm7ecvs"
+
+[deps]
+
+files=["res://data/TeamLeagueMap.club.translation", "res://data/TeamLeagueMap.club.translation"]
+
+source_file="res://data/TeamLeagueMap.csv"
+dest_files=["res://data/TeamLeagueMap.club.translation", "res://data/TeamLeagueMap.club.translation"]
+
+[params]
+
+compress=true
+delimiter=0
