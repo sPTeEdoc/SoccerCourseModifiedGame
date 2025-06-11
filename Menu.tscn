@@ -1,0 +1,110 @@
+[gd_scene load_steps=14 format=3 uid="uid://d4e2stbhmavfb"]
+
+[ext_resource type="Script" uid="uid://clh1il512gebe" path="res://Menu.cs" id="1_uubjt"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lthh4"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0, 0, 1)
+border_blend = true
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_uubjt"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_5yleq"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ylpcl"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_cx167"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_dolsu"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_n4eug"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_dlksc"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hcwhg"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_5p1lm"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_1igrg"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_v0s1l"]
+
+[node name="Menu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_uubjt")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="VBoxContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer/MarginContainer/TextureRect"]
+custom_minimum_size = Vector2(100, 100)
+offset_left = 53.0
+offset_top = 40.0
+offset_right = 270.0
+offset_bottom = 140.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_lthh4")
+
+[node name="Label" type="Label" parent="VBoxContainer/MarginContainer/TextureRect/PanelContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "Calendar"
+horizontal_alignment = 1
+
+[node name="Button" type="Button" parent="VBoxContainer/MarginContainer/TextureRect/PanelContainer/Label"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -40.0
+offset_bottom = 37.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/focus = SubResource("StyleBoxEmpty_uubjt")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxEmpty_5yleq")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_ylpcl")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxEmpty_cx167")
+theme_override_styles/hover_pressed = SubResource("StyleBoxEmpty_dolsu")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxEmpty_n4eug")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_dlksc")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxEmpty_hcwhg")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_5p1lm")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxEmpty_1igrg")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_v0s1l")
+
+[connection signal="pressed" from="VBoxContainer/MarginContainer/TextureRect/PanelContainer/Label/Button" to="." method="OnButtonPressed"]

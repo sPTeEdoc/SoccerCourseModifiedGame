@@ -6,25 +6,25 @@ public partial class DateLabel : MarginContainer
 {
 	public Label label;
 	public PanelContainer panelContainer;
-	public DateTime date;
+	public DateTime dateOfDay;
 
-    public DateLabel()
-    {
+	public DateLabel()
+	{
 
-    }
+	}
 
 	public override void _Ready()
 	{
 		panelContainer = GetNode<PanelContainer>("PanelContainer");
 		label = GetNode<Label>("PanelContainer/Label");
-		label.Text = date.Day.ToString();
+		label.Text = dateOfDay.Day.ToString();
 		SetUnselected();
 	}
 
 	private void SetUnselected()
 	{
-		var currentDate = DateTime.Now;
-		bool isCurrentDate = date.Day == currentDate.Day && date.Month == currentDate.Month && date.Year == currentDate.Year;
+		var currentDate = Season.Instance.seasonGameDate;
+		bool isCurrentDate = dateOfDay.Day == currentDate.Day && dateOfDay.Month == currentDate.Month && dateOfDay.Year == currentDate.Year;
 
 		if (!isCurrentDate)
 		{
@@ -40,10 +40,15 @@ public partial class DateLabel : MarginContainer
 		}
 	}
 
-    private void OnButtonPressed()
-    {
-        // do what ever you want
-        GD.Print(date);
-        int x = 0;
+	private void OnButtonPressed()
+	{
+		// do what ever you want
+		GD.Print(dateOfDay);
+		ShowPopupScreen();
+	}
+
+	public void ShowPopupScreen()
+	{
+		
 	}
 }

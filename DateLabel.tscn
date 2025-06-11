@@ -3,11 +3,11 @@
 [ext_resource type="Script" uid="uid://5apc6pgv1pcu" path="res://DateLabel.cs" id="1_twsc0"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hl4hm"]
-bg_color = Color(0.309804, 0.611765, 0.952941, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
 border_color = Color(1, 0, 0, 1)
 border_blend = true
 corner_radius_top_left = 20

@@ -9,7 +9,7 @@ public partial class Calendar : Control
         "June", "July", "August", "September", "October", "November", "December" };
     private const int DAY_IN_UNIX_TIME = 86400;
 
-    private DateTime selectedDate = DateTime.Now;
+    private DateTime selectedDate = Season.Instance.startOfSeasonDate;
 
     PackedScene scene = null;
 
@@ -63,7 +63,7 @@ public partial class Calendar : Control
     private void CreateLabel(DateTime date, int index)
     {
         var dateLabel = (DateLabel)scene.Instantiate();
-        dateLabel.date = date;
+        dateLabel.dateOfDay = date;
 
         columnsBox.GetChildren()[index].AddChild(dateLabel);
     }
