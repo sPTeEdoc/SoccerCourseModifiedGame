@@ -8,6 +8,12 @@ public partial class DateLabel : MarginContainer
 	public PanelContainer panelContainer;
 	public DateTime dateOfDay;
 
+	public bool Visible; 
+
+	public Sprite2D leagueDay;
+
+	public string textureString;
+
 	public DateLabel()
 	{
 
@@ -16,8 +22,24 @@ public partial class DateLabel : MarginContainer
 	public override void _Ready()
 	{
 		panelContainer = GetNode<PanelContainer>("PanelContainer");
-		label = GetNode<Label>("PanelContainer/Label");
+		label = GetNode<Label>("PanelContainer/TextureRect/Label");
 		label.Text = dateOfDay.Day.ToString();
+		label.Visible = Visible;
+		leagueDay = GetNode<Sprite2D>("PanelContainer/Leagueday");
+		label.AddThemeColorOverride("font_color", Godot.Colors.Black);
+		if (textureString == "" || !Visible)
+		{
+			leagueDay.Visible = false;
+		}
+		else
+		{
+			if (textureString == "leagueday")
+			{
+				label.AddThemeColorOverride("font_color", Godot.Colors.White);
+			}
+			var newTexture = (Texture2D)GD.Load($"res://assets/Logos/{textureString}.jpg");
+			leagueDay.Texture = newTexture;
+		}
 		SetUnselected();
 	}
 
@@ -28,23 +50,29 @@ public partial class DateLabel : MarginContainer
 
 		if (!isCurrentDate)
 		{
-			StyleBoxFlat x = new StyleBoxFlat();
-			x.CornerRadiusTopLeft = 0;
-			x.CornerRadiusBottomRight = 0;
-			x.CornerRadiusTopRight = 0;
-			x.CornerRadiusBottomLeft = 0;
-			x.SetBorderWidthAll(1);
-			x.BgColor = Godot.Colors.White;
-			x.BorderColor = Godot.Colors.Black;
-			panelContainer.AddThemeStyleboxOverride("panel", x);
+			StyleBoxFlat styleBox = new StyleBoxFlat();
+			styleBox.CornerRadiusTopLeft = 0;
+			styleBox.CornerRadiusBottomRight = 0;
+			styleBox.CornerRadiusTopRight = 0;
+			styleBox.CornerRadiusBottomLeft = 0;
+			styleBox.SetBorderWidthAll(1);
+			styleBox.BgColor = Godot.Colors.White;
+			styleBox.BorderColor = Godot.Colors.Black;
+			panelContainer.AddThemeStyleboxOverride("panel", styleBox);
+		}
+		else
+		{
+
 		}
 	}
 
 	private void OnButtonPressed()
 	{
 		// do what ever you want
-		GD.Print(dateOfDay);
-		ShowPopupScreen();
+		if (Visible)
+		{
+			ShowPopupScreen();
+		}
 	}
 
 	public void ShowPopupScreen()

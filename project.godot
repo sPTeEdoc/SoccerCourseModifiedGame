@@ -20,6 +20,11 @@ config/icon="res://icon.svg"
 GameStart="*res://GameStart.cs"
 SceneTransition="*res://scene_transition.tscn"
 
+[display]
+
+window/size/viewport_width=1250
+window/size/viewport_height=750
+
 [dotnet]
 
 project/assembly_name="MeetTheGlazers"
