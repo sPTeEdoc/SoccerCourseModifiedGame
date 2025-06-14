@@ -59,6 +59,7 @@ texture = ExtResource("2_8fbjc")
 layout_mode = 2
 
 [node name="Label" type="Label" parent="PanelContainer/TextureRect"]
+layout_mode = 0
 offset_top = 3.0
 offset_right = 90.0
 offset_bottom = 89.0

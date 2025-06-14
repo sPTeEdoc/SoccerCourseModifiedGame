@@ -1,26 +1,26 @@
 using Godot;
 using System;
-using System.Drawing;
+using System.Threading.Tasks;
 
 public partial class DateLabel : MarginContainer
 {
+	private PopupScene popScene = null;
+    private Window view_port;
+
 	public Label label;
 	public PanelContainer panelContainer;
 	public DateTime dateOfDay;
 
-	public bool Visible; 
+	public bool Visible = false; 
 
 	public Sprite2D leagueDay;
+	[Signal] public delegate void UserInteractionDialogEventHandler(bool interaction);
 
 	public string textureString;
 
-	public DateLabel()
-	{
-
-	}
-
 	public override void _Ready()
 	{
+		// pus = ResourceLoader.Load<PackedScene>("res://YAP.tscn");
 		panelContainer = GetNode<PanelContainer>("PanelContainer");
 		label = GetNode<Label>("PanelContainer/TextureRect/Label");
 		label.Text = dateOfDay.Day.ToString();
@@ -75,8 +75,17 @@ public partial class DateLabel : MarginContainer
 		}
 	}
 
+	private async void ShowPopup()
+	{
+		view_port = GetWindow();
+		popScene = (PopupScene)GD.Load<PackedScene>("res://PopupScene.tscn").Instantiate();
+		view_port.AddChild(popScene);
+        var result = await ToSignal(popScene, PopupScene.SignalName.ConfirmationResult);
+        Enums.DialogResult dialogResult = popScene.dialogResult;
+	}
+
 	public void ShowPopupScreen()
 	{
-		
+		this.ShowPopup();
 	}
 }

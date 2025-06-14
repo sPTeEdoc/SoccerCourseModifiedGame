@@ -1,0 +1,209 @@
+[gd_scene load_steps=18 format=3 uid="uid://bkea41k0kktov"]
+
+[ext_resource type="PackedScene" uid="uid://cnwd7m4vmdd3y" path="res://PopupScene.tscn" id="1_0cht4"]
+
+[sub_resource type="CSharpScript" id="CSharpScript_4l5wo"]
+script/source = "using Godot;
+using System;
+
+public partial class DialogYesNo : Control
+{
+    private Timer _timer;
+    // [Signal] public delegate void UserInteractionDialogEventHandler(bool interaction);
+    public Action<bool> Interaction;
+    public bool interaction = false;
+    public Enums.DialogResult dialogResult = Enums.DialogResult.None;
+
+    public override async void _Ready()
+    {
+        // Await the ConfirmationResult signal from the dialog
+        var popScene = (PopupScene)GD.Load<PackedScene>(\"res://PopupScene.tscn\").Instantiate();
+        var result = await ToSignal(popScene, PopupScene.SignalName.ConfirmationResult);
+        this.dialogResult = popScene.dialogResult;
+
+        // 'result' will be an array containing the emitted signal's arguments.
+        // In this case, it will contain a single boolean value.
+        // bool confirmationResult = (bool)result[0];
+
+        // if (confirmationResult)
+        // {
+        //     // Create and await a one-shot timer using SceneTree.CreateTimer()
+        //     GD.Print(\"Confirmation received! Waiting for 3 seconds...\");
+        //     await ToSignal(GetTree().CreateTimer(3.0f), SceneTreeTimer.SignalName.Timeout);
+        //     GD.Print(\"3 seconds elapsed.\");
+        // }
+        // else
+        // {
+        //     GD.Print(\"Confirmation cancelled.\");
+        // }
+    }
+
+    private void OnTimerTimeoutSignal()
+    {
+        Interaction?.Invoke(interaction);
+        // EmitSignal(SignalName.UserInteractionDialog);
+    }
+}
+"
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h8wv2"]
+bg_color = Color(0.27581, 0.477101, 0.213465, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ry6im"]
+bg_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8ihhp"]
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_7pd0y"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_l6emk"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_p3w42"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_cuaab"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_aesv4"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hewtc"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_bsv4t"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_quta7"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ukeky"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xnoib"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_mkcba"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dgi8y"]
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("CSharpScript_4l5wo")
+
+[node name="Window" parent="." instance=ExtResource("1_0cht4")]
+auto_translate_mode = 1
+script = null
+
+[node name="ColorRect2" type="ColorRect" parent="Window"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="Window/ColorRect2"]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 3.0
+offset_right = 308.0
+offset_bottom = 120.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_h8wv2")
+
+[node name="Label" type="Label" parent="Window/ColorRect2/Panel"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 4.0
+offset_right = 304.0
+offset_bottom = 114.0
+text = "Simulate until this day?"
+horizontal_alignment = 1
+
+[node name="Panel2" type="Panel" parent="Window/ColorRect2"]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 122.0
+offset_right = 309.0
+offset_bottom = 162.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_ry6im")
+
+[node name="PanelContainer" type="PanelContainer" parent="Window/ColorRect2/Panel2"]
+layout_mode = 0
+offset_right = 135.0
+offset_bottom = 40.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_8ihhp")
+
+[node name="Label" type="Label" parent="Window/ColorRect2/Panel2/PanelContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "Yes"
+horizontal_alignment = 1
+
+[node name="Button" type="Button" parent="Window/ColorRect2/Panel2/PanelContainer/Label"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -8.0
+offset_bottom = 9.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/focus = SubResource("StyleBoxEmpty_7pd0y")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxEmpty_l6emk")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_p3w42")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxEmpty_cuaab")
+theme_override_styles/hover_pressed = SubResource("StyleBoxEmpty_aesv4")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxEmpty_hewtc")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_bsv4t")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxEmpty_quta7")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_ukeky")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxEmpty_xnoib")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_mkcba")
+
+[node name="PanelContainer2" type="PanelContainer" parent="Window/ColorRect2/Panel2"]
+layout_mode = 0
+offset_left = 169.0
+offset_top = -1.0
+offset_right = 304.0
+offset_bottom = 39.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_dgi8y")
+
+[node name="Label" type="Label" parent="Window/ColorRect2/Panel2/PanelContainer2"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "No"
+horizontal_alignment = 1
+
+[node name="Button" type="Button" parent="Window/ColorRect2/Panel2/PanelContainer2/Label"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -8.0
+offset_bottom = 9.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/focus = SubResource("StyleBoxEmpty_7pd0y")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxEmpty_l6emk")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_p3w42")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxEmpty_cuaab")
+theme_override_styles/hover_pressed = SubResource("StyleBoxEmpty_aesv4")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxEmpty_hewtc")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_bsv4t")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxEmpty_quta7")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_ukeky")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxEmpty_xnoib")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_mkcba")

@@ -24,6 +24,7 @@ SceneTransition="*res://scene_transition.tscn"
 
 window/size/viewport_width=1250
 window/size/viewport_height=750
+window/subwindows/embed_subwindows=false
 
 [dotnet]
 
