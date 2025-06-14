@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 public partial class DateLabel : MarginContainer
 {
-	private PopupScene popScene = null;
+	private DialogYesNo popScene = null;
     private Window view_port;
 
 	public Label label;
@@ -78,9 +78,9 @@ public partial class DateLabel : MarginContainer
 	private async void ShowPopup()
 	{
 		view_port = GetWindow();
-		popScene = (PopupScene)GD.Load<PackedScene>("res://PopupScene.tscn").Instantiate();
+		popScene = (DialogYesNo)GD.Load<PackedScene>("res://DialogYesNo.tscn").Instantiate();
 		view_port.AddChild(popScene);
-        var result = await ToSignal(popScene, PopupScene.SignalName.ConfirmationResult);
+        var result = await ToSignal(popScene, DialogYesNo.SignalName.ConfirmationResult);
         Enums.DialogResult dialogResult = popScene.dialogResult;
 	}
 

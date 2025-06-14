@@ -1,41 +1,78 @@
 using Godot;
 using System;
+using System.Threading.Tasks;
 
-public partial class DialogYesNo : Control
+public partial class DialogYesNo : Window
 {
-    private Timer _timer;
-    // [Signal] public delegate void UserInteractionDialogEventHandler(bool interaction);
-    public Action<bool> Interaction;
-    public bool interaction = false;
     public Enums.DialogResult dialogResult = Enums.DialogResult.None;
 
     public override void _Ready()
     {
-        // Await the ConfirmationResult signal from the dialog
-        var popScene = (PopupScene)GD.Load<PackedScene>("res://PopupScene.tscn").Instantiate();
-        // var result = await ToSignal(popScene, PopupScene.SignalName.ConfirmationResult);
-        this.dialogResult = popScene.dialogResult;
-
-        // 'result' will be an array containing the emitted signal's arguments.
-        // In this case, it will contain a single boolean value.
-        // bool confirmationResult = (bool)result[0];
-
-        // if (confirmationResult)
-        // {
-        //     // Create and await a one-shot timer using SceneTree.CreateTimer()
-        //     GD.Print("Confirmation received! Waiting for 3 seconds...");
-        //     await ToSignal(GetTree().CreateTimer(3.0f), SceneTreeTimer.SignalName.Timeout);
-        //     GD.Print("3 seconds elapsed.");
-        // }
-        // else
-        // {
-        //     GD.Print("Confirmation cancelled.");
-        // }
+        this.Show();
     }
 
-    private void OnTimerTimeoutSignal()
+    private void OnCloseButtonPressed()
     {
-        Interaction?.Invoke(interaction);
-        // EmitSignal(SignalName.UserInteractionDialog);
+        EmitSignal(SignalName.ConfirmationResult, false);
+        this.Hide();
+    }
+    
+    // Define the custom signal using a delegate and the [Signal] attribute.
+    [Signal]
+    public delegate void ConfirmationResultEventHandler(bool result);
+
+    // Instead of 'finished' and 'result' variables, we'll rely on signals.
+    private Button _okButton;
+    private Button _cancelButton;
+
+    // public override void _Ready()
+    // {
+    //     _okButton = GetOkButton(); // Get the OK button
+    //     _cancelButton = GetCancelButton(); // Get the Cancel button
+
+    //     // Connect the dialog's signals
+    //     AboutToPopup += OnAboutToPopup;
+    //     _okButton.Pressed += OnOkPressed; // Connect the pressed signal
+    //     _cancelButton.Pressed += OnCancelPressed; // Connect the pressed signal
+    // }
+
+    // This method will handle the 'AboutToPopup' signal.
+    private void OnAboutToPopup()
+    {
+        // Reset or initialize any state needed when the dialog is about to show.
+        // For example, you might set the dialog's text here.
+        GD.Print("Confirmation dialog is about to pop up.");
+    }
+
+    // This method will handle the OK button's 'Pressed' signal.
+    private void OnOkPressed()
+    {
+        // Emit the custom signal with the confirmation result.
+        dialogResult = Enums.DialogResult.Yes;
+        Hide(); // Optionally hide the dialog after confirmation
+        EmitSignal(SignalName.ConfirmationResult, true); // Emit the signal
+    }
+
+    // This method will handle the Cancel button's 'Pressed' signal.
+    private void OnCancelPressed()
+    {
+        // Emit the custom signal with the cancellation result.
+        dialogResult = Enums.DialogResult.No;
+        Hide(); // Optionally hide the dialog after cancellation
+        EmitSignal(SignalName.ConfirmationResult, false); // Emit the signal
+    }
+
+    // How to await the result:
+    public async Task<bool> GetConfirmationResult()
+    {
+        // Show the dialog first
+        PopupCentered();
+
+        // Wait for the confirmation_result signal to be emitted
+        var result = await ToSignal(this, SignalName.ConfirmationResult);
+
+        // The result will be an array containing the emitted signal's arguments.
+        // In this case, it will be an array with one element: the boolean confirmation result.
+        return (bool)result[0];
     }
 }
