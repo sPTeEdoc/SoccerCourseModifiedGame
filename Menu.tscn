@@ -72,10 +72,10 @@ layout_mode = 2
 [node name="PanelContainer" type="PanelContainer" parent="VBoxContainer/MarginContainer/TextureRect"]
 custom_minimum_size = Vector2(100, 100)
 layout_mode = 0
-offset_left = 53.0
-offset_top = 40.0
-offset_right = 270.0
-offset_bottom = 140.0
+offset_left = 43.0
+offset_top = 28.0
+offset_right = 260.0
+offset_bottom = 128.0
 size_flags_horizontal = 4
 size_flags_vertical = 4
 mouse_filter = 1
@@ -92,8 +92,50 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -40.0
-offset_bottom = 37.0
+offset_left = 413.0
+offset_top = -17.0
+offset_right = 413.0
+offset_bottom = 60.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/focus = SubResource("StyleBoxEmpty_uubjt")
+theme_override_styles/disabled_mirrored = SubResource("StyleBoxEmpty_5yleq")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_ylpcl")
+theme_override_styles/hover_pressed_mirrored = SubResource("StyleBoxEmpty_cx167")
+theme_override_styles/hover_pressed = SubResource("StyleBoxEmpty_dolsu")
+theme_override_styles/hover_mirrored = SubResource("StyleBoxEmpty_n4eug")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_dlksc")
+theme_override_styles/pressed_mirrored = SubResource("StyleBoxEmpty_hcwhg")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_5p1lm")
+theme_override_styles/normal_mirrored = SubResource("StyleBoxEmpty_1igrg")
+theme_override_styles/normal = SubResource("StyleBoxEmpty_v0s1l")
+
+[node name="PanelContainer2" type="PanelContainer" parent="VBoxContainer/MarginContainer/TextureRect"]
+custom_minimum_size = Vector2(100, 100)
+offset_left = 285.0
+offset_top = 17.0
+offset_right = 502.0
+offset_bottom = 117.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_lthh4")
+
+[node name="Label" type="Label" parent="VBoxContainer/MarginContainer/TextureRect/PanelContainer2"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+text = "Exhibtion"
+horizontal_alignment = 1
+
+[node name="Button" type="Button" parent="VBoxContainer/MarginContainer/TextureRect/PanelContainer2/Label"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 413.0
+offset_top = -17.0
+offset_right = 413.0
+offset_bottom = 60.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/focus = SubResource("StyleBoxEmpty_uubjt")
@@ -109,3 +151,4 @@ theme_override_styles/normal_mirrored = SubResource("StyleBoxEmpty_1igrg")
 theme_override_styles/normal = SubResource("StyleBoxEmpty_v0s1l")
 
 [connection signal="pressed" from="VBoxContainer/MarginContainer/TextureRect/PanelContainer/Label/Button" to="." method="OnButtonPressed"]
+[connection signal="pressed" from="VBoxContainer/MarginContainer/TextureRect/PanelContainer2/Label/Button" to="." method="OnButtonPressed"]
