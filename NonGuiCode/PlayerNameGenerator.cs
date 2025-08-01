@@ -42,7 +42,7 @@ public class PlayerNameGenerator
     private void BuildWeightedList(string csv, List<string> names)
     {
         double runningCount = 0;
-        using (StreamReader readtext = new StreamReader(@"..\\..\\Data\\" + csv))
+        using (StreamReader readtext = new StreamReader(@"Data\\" + csv))
         {
             string readText = readtext.ReadLine();
             // Clear any existing weighted nations

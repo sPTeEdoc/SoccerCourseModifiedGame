@@ -94,16 +94,16 @@ namespace FunnyOldGame
         public enum WeatherIssue
         {
             None
-            ,Light
-            ,Moderate
-            ,Heavy
+            , Light
+            , Moderate
+            , Heavy
         }
 
         public enum TierDifference
         {
             None
-            ,HomeSuperior
-            ,AwaySuperior
+            , HomeSuperior
+            , AwaySuperior
         }
 
         public enum YellowCardRegulations
@@ -272,7 +272,7 @@ namespace FunnyOldGame
             Offside,
             LostPossession, // Receiver fails to control
             LooseBall,
-            FoulInAerialContest 
+            FoulInAerialContest
         }
 
         public enum DribbleOutcome
@@ -748,6 +748,13 @@ namespace FunnyOldGame
             Home,       // Zones in the defending team's (Home team's goal) half
             Midfield,   // Central midfield zones
             Away        // Zones in the defending team's (Away team's goal) half
+        }
+
+        public enum DialogResult
+        {
+            Yes,
+            No,
+            None
         }
     }
 }

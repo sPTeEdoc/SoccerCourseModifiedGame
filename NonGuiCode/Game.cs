@@ -15,7 +15,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using static FunnyOldGame.Enums;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolTip;
 
 namespace FunnyOldGame
 {
@@ -1834,7 +1833,7 @@ namespace FunnyOldGame
                         if (TotalHomeScore() == TotalAwayScore())
                         {
                             CurrentMatchState = Enums.MatchState.PenaltyShootout;
-                            CurrentHalf = Half.PenaltyShootout;
+                            CurrentHalf = Enums.Half.PenaltyShootout;
                         }
                         else
                         {

@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://brj16q8ttvqfc"]
+
+[ext_resource type="Script" uid="uid://cbsrvtgrs4kcp" path="res://Scenes/SoccerGame.cs" id="1_3wl3f"]
+
+[node name="SoccerGame" type="Node"]
+script = ExtResource("1_3wl3f")

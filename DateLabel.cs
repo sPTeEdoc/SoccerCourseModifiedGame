@@ -1,3 +1,5 @@
+using FunnyOldGame;
+using FunnyOldGameRedux;
 using Godot;
 using System;
 using System.Threading.Tasks;

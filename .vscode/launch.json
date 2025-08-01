@@ -1,25 +1,28 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
-            "name": ".NET Core Launch (console)",
-            "type": "coreclr",
+            "name": "Launch Godot Editor & Debug Game",
+            "type": "coreclr", // For Godot 4.x, 'coreclr' is generally correct
             "request": "launch",
-            "preLaunchTask": "build",
-            "program": "C:/Users/biger/OneDrive/Documents/Godot_v4.4.1-stable_mono_win64/Godot_v4.4.1-stable_mono_win64.exe",
-            "args": [],
+            "preLaunchTask": "build", // Ensures your C# project is built before launch
+            "program": "C:/Users/biger/OneDrive/Documents/Godot_v4.4.1-stable_mono_win64/Godot_v4.4.1-stable_mono_win64.exe", // Path to your Godot executable
+            "args": [
+                "--path", "${workspaceFolder}", // Tells Godot to open your current project folder
+                "--debug-fuzzer", // Enables C# debugging (important for Godot 4.x)
+                "--remote-debug-host", "127.0.0.1",
+                "--remote-debug-port", "6007" // Or whatever port you configure in Godot's Project Settings -> Debugger
+            ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
-            "console": "internalConsole",
+            "console": "internalConsole", // Or "integratedTerminal" or "externalTerminal"
+            "justMyCode": false, // Set to false to debug Godot's internal C# code if needed
+            "requireExactSource": false // <--- ADD THIS LINE HERE
         },
         {
-            "name": ".NET Core Attach",
+            "name": ".NET Core Attach", // Keep this one, it can be useful as a fallback
             "type": "coreclr",
-            "request": "attach",
+            "request": "attach"
         }
-
     ]
 }

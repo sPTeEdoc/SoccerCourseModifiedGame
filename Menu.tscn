@@ -92,10 +92,10 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 413.0
-offset_top = -17.0
-offset_right = 413.0
-offset_bottom = 60.0
+offset_left = 1.0
+offset_top = -40.0
+offset_right = 1.0
+offset_bottom = 37.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/focus = SubResource("StyleBoxEmpty_uubjt")
@@ -112,10 +112,11 @@ theme_override_styles/normal = SubResource("StyleBoxEmpty_v0s1l")
 
 [node name="PanelContainer2" type="PanelContainer" parent="VBoxContainer/MarginContainer/TextureRect"]
 custom_minimum_size = Vector2(100, 100)
-offset_left = 285.0
-offset_top = 17.0
-offset_right = 502.0
-offset_bottom = 117.0
+layout_mode = 0
+offset_left = 45.0
+offset_top = 140.0
+offset_right = 262.0
+offset_bottom = 240.0
 size_flags_horizontal = 4
 size_flags_vertical = 4
 mouse_filter = 1
@@ -132,10 +133,10 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 413.0
-offset_top = -17.0
-offset_right = 413.0
-offset_bottom = 60.0
+offset_left = -3.0
+offset_top = -39.0
+offset_right = -3.0
+offset_bottom = 38.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/focus = SubResource("StyleBoxEmpty_uubjt")
@@ -151,4 +152,4 @@ theme_override_styles/normal_mirrored = SubResource("StyleBoxEmpty_1igrg")
 theme_override_styles/normal = SubResource("StyleBoxEmpty_v0s1l")
 
 [connection signal="pressed" from="VBoxContainer/MarginContainer/TextureRect/PanelContainer/Label/Button" to="." method="OnButtonPressed"]
-[connection signal="pressed" from="VBoxContainer/MarginContainer/TextureRect/PanelContainer2/Label/Button" to="." method="OnButtonPressed"]
+[connection signal="pressed" from="VBoxContainer/MarginContainer/TextureRect/PanelContainer2/Label/Button" to="." method="OnExhibitionButtonPressed"]

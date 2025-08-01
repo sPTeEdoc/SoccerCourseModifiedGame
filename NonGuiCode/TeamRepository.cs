@@ -106,10 +106,10 @@ namespace FunnyOldGameRedux
 
             MarketValue = MarketDemand();
 
-            using (StreamReader readtext = new StreamReader(@"..\\..\\Data\\male_players.csv"))
+            using (StreamReader readtext = new StreamReader(@"Data\\male_players.csv"))
             {
                 string readText = readtext.ReadLine();
-                using (StreamWriter writer = new StreamWriter(@"..\\..\\Data\\default_players.dat"))
+                using (StreamWriter writer = new StreamWriter(@"Data\\default_players.dat"))
                 {
                     int rowNumber = 0;
                     while (readText != null)
@@ -315,7 +315,7 @@ namespace FunnyOldGameRedux
 
         public void LoadTeams()
         {
-            using (StreamReader readtext = new StreamReader(@"..\\..\\Data\\default_players.dat"))
+            using (StreamReader readtext = new StreamReader(@"Data\\default_players.dat"))
             {
                 //Dictionary<Player, int> defenders = new Dictionary<Player, int>();
                 //Dictionary<Player, int> forwards = new Dictionary<Player, int>();

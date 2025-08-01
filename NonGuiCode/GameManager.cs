@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 // Assuming Player, Club, PlayerDevelopmentManager, TrainingIntensity, PlayerDailyActivity are all defined
 
-public class GameManager // Example: Your main game managing class
+public class GameManagerOrig // Example: Your main game managing class
 {
     // ... (other game state properties like current date, active club, etc.) ...
 
