@@ -186,15 +186,12 @@ public partial class PlayerCharacter : CharacterBody2D
         // 🔌 Disconnect before freeing the old state
         if (currentState != null)
         {
-            currentState.Cleanup(); // 🌟 Abstracted cleanup
-
             var callback = new Callable(this, nameof(SwitchStateWrapped));
-            currentState.Disconnect("StateTransitionRequested", callback); // ❌ don't check IsConnected
-
+            currentState.Disconnect("StateTransitionRequested", callback);
             currentState.QueueFree();
         }
 
-        // 🧱 Create and set up the new state
+        // Create and set up the new state
         currentState = stateFactory.GetFreshState(state, this);
         currentState.Setup(this, stateData, animationPlayer, ball,
             teammateDetectionArea, ballDetectionArea, ownGoal, targetGoal,
@@ -202,10 +199,10 @@ public partial class PlayerCharacter : CharacterBody2D
 
         currentState.Name = $"PlayerStateMachine: {state}";
 
-        // 🔁 Reconnect the signal with the fresh state
+        // Reconnect the signal with the fresh state
         currentState.Connect("StateTransitionRequested", new Callable(this, nameof(SwitchStateWrapped)));
 
-        // 🐣 Add the new state to the tree after setup
+        // Add the new state to the tree after setup
         GetNode<Node>("PlayerStateMachine").CallDeferred("add_child", currentState);
     }
 
