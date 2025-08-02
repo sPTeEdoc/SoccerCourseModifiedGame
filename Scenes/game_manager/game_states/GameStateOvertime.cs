@@ -11,6 +11,13 @@ public partial class GameStateOvertime : GameState
         gameEvents.TeamScored += OnTeamScored;
     }
 
+    public override void _ExitTree()
+    {
+        if (gameEvents != null)
+            gameEvents.TeamScored -= OnTeamScored;
+    }
+
+
     private void OnTeamScored(string countryScoredOn)
     {
         manager.IncreaseScore(countryScoredOn);

@@ -27,6 +27,16 @@ public partial class ActorsContainer : Node2D
 
     public DataLoader dataLoader;
 
+    public override void _ExitTree()
+    {
+        if (gameEvents != null)
+        {
+            gameEvents.TeamResetEventTriggered -= OnTeamReset;
+            gameEvents.ImpactReceived -= OnImpactReceived;
+        }
+    }
+
+
     public override void _Ready()
     {
         kickoffs = GetNode<Node2D>("KickOffs");

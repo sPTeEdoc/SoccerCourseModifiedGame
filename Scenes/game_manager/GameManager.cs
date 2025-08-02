@@ -67,14 +67,13 @@ public partial class GameManager : Node
 
     public string GetWinnerCountry()
     {
-        GD.Print(currentMatch != null && !currentMatch.IsTied());
         return currentMatch.Winner;
     }
 
     public void IncreaseScore(string countryScoredOn)
     {
         currentMatch.IncreaseScore(countryScoredOn);
-        ((GameEvents)gameEvents).EmitScoreChanged();
+        gameEvents.EmitScoreChanged();
     }
 
     private void OnImpactReceived(Vector2 impactPosition, bool isHighImpact)

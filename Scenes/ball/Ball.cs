@@ -159,6 +159,9 @@ public partial class Ball : AnimatableBody2D
     public override void _ExitTree()
     {
         if (gameEvents != null)
+        {
             gameEvents.KickoffStarted -= OnKickoffStarted;
+            gameEvents.TeamResetEventTriggered -= OnTeamReset; // ✅ add this
+        }   
     }
 }

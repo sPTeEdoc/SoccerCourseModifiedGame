@@ -113,6 +113,21 @@ public partial class PlayerCharacter : CharacterBody2D
         gameEvents.GameOver += OnGameOver;
 
         var initialPosition = country == gameManager.currentMatch.CountryHome ? kickoffPosition : spawnPosition;
+        CallDeferred(nameof(InitializeResetState));
+    }
+
+    public override void _ExitTree()
+    {
+        if (gameEvents != null)
+        {
+            gameEvents.TeamScored -= OnTeamScored;
+            gameEvents.GameOver -= OnGameOver;
+        }
+    }
+
+    private void InitializeResetState()
+    {
+        var initialPosition = country == gameManager.currentMatch.CountryHome ? kickoffPosition : spawnPosition;
         SwitchState(State.RESETING, PlayerStateData.Build().SetResetPosition(initialPosition));
     }
 
@@ -171,9 +186,10 @@ public partial class PlayerCharacter : CharacterBody2D
         // 🔌 Disconnect before freeing the old state
         if (currentState != null)
         {
+            currentState.Cleanup(); // 🌟 Abstracted cleanup
+
             var callback = new Callable(this, nameof(SwitchStateWrapped));
-            if (currentState.IsConnected("StateTransitionRequested", callback))
-                currentState.Disconnect("StateTransitionRequested", callback);
+            currentState.Disconnect("StateTransitionRequested", callback); // ❌ don't check IsConnected
 
             currentState.QueueFree();
         }
@@ -192,6 +208,7 @@ public partial class PlayerCharacter : CharacterBody2D
         // 🐣 Add the new state to the tree after setup
         GetNode<Node>("PlayerStateMachine").CallDeferred("add_child", currentState);
     }
+
 
     private void SwitchStateWrapped(int nextState, PlayerStateData data)
     {

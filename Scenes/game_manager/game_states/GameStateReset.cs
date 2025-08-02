@@ -24,8 +24,8 @@ public partial class GameStateReset : GameState
 
     public override void _ExitTree()
     {
-        GD.Print("Exiting GameStateReset: cleaning up");
-        gameEvents.KickoffReady -= OnKickoffReady;
+        if (gameEvents != null)
+            gameEvents.KickoffReady -= OnKickoffReady;
 
     }
 }

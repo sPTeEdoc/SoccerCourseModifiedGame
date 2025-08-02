@@ -13,6 +13,13 @@ public partial class BallStateFreeform : BallState
         timeSinceFreeform = Time.GetTicksMsec();
     }
 
+    public override void _ExitTree()
+    {
+        if (playerDetectionArea != null)
+            playerDetectionArea.BodyEntered -= OnPlayerEnter;
+    }
+
+
     private void OnPlayerEnter(Node body)
     {
         if (body is PlayerCharacter p && p.CanCarryBall() && ball.Height < MaxCaptureHeight)

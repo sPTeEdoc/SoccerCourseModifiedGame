@@ -52,4 +52,8 @@ public partial class PlayerState : Node
     public virtual bool CanCarryBall() => false;
     public virtual bool CanPass() => false;
     public virtual bool IsReadyForKickoff() => false;
+    public virtual void Cleanup()
+    {
+        // Override in child classes as needed
+    }
 }

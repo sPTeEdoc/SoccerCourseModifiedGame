@@ -14,8 +14,15 @@ public partial class PlayerStateCelebrating : PlayerState
 
     public override void _EnterTree()
     {
+
+    }
+
+    public override void _Ready()
+    {
         gameEvents = GetNode<GameEvents>("/root/GameEvents");
-        gameEvents.TeamResetEventTriggered += OnTeamReset;
+        var callable = new Callable(this, nameof(OnTeamReset));
+        if (!gameEvents.IsConnected("TeamResetEventTriggered", callable))
+            gameEvents.TeamResetEventTriggered += OnTeamReset;
     }
 
     public override void _Process(double delta)
@@ -38,5 +45,17 @@ public partial class PlayerStateCelebrating : PlayerState
     private void OnTeamReset()
     {
         TransitionState(PlayerCharacter.State.RESETING, PlayerStateData.Build().SetResetPosition(player.spawnPosition));
+    }
+
+    public override void _ExitTree()
+    {
+        if (gameEvents != null)
+            gameEvents.TeamResetEventTriggered -= OnTeamReset;
+    }
+
+    public override void Cleanup()
+    {
+        if (gameEvents != null)
+            gameEvents.TeamResetEventTriggered -= OnTeamReset;
     }
 }

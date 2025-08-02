@@ -3,13 +3,16 @@ using Godot;
 [GlobalClass]
 public partial class GameStateGameOver : GameState
 {
-    public Node soundPlayer;
-    public Node gameEvents;
+    public SoundPlayer soundPlayer;
+    public GameEvents gameEvents;
 
     public override void _EnterTree()
     {
         string countryWinner = manager.GetWinnerCountry();
-        ((SoundPlayer)soundPlayer).Play(SoundPlayer.Sound.WHISTLE);
-        ((GameEvents)gameEvents).EmitGameOver(countryWinner);
+        soundPlayer = GetNode<SoundPlayer>("/root/SoundPlayer");
+        gameEvents = GetNode<GameEvents>("/root/GameEvents");
+
+        soundPlayer.Play(SoundPlayer.Sound.WHISTLE);
+        gameEvents.EmitGameOver(countryWinner);
     }
 }

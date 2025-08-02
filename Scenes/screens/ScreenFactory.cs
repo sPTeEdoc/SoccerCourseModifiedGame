@@ -19,10 +19,6 @@ public partial class ScreenFactory : Node
 
     public Screen GetFreshScreen(SoccerGame.ScreenType type)
     {
-        if (screens != null)
-        {
-            int x = 0;
-        }
         if (!screens.ContainsKey(type))
             {
                 GD.PushError($"Screen '{type}' does not exist");

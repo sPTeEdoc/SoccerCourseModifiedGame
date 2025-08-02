@@ -15,6 +15,13 @@ public partial class PlayerStateBicycleKick : PlayerState
         ballDetectionArea.BodyEntered += OnBallEntered;
     }
 
+    public override void _ExitTree()
+    {
+        if (ballDetectionArea != null)
+            ballDetectionArea.BodyEntered -= OnBallEntered;
+    }
+
+
     private void OnBallEntered(Node body)
     {
         if (body is Ball contactBall &&

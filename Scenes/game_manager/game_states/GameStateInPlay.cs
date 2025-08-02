@@ -10,6 +10,13 @@ public partial class GameStateInPlay : GameState
         gameEvents.TeamScored += OnTeamScored;
     }
 
+    public override void _ExitTree()
+    {
+        if (gameEvents != null)
+            gameEvents.TeamScored -= OnTeamScored;
+    }
+
+
     public override void _Process(double delta)
     {
         manager.timeLeft -= (float)delta;
