@@ -19,7 +19,7 @@ public partial class PlayerStateReseting : PlayerState
         if (!hasArrived)
         {
             Vector2 direction = player.Position.DirectionTo(stateData.ResetPosition);
-            if (player.Position.DistanceSquaredTo(stateData.ResetPosition) < 200)
+            if (player.Position.DistanceSquaredTo(stateData.ResetPosition) < 2)
             {
                 hasArrived = true;
                 player.Velocity = Vector2.Zero;

@@ -41,15 +41,16 @@ public partial class GameManager : Node
     {
         data ??= new GameStateData();
 
-        // 🧹 Clean up the current state
+        // Clean up the current state
         if (currentState != null)
         {
-            currentState.StateTransitionRequested -= SwitchState; // 🔌 Disconnect to prevent dangling callables
-            currentState.QueueFree(); // 🧨 Dispose safely
-            currentState = null;      // 🚫 Null out to ensure no accidental reuse
+            currentState.StateTransitionRequested -= SwitchState; // Disconnect to prevent dangling callables
+            currentState.QueueFree(); // Dispose safely
+            RemoveChild(currentState);
+            currentState = null;      // Null out to ensure no accidental reuse
         }
 
-        // 🌱 Create and set up new state
+        // Create and set up new state
         currentState = stateFactory.GetFreshState(state);
         currentState.Setup(this, data);
         currentState.Name = $"GameStateMachine: {state}";

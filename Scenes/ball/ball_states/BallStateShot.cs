@@ -29,6 +29,11 @@ public partial class BallStateShot : BallState
 
     public override void _Process(double delta)
     {
+        
+    }
+    
+    public override void _PhysicsProcess(double delta)
+    {
         if (Time.GetTicksMsec() - timeSinceShot > DurationShot)
         {
             TransitionState(Ball.State.FREEFORM);

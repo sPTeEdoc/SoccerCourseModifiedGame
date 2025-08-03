@@ -47,6 +47,7 @@ public partial class Ball : AnimatableBody2D
 
     public override void _Process(double delta)
     {
+        // GD.Print("Ball is processing in Freeform");
         ballSprite.Position = Vector2.Up * Height;
         scoringRaycast.Rotation = Velocity.Angle();
     }
@@ -86,6 +87,8 @@ public partial class Ball : AnimatableBody2D
         Vector2 direction = Position.DirectionTo(destination);
         float distance = Position.DistanceTo(destination);
         float intensity = Mathf.Sqrt(2 * distance * FrictionGround);
+
+        // GD.Print($"Pass intensity={intensity}");
 
         Velocity = intensity * direction;
 
@@ -143,9 +146,18 @@ public partial class Ball : AnimatableBody2D
         SwitchState(State.FREEFORM);
     }
 
-    private void OnKickoffStarted()
+    private void KickoffPass()
     {
+        Velocity = Vector2.Zero;
+        HeightVelocity = 0;
         PassTo(spawnPosition + Vector2.Down * KICKOFF_PASS_DISTANCE, 0);
+    }
+
+    private async void OnKickoffStarted()
+    {
+        await ToSignal(GetTree(), "physics_frame"); // wait for physics tick
+
+        KickoffPass();
     }
 
     public override void _EnterTree()

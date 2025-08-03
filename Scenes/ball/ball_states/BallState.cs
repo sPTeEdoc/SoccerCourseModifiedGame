@@ -101,4 +101,10 @@ public partial class BallState : Node
     {
         return false;
     }
+
+    public override void _PhysicsProcess(double delta)
+    {
+        // GD.Print("FREEFORM active");
+    }
+
 }
