@@ -64,7 +64,7 @@ public partial class AIBehaviorField : AIBehavior
             float shotProbability = SHOT_PROBABILITY;
             gameManager = GetNode<GameManager>("/root/GameManager");
 
-            if (gameManager.playerSetup[0] == player.country || gameManager.playerSetup[1] == player.country)
+            if (gameManager.playerSetup[0] == player.team || gameManager.playerSetup[1] == player.team)
             {
                 shotProbability /= 10f;
             }
@@ -123,7 +123,7 @@ public partial class AIBehaviorField : AIBehavior
 
     public Vector2 GetDensityAroundBallSteeringForce()
     {
-        int nearbyCount = ball.GetProximityTeammatesCount(player.country);
+        int nearbyCount = ball.GetProximityTeammatesCount(player.team);
         if (nearbyCount == 0)
             return Vector2.Zero;
 
@@ -136,7 +136,7 @@ public partial class AIBehaviorField : AIBehavior
     {
         var teammates = teammateDetectionArea.GetOverlappingBodies()
             .OfType<PlayerCharacter>()
-            .Where(p => p != player && p.country == player.country);
+            .Where(p => p != player && p.team == player.team);
 
         return teammates.Any();
     }

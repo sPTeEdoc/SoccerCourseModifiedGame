@@ -42,6 +42,8 @@ public partial class BallState : Node
         sprite = contextSprite;
         stateData = contextStateData;
         shotParticles = contextShotParticles;
+        if (ball.Carrier != null)
+            ball.Carrier.EmitSwapRequest(ball.Carrier);
     }
 
     protected void TransitionState(Ball.State newState, BallStateData data = null)

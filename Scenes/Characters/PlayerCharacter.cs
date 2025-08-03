@@ -5,7 +5,7 @@ using System.Collections.Generic;
 [GlobalClass]
 public partial class PlayerCharacter : CharacterBody2D
 {
-    // 🚩 Signals
+    // Signals
     [Signal]
     public delegate void SwapRequestedEventHandler(PlayerCharacter player);
 
@@ -14,12 +14,12 @@ public partial class PlayerCharacter : CharacterBody2D
         EmitSignal("SwapRequested", requestor);
     }
 
-    // 📌 Constants
+    // Constants
     public const float BallControlHeightMax = 10.0f;
     public const float Gravity = 8.0f;
     public const float WalkAnimThreshold = 0.6f;
 
-    // 🎮 Enums
+    // Enums
     public enum ControlScheme { CPU, P1, P2 }
     public enum Role { GOALIE, DEFENSE, MIDFIELD, OFFENSE }
     public enum SkinColor { LIGHT, MEDIUM, DARK }
@@ -30,7 +30,7 @@ public partial class PlayerCharacter : CharacterBody2D
         CELEBRATING, MOURNING, RESETING
     }
 
-    // 🧩 Control Sprites Map
+    // Control Sprites Map
     private readonly Dictionary<ControlScheme, Texture2D> controlSchemeMap = new()
     {
         { ControlScheme.CPU, GD.Load<Texture2D>("res://assets/art/props/cpu.png") },
@@ -38,7 +38,7 @@ public partial class PlayerCharacter : CharacterBody2D
         { ControlScheme.P2, GD.Load<Texture2D>("res://assets/art/props/2p.png") }
     };
 
-    // 🎯 Exported Fields
+    // Exported Fields
     [Export] public Ball ball;
     [Export] public ControlScheme controlScheme;
     [Export] public Goal ownGoal;
@@ -46,7 +46,7 @@ public partial class PlayerCharacter : CharacterBody2D
     [Export] public float speed;
     [Export] public Goal targetGoal;
 
-    // 🧠 Node References
+    // Node References
     public AnimationPlayer animationPlayer;
     public Area2D ballDetectionArea;
     public Sprite2D controlSprite;
@@ -59,7 +59,7 @@ public partial class PlayerCharacter : CharacterBody2D
     public Area2D tackleDamageEmitterArea;
     public Area2D teammateDetectionArea;
 
-    // 🧠 Internal State
+    // Internal State
     public AIBehaviorFactory aiBehaviorFactory = new();
     public AIBehavior currentAIBehavior = null;
     public PlayerStateFactory stateFactory = new();
@@ -72,7 +72,7 @@ public partial class PlayerCharacter : CharacterBody2D
     public Vector2 spawnPosition = Vector2.Zero;
     public float weightOnDutySteering = 0f;
 
-    public string country = "";
+    public string team = "";
     public string fullname = "";
     public Role role = Role.MIDFIELD;
     public SkinColor skinColor = SkinColor.MEDIUM;
@@ -112,7 +112,7 @@ public partial class PlayerCharacter : CharacterBody2D
         gameEvents.TeamScored += OnTeamScored;
         gameEvents.GameOver += OnGameOver;
 
-        var initialPosition = country == gameManager.currentMatch.CountryHome ? kickoffPosition : spawnPosition;
+        var initialPosition = team == gameManager.currentMatch.CountryHome ? kickoffPosition : spawnPosition;
         CallDeferred(nameof(InitializeResetState));
     }
 
@@ -127,7 +127,7 @@ public partial class PlayerCharacter : CharacterBody2D
 
     private void InitializeResetState()
     {
-        var initialPosition = country == gameManager.currentMatch.CountryHome ? kickoffPosition : spawnPosition;
+        var initialPosition = team == gameManager.currentMatch.CountryHome ? kickoffPosition : spawnPosition;
         SwitchState(State.RESETING, PlayerStateData.Build().SetResetPosition(initialPosition));
     }
 
@@ -148,7 +148,7 @@ public partial class PlayerCharacter : CharacterBody2D
         }
 
         var countries = dataLoader.GetCountries();
-        int countryColor = countries.FindIndex(c => c == country);
+        int countryColor = countries.FindIndex(c => c == team);
         countryColor = Mathf.Clamp(countryColor, 0, countries.Count - 1);
 
         shaderMat?.SetShaderParameter("team_color", countryColor);
@@ -168,7 +168,7 @@ public partial class PlayerCharacter : CharacterBody2D
         skinColor = contextPlayerData.SkinColor;
         fullname = contextPlayerData.FullName;
         heading = targetGoal.Position.X < Position.X ? Vector2.Left : Vector2.Right;
-        country = contextCountry;
+        team = contextCountry;
     }
 
     private void SetupAIBehavior()
@@ -183,7 +183,7 @@ public partial class PlayerCharacter : CharacterBody2D
     {
         stateData ??= new PlayerStateData();
 
-        // 🔌 Disconnect before freeing the old state
+        // Disconnect before freeing the old state
         if (currentState != null)
         {
             var callback = new Callable(this, nameof(SwitchStateWrapped));
@@ -304,7 +304,7 @@ public partial class PlayerCharacter : CharacterBody2D
     {
         if (other is PlayerCharacter player &&
             player != this &&
-            player.country != country &&
+            player.team != team &&
             ball.Carrier == player)
         {
             Vector2 direction = Position.DirectionTo(player.Position);
@@ -319,7 +319,7 @@ public partial class PlayerCharacter : CharacterBody2D
 
     private void OnTeamScored(string teamScoredOn)
     {
-        if (country == teamScoredOn)
+        if (team == teamScoredOn)
             SwitchState(State.MOURNING);
         else
             SwitchState(State.CELEBRATING);
@@ -327,7 +327,7 @@ public partial class PlayerCharacter : CharacterBody2D
 
     private void OnGameOver(string winningTeam)
     {
-        if (country == winningTeam)
+        if (team == winningTeam)
             SwitchState(State.CELEBRATING);
         else
             SwitchState(State.MOURNING);

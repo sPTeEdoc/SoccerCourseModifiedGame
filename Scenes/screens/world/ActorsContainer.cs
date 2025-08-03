@@ -118,7 +118,30 @@ public partial class ActorsContainer : Node2D
 
     private void OnPlayerSwapRequest(PlayerCharacter requester)
     {
-        var squad = requester.country == squadHome[0].country ? squadHome : squadAway;
+        if (Ball.Carrier != null && (Ball.Carrier.controlScheme == PlayerCharacter.ControlScheme.P1 ||
+            Ball.Carrier.controlScheme == PlayerCharacter.ControlScheme.P2))
+        {
+            // Already controlled by human — no swap needed
+            return;
+        }
+        
+        if (Ball.Carrier != null &&
+            Ball.Carrier.team == gameManager.playerSetup[0] &&
+            Ball.Carrier.controlScheme != PlayerCharacter.ControlScheme.P1)
+        {
+            var squad1 = Ball.Carrier.team == squadHome[0].team ? squadHome : squadAway;
+            var currentHuman = squad1.Find(p => p.controlScheme == PlayerCharacter.ControlScheme.P1);
+
+            if (Ball.Carrier == currentHuman)
+                return;
+
+            currentHuman?.SetControlScheme(PlayerCharacter.ControlScheme.CPU);
+            Ball.Carrier.SetControlScheme(PlayerCharacter.ControlScheme.P1);
+            return;
+        }
+
+
+        var squad = requester.team == squadHome[0].team ? squadHome : squadAway;
         var cpuPlayers = squad.FindAll(p => p.controlScheme == PlayerCharacter.ControlScheme.CPU && p.role != PlayerCharacter.Role.GOALIE);
         cpuPlayers.Sort((p1, p2) =>
             p1.Position.DistanceSquaredTo(Ball.Position).CompareTo(p2.Position.DistanceSquaredTo(Ball.Position)));
@@ -151,22 +174,22 @@ public partial class ActorsContainer : Node2D
     private void SetupControlSchemes()
     {
         ResetControlSchemes();
-        string p1Country = gameManager.playerSetup[0];
+        string p1Team = gameManager.playerSetup[0];
 
         if (gameManager.IsCoop())
         {
-            var playerSquad = squadHome[0].country == p1Country ? squadHome : squadAway;
+            var playerSquad = squadHome[0].team == p1Team ? squadHome : squadAway;
             playerSquad[4].SetControlScheme(PlayerCharacter.ControlScheme.P1);
             playerSquad[5].SetControlScheme(PlayerCharacter.ControlScheme.P2);
         }
         else if (gameManager.IsSinglePlayer())
         {
-            var playerSquad = squadHome[0].country == p1Country ? squadHome : squadAway;
+            var playerSquad = squadHome[0].team == p1Team ? squadHome : squadAway;
             playerSquad[5].SetControlScheme(PlayerCharacter.ControlScheme.P1);
         }
         else // versus
         {
-            var p1Squad = squadHome[0].country == p1Country ? squadHome : squadAway;
+            var p1Squad = squadHome[0].team == p1Team ? squadHome : squadAway;
             var p2Squad = p1Squad == squadAway ? squadHome : squadAway;
             p1Squad[5].SetControlScheme(PlayerCharacter.ControlScheme.P1);
             p2Squad[5].SetControlScheme(PlayerCharacter.ControlScheme.P2);

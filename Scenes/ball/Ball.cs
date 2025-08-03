@@ -128,7 +128,7 @@ public partial class Ball : AnimatableBody2D
 
         foreach (var body in players)
         {
-            if (body is PlayerCharacter p && p.country == country)
+            if (body is PlayerCharacter p && p.team == country)
                 count++;
         }
 

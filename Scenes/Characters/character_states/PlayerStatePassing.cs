@@ -41,7 +41,7 @@ public partial class PlayerStatePassing : PlayerState
     {
         var playersInView = teammateDetectionArea.GetOverlappingBodies()
             .OfType<PlayerCharacter>()
-            .Where(p => p != player && p.country == player.country)
+            .Where(p => p != player && p.team == player.team)
             .ToList();
 
         playersInView.Sort((p1, p2) =>
