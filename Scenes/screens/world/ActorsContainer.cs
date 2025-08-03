@@ -127,16 +127,20 @@ public partial class ActorsContainer : Node2D
         
         if (Ball.Carrier != null &&
             Ball.Carrier.team == gameManager.playerSetup[0] &&
-            Ball.Carrier.controlScheme != PlayerCharacter.ControlScheme.P1)
+            Ball.Carrier.controlScheme != PlayerCharacter.ControlScheme.P1 &&
+            Ball.Carrier.controlScheme != PlayerCharacter.ControlScheme.P2)
         {
             var squad1 = Ball.Carrier.team == squadHome[0].team ? squadHome : squadAway;
-            var currentHuman = squad1.Find(p => p.controlScheme == PlayerCharacter.ControlScheme.P1);
+            var squad2 = Ball.Carrier.team == squadHome[0].team ? squadHome : squadAway;
+            var currentHuman1 = squad1.Find(p => p.controlScheme == PlayerCharacter.ControlScheme.P1);
+            var currentHuman2 = squad1.Find(p => p.controlScheme == PlayerCharacter.ControlScheme.P2);
 
-            if (Ball.Carrier == currentHuman)
+            if (Ball.Carrier == currentHuman1 || Ball.Carrier == currentHuman2)
                 return;
 
-            currentHuman?.SetControlScheme(PlayerCharacter.ControlScheme.CPU);
-            Ball.Carrier.SetControlScheme(PlayerCharacter.ControlScheme.P1);
+            currentHuman1?.SetControlScheme(PlayerCharacter.ControlScheme.CPU);
+            if (currentHuman1 != null) Ball.Carrier.SetControlScheme(PlayerCharacter.ControlScheme.P1);
+            if (currentHuman2 != null) Ball.Carrier.SetControlScheme(PlayerCharacter.ControlScheme.P2);
             return;
         }
 
