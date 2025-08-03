@@ -9,7 +9,6 @@ public partial class BallStateFreeform : BallState
 
     public override void _EnterTree()
     {
-        GD.Print($"BallStateFreeform entered. Velocity: {ball.Velocity}");
         playerDetectionArea.BodyEntered += OnPlayerEnter;
         timeSinceFreeform = Time.GetTicksMsec();
     }
@@ -33,11 +32,6 @@ public partial class BallStateFreeform : BallState
 
     public override void _Process(double delta)
     {
-
-    }
-
-    public override void _PhysicsProcess(double delta)
-    {
         playerDetectionArea.Monitoring =
             (Time.GetTicksMsec() - timeSinceFreeform) > (ulong)stateData.LockDuration;
 
@@ -45,6 +39,7 @@ public partial class BallStateFreeform : BallState
 
         float friction = ball.Height > 0 ? ball.FrictionAir : ball.FrictionGround;
         ball.Velocity = ball.Velocity.MoveToward(Vector2.Zero, friction * (float)delta);
+
         ProcessGravity((float)delta, Ball.BOUNCINESS);
         MoveAndBounce((float)delta);
     }

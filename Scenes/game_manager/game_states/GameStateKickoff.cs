@@ -36,15 +36,10 @@ public partial class GameStateKickoff : GameState
         {
             if (KeyUtils.IsActionJustPressed(controlScheme, KeyUtils.Action.PASS))
             {
-                CallDeferred(nameof(TriggerKickoff));
+                gameEvents.EmitKickOffStarted();
+                soundPlayer.Play(SoundPlayer.Sound.WHISTLE);
+                TransitionState(GameManager.State.IN_PLAY);
             }
         }
-    }
-
-    private void TriggerKickoff()
-    {
-        gameEvents.EmitKickOffStarted();
-        soundPlayer.Play(SoundPlayer.Sound.WHISTLE);
-        TransitionState(GameManager.State.IN_PLAY);
     }
 }
