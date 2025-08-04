@@ -21,6 +21,10 @@ public partial class ActorsContainer : Node2D
     private List<PlayerCharacter> squadAway = new();
     private ulong timeSinceLastCacheRefresh = Time.GetTicksMsec();
 
+    private ulong lastAutoSwitchTime = 0;
+    private const int AUTO_SWITCH_INTERVAL = 300;  // ms between switch attempts
+    private const float MIN_SWITCH_DELTA = 40f;    // how much closer candidate must be
+
     public GameManager gameManager;
 
     public GameEvents gameEvents;
@@ -65,6 +69,8 @@ public partial class ActorsContainer : Node2D
 
     public override void _Process(double delta)
     {
+        TryAutoSwitchDefender();
+
         if (Time.GetTicksMsec() - timeSinceLastCacheRefresh > DurationWeightCache)
         {
             timeSinceLastCacheRefresh = Time.GetTicksMsec();
@@ -124,7 +130,7 @@ public partial class ActorsContainer : Node2D
             // Already controlled by human — no swap needed
             return;
         }
-        
+
         if (Ball.Carrier != null &&
             Ball.Carrier.team == gameManager.playerSetup[0] &&
             Ball.Carrier.controlScheme != PlayerCharacter.ControlScheme.P1 &&
@@ -224,4 +230,44 @@ public partial class ActorsContainer : Node2D
     private float Ease(float x, float curve) => x < 0.5f
         ? 0.5f * Mathf.Pow(2 * x, curve)
         : 1 - 0.5f * Mathf.Pow(2 * (1 - x), curve);
+
+    private void TryAutoSwitchDefender()
+    {
+        if (Time.GetTicksMsec() - lastAutoSwitchTime < AUTO_SWITCH_INTERVAL)
+            return;
+
+        if (Ball?.Carrier == null || Ball.Carrier.team == null)
+            return;
+
+        // Ignore switching if human team has ball
+        string playerTeam = gameManager.playerSetup[0];
+        if (Ball.Carrier.team == playerTeam)
+            return;
+
+        var squad = squadHome[0].team == playerTeam ? squadHome : squadAway;
+        var currentHuman = squad.Find(p => p.controlScheme == PlayerCharacter.ControlScheme.P1);
+
+        var cpuDefenders = squad.FindAll(p =>
+            p.controlScheme == PlayerCharacter.ControlScheme.CPU &&
+            p.role != PlayerCharacter.Role.GOALIE);
+
+        if (currentHuman == null || cpuDefenders.Count == 0)
+            return;
+
+        cpuDefenders.Sort((a, b) =>
+            a.Position.DistanceSquaredTo(Ball.Position).CompareTo(
+                b.Position.DistanceSquaredTo(Ball.Position)));
+
+        var bestCandidate = cpuDefenders[0];
+        float currentDist = currentHuman.Position.DistanceTo(Ball.Position);
+        float candidateDist = bestCandidate.Position.DistanceTo(Ball.Position);
+
+        if (candidateDist + MIN_SWITCH_DELTA < currentDist)
+        {
+            currentHuman.SetControlScheme(PlayerCharacter.ControlScheme.CPU);
+            bestCandidate.SetControlScheme(PlayerCharacter.ControlScheme.P1);
+            lastAutoSwitchTime = Time.GetTicksMsec();
+            GD.Print($"[AutoSwitch] Control passed to {bestCandidate.Name}");
+        }
+    }
 }

@@ -86,6 +86,7 @@ public partial class Ball : AnimatableBody2D
         Vector2 direction = Position.DirectionTo(destination);
         float distance = Position.DistanceTo(destination);
         float intensity = Mathf.Sqrt(2 * distance * FrictionGround);
+        intensity *= 1.15f;
 
         Velocity = intensity * direction;
 
