@@ -23,17 +23,27 @@ public partial class Camera : Camera2D
 
     public override void _Process(double delta)
     {
+        Vector2 targetPosition;
+
         if (Ball.Carrier != null)
         {
-            Position = Ball.Carrier.Position + Ball.Carrier.heading * DistanceTarget;
+            // Bias toward heading direction of the carrier
+            Vector2 heading = Ball.Carrier.heading.Normalized();
+            targetPosition = Ball.Carrier.Position + heading * DistanceTarget;
             PositionSmoothingSpeed = SmoothingBallCarried;
         }
         else
         {
-            Position = Ball.Position;
+            // Bias toward velocity direction of the ball
+            Vector2 velocityDir = Ball.Velocity.Normalized();
+            targetPosition = Ball.Position + velocityDir * DistanceTarget;
             PositionSmoothingSpeed = SmoothingBallDefault;
         }
 
+        // Smoothly move toward biased target position
+        Position = Position.Lerp(targetPosition, 0.1f);
+
+        // Shake logic (unchanged)
         if (isShaking && Time.GetTicksMsec() - timeStartShake < DurationShake)
         {
             Offset = new Vector2(
@@ -47,6 +57,7 @@ public partial class Camera : Camera2D
             Offset = Vector2.Zero;
         }
     }
+
 
     private void OnImpactReceived(Vector2 impactPosition, bool isHighImpact)
     {

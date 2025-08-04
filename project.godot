@@ -27,8 +27,8 @@ GameManager="*res://Scenes/game_manager/GameManager.cs"
 
 [display]
 
-window/size/viewport_width=280
-window/size/viewport_height=180
+window/size/viewport_width=400
+window/size/viewport_height=300
 window/size/window_width_override=1250
 window/size/window_height_override=500
 window/subwindows/embed_subwindows=false
