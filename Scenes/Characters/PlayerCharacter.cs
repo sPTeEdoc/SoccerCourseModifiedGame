@@ -18,6 +18,8 @@ public partial class PlayerCharacter : CharacterBody2D
     public const float BallControlHeightMax = 10.0f;
     public const float Gravity = 8.0f;
     public const float WalkAnimThreshold = 0.6f;
+    
+    private Vector2 passTargetPosition;
 
     // Enums
     public enum ControlScheme { CPU, P1, P2 }
@@ -25,7 +27,7 @@ public partial class PlayerCharacter : CharacterBody2D
     public enum SkinColor { LIGHT, MEDIUM, DARK }
     public enum State
     {
-        MOVING, TACKLING, RECOVERING, PREPPING_SHOT, SHOOTING, PASSING, HEADER,
+        MOVING, TACKLING, RECOVERING, PREPPING_SHOT, SHOOTING, PASSING, HEADER, RECEIVING_PASS,
         VOLLEY_KICK, BICYCLE_KICK, CHEST_CONTROL, HURT, DIVING,
         CELEBRATING, MOURNING, RESETING
     }
@@ -247,6 +249,12 @@ public partial class PlayerCharacter : CharacterBody2D
             heading *= -1;
     }
 
+    public void FaceDirectionOfBall()
+    {
+        if (!IsFacingBall(ball, 45))
+            heading *= -1;
+    }
+
     private void FlipSprites()
     {
         bool facingRight = heading == Vector2.Right;
@@ -298,9 +306,17 @@ public partial class PlayerCharacter : CharacterBody2D
         return heading.Dot(directionToGoal) > 0;
     }
 
+    public bool IsFacingBall(Ball ball, float angleThresholdDegrees = 45f)
+    {
+        Vector2 toBall = (ball.Position - Position).Normalized();
+        float dot = heading.Dot(toBall);
+        float angle = Mathf.RadToDeg(Mathf.Acos(dot));
+        return angle <= angleThresholdDegrees;
+    }
+
     public bool CanCarryBall() => currentState != null && currentState.CanCarryBall();
 
-        private void OnTacklePlayer(Node other)
+    private void OnTacklePlayer(Node other)
     {
         if (other is PlayerCharacter player &&
             player != this &&
@@ -338,4 +354,16 @@ public partial class PlayerCharacter : CharacterBody2D
         if (ball.Height > BallControlHeightMax)
             SwitchState(State.CHEST_CONTROL);
     }
+
+    public void ReceiveIncomingPass(Vector2 targetPosition)
+    {
+        passTargetPosition = targetPosition;
+        SwitchState(State.RECEIVING_PASS);
+    }
+
+    public Vector2 GetPassTarget()
+    {
+        return passTargetPosition;
+    }
+
 }

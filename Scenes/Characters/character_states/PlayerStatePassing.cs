@@ -20,7 +20,7 @@ public partial class PlayerStatePassing : PlayerState
 
         if (passTarget == null)
         {
-            ball.PassTo(ball.Position + player.heading * player.speed);
+            ball.PassTo(ball.Position + player.heading * player.speed, receiver: passTarget);
         }
         else
         {
@@ -31,7 +31,7 @@ public partial class PlayerStatePassing : PlayerState
                 player.heading *= -1;
             }
 
-            ball.PassTo(passTarget.Position + passTarget.Velocity * 0.8f);
+            ball.PassTo(passTarget.Position + passTarget.Velocity * 0.8f, receiver: passTarget);
         }
 
         TransitionState(PlayerCharacter.State.MOVING);

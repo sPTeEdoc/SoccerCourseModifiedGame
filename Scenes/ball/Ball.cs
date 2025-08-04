@@ -81,7 +81,7 @@ public partial class Ball : AnimatableBody2D
         SwitchState(State.FREEFORM, BallStateData.Build().SetLockDuration(DURATION_TUMBLE_LOCK));
     }
 
-    public void PassTo(Vector2 destination, int lockDuration = DURATION_PASS_LOCK)
+    public void PassTo(Vector2 destination, int lockDuration = DURATION_PASS_LOCK, PlayerCharacter receiver = null)
     {
         Vector2 direction = Position.DirectionTo(destination);
         float distance = Position.DistanceTo(destination);
@@ -95,9 +95,18 @@ public partial class Ball : AnimatableBody2D
             HeightVelocity = BallState.Gravity * distance / (1.85f * intensity);
         }
 
+        if (receiver != null)
+        {// we are only keeping null for kickoffs. Even then, this is temporary.
+         // soon kickoffs will be going backward to one of two players.
+         // Notify receiver to prepare
+            receiver.FaceDirectionOfBall();
+            receiver.ReceiveIncomingPass(destination);
+        }
+
         Carrier = null;
         SwitchState(State.FREEFORM, BallStateData.Build().SetLockDuration(lockDuration));
     }
+
 
     public void Stop()
     {
