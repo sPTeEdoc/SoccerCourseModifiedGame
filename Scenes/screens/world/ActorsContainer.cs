@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public partial class ActorsContainer : Node2D
 {
@@ -239,35 +240,46 @@ public partial class ActorsContainer : Node2D
         if (Ball?.Carrier == null || Ball.Carrier.team == null)
             return;
 
-        // Ignore switching if human team has ball
         string playerTeam = gameManager.playerSetup[0];
         if (Ball.Carrier.team == playerTeam)
-            return;
+            return; // Human team is attacking
 
         var squad = squadHome[0].team == playerTeam ? squadHome : squadAway;
-        var currentHuman = squad.Find(p => p.controlScheme == PlayerCharacter.ControlScheme.P1);
+
+        // Handle both P1 and P2
+        var humans = squad.FindAll(p =>
+            p.controlScheme == PlayerCharacter.ControlScheme.P1 ||
+            p.controlScheme == PlayerCharacter.ControlScheme.P2);
 
         var cpuDefenders = squad.FindAll(p =>
             p.controlScheme == PlayerCharacter.ControlScheme.CPU &&
             p.role != PlayerCharacter.Role.GOALIE);
 
-        if (currentHuman == null || cpuDefenders.Count == 0)
+        if (cpuDefenders.Count == 0 || humans.Count == 0)
             return;
 
+        // Sort CPU defenders by proximity to ball
         cpuDefenders.Sort((a, b) =>
-            a.Position.DistanceSquaredTo(Ball.Position).CompareTo(
-                b.Position.DistanceSquaredTo(Ball.Position)));
+            a.Position.DistanceSquaredTo(Ball.Position)
+            .CompareTo(b.Position.DistanceSquaredTo(Ball.Position)));
 
-        var bestCandidate = cpuDefenders[0];
-        float currentDist = currentHuman.Position.DistanceTo(Ball.Position);
-        float candidateDist = bestCandidate.Position.DistanceTo(Ball.Position);
-
-        if (candidateDist + MIN_SWITCH_DELTA < currentDist)
+        foreach (var human in humans)
         {
-            currentHuman.SetControlScheme(PlayerCharacter.ControlScheme.CPU);
-            bestCandidate.SetControlScheme(PlayerCharacter.ControlScheme.P1);
-            lastAutoSwitchTime = Time.GetTicksMsec();
-            GD.Print($"[AutoSwitch] Control passed to {bestCandidate.Name}");
+            var bestCandidate = cpuDefenders.FirstOrDefault();
+            if (bestCandidate == null)
+                continue;
+
+            float currentDist = human.Position.DistanceTo(Ball.Position);
+            float candidateDist = bestCandidate.Position.DistanceTo(Ball.Position);
+
+            if (candidateDist + MIN_SWITCH_DELTA < currentDist)
+            {
+                var oldScheme = human.controlScheme;
+                human.SetControlScheme(PlayerCharacter.ControlScheme.CPU);
+                bestCandidate.SetControlScheme(oldScheme);
+                lastAutoSwitchTime = Time.GetTicksMsec();
+                // GD.Print($"[AutoSwitch] {oldScheme} now controls {bestCandidate.Name}");
+            }
         }
     }
 }
