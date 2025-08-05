@@ -94,7 +94,7 @@ collision_mask = 33
 sync_to_physics = false
 script = ExtResource("1_n814c")
 FrictionAir = 35.0
-FrictionGround = 250.0
+FrictionGround = 350.0
 
 [node name="ShotParticles" type="GPUParticles2D" parent="."]
 unique_name_in_owner = true

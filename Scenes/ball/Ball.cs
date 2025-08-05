@@ -86,7 +86,13 @@ public partial class Ball : AnimatableBody2D
         Vector2 direction = Position.DirectionTo(destination);
         float distance = Position.DistanceTo(destination);
         float intensity = Mathf.Sqrt(2 * distance * FrictionGround);
-        intensity *= 1.15f;
+
+        if (Carrier != null)
+        {
+            // float ratingFactor = Mathf.InverseLerp(50f, 99f, Carrier.ShortPassRating);
+            float ratingFactor = Mathf.InverseLerp(50f, 99f, Carrier.power);
+            intensity *= Mathf.Lerp(0.9f, 1.1f, ratingFactor); // more skilled players add zip
+        }
 
         Velocity = intensity * direction;
 
@@ -95,12 +101,12 @@ public partial class Ball : AnimatableBody2D
             HeightVelocity = BallState.Gravity * distance / (1.85f * intensity);
         }
 
-        if (receiver != null)
+        if (receiver != null && Carrier != null)
         {// we are only keeping null for kickoffs. Even then, this is temporary.
          // soon kickoffs will be going backward to one of two players.
          // Notify receiver to prepare
             receiver.FaceDirectionOfBall();
-            receiver.ReceiveIncomingPass(destination);
+            receiver.ReceiveIncomingPass(destination, Carrier.power);
         }
 
         Carrier = null;

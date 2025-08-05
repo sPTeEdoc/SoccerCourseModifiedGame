@@ -82,6 +82,8 @@ public partial class PlayerCharacter : CharacterBody2D
     public GameEvents gameEvents;
     public GameManager gameManager;
     public DataLoader dataLoader;
+
+    public double passerRating = 0;
     public override void _Ready()
     {
         animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
@@ -355,9 +357,10 @@ public partial class PlayerCharacter : CharacterBody2D
             SwitchState(State.CHEST_CONTROL);
     }
 
-    public void ReceiveIncomingPass(Vector2 targetPosition)
+    public void ReceiveIncomingPass(Vector2 targetPosition, double passerRating)
     {
         passTargetPosition = targetPosition;
+        this.passerRating = passerRating;
         SwitchState(State.RECEIVING_PASS);
     }
 
