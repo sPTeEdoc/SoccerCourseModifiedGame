@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="MeetTheGlazers"
+config/name="SoccerCourseModifiedGame"
 run/main_scene="uid://brj16q8ttvqfc"
 config/features=PackedStringArray("4.4", "C#", "Forward Plus")
 config/icon="res://icon.svg"
