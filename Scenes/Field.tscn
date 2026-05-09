@@ -1,6 +1,6 @@
-[gd_scene load_steps=7 format=3 uid="uid://cms7ubdnpuyqy"]
+[gd_scene load_steps=7 format=3 uid="uid://bg6hbfw5sw8v3"]
 
-[ext_resource type="Script" uid="uid://de6alibq8iyxh" path="res://Scenes/Field.cs" id="1_ieerp"]
+[ext_resource type="Script" path="res://Scenes/Field.cs" id="1_ieerp"]
 [ext_resource type="Texture2D" uid="uid://b7c82hlauxi3s" path="res://assets/art/backgrounds/pitch-background.png" id="1_s24h8"]
 [ext_resource type="Texture2D" uid="uid://cjo760h5txa0w" path="res://assets/art/backgrounds/pitch-pattern.png" id="2_hmimj"]
 [ext_resource type="Texture2D" uid="uid://cv4n0o2f54jf6" path="res://assets/art/backgrounds/pitch-lines.png" id="3_804wt"]

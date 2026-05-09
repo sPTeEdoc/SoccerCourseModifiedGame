@@ -1,4 +1,3 @@
-using FunnyOldGame;
 using Godot;
 
 [GlobalClass]
