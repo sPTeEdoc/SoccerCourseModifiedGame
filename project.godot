@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="SoccerCourseModifiedGame"
+config/name="Nibley"
 run/main_scene="uid://brj16q8ttvqfc"
 config/features=PackedStringArray("4.4", "C#", "Forward Plus")
 config/icon="res://icon.svg"
@@ -27,8 +27,8 @@ GameManager="*res://Scenes/game_manager/GameManager.cs"
 
 [display]
 
-window/size/viewport_width=400
-window/size/viewport_height=300
+window/size/viewport_width=560
+window/size/viewport_height=360
 window/size/window_width_override=1250
 window/size/window_height_override=500
 window/subwindows/embed_subwindows=false

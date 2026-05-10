@@ -10,7 +10,7 @@ public partial class ScreenFactory : Node
     {
         screens = new Dictionary<SoccerGame.ScreenType, PackedScene>
         {
-            { SoccerGame.ScreenType.InGame, GD.Load<PackedScene>("res://scenes/screens/world/world_screen.tscn") },
+            { SoccerGame.ScreenType.InGame, GD.Load<PackedScene>("res://scenes/screens/world/world_screen2.tscn") },
             { SoccerGame.ScreenType.MainMenu, GD.Load<PackedScene>("res://scenes/screens/main_menu/main_menu_screen.tscn") },
             { SoccerGame.ScreenType.TeamSelection, GD.Load<PackedScene>("res://scenes/screens/team_selection/team_selection_screen.tscn") },
             { SoccerGame.ScreenType.Tournament, GD.Load<PackedScene>("res://scenes/screens/tournament/tournament_screen.tscn") }

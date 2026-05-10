@@ -6,18 +6,29 @@
             "type": "coreclr", // For Godot 4.x, 'coreclr' is generally correct
             "request": "launch",
             "preLaunchTask": "build", // Ensures your C# project is built before launch
-            "program": "C:/Users/biger/OneDrive/Documents/Godot_v4.4.1-stable_mono_win64/Godot_v4.4.1-stable_mono_win64.exe", // Path to your Godot executable
+            "program": "C:/Users/biger/Documents/Godot_v4.4.1-stable_mono_win64/Godot_v4.4.1-stable_mono_win64.exe", // Path to your Godot executable
             "args": [
-                "--path", "${workspaceFolder}", // Tells Godot to open your current project folder
+                "--path",
+                "${workspaceFolder}", // Tells Godot to open your current project folder
                 "--debug-fuzzer", // Enables C# debugging (important for Godot 4.x)
-                "--remote-debug-host", "127.0.0.1",
-                "--remote-debug-port", "6007" // Or whatever port you configure in Godot's Project Settings -> Debugger
+                "--remote-debug-host",
+                "127.0.0.1",
+                "--remote-debug-port",
+                "6007" // Or whatever port you configure in Godot's Project Settings -> Debugger
             ],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
-            "console": "internalConsole", // Or "integratedTerminal" or "externalTerminal"
-            "justMyCode": false, // Set to false to debug Godot's internal C# code if needed
-            "requireExactSource": false // <--- ADD THIS LINE HERE
+            "console": "integratedTerminal", // Or "integratedTerminal" or "externalTerminal"
+            "justMyCode": true, // Set to false to debug Godot's internal C# code if needed
+            "requireExactSource": false, // <--- ADD THIS LINE HERE
+            "logging": {
+                "moduleLoad": false, // <--- ADD THIS: Stops VS Code from logging every DLL load
+                "programOutput": true,
+                "engineLogging": false // <--- ADD THIS: Ensures engine-level verbose logs are off
+            },
+            "symbolOptions": {
+                "searchMicrosoftSymbolServer": false // <--- ADD THIS: Prevents the debugger from phoning home for symbols
+            }
         },
         {
             "name": ".NET Core Attach", // Keep this one, it can be useful as a fallback

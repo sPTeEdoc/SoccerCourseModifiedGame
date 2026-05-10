@@ -1,11 +1,18 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq; // Required for .FirstOrDefault()
 
 public partial class DataLoader : Node
 {
     private List<string> countries = new() { "DEFAULT" };
     private Dictionary<string, List<PlayerResource>> squads = new();
+    private Dictionary<string, string> colorHexComboJerseyA = new Dictionary<string, string>();
+    private Dictionary<string, string> colorHexComboJerseyB = new Dictionary<string, string>();
+    private Dictionary<string, string> colorHexComboJerseyC = new Dictionary<string, string>();
+    private Dictionary<string, string> socksCombo = new Dictionary<string, string>();
+    private Dictionary<string, string> shortsCombo = new Dictionary<string, string>();
+    private Dictionary<string, string> skinColorCombo = new Dictionary<string, string>();
 
     public override void _Ready()
     {
@@ -32,6 +39,18 @@ public partial class DataLoader : Node
             var team = teamVariant.AsGodotDictionary();
             string country = team["country"].AsString();
             countries.Add(country);
+            string hexColor = team["jersey_color"].AsString();
+            string hexColorB = team["jersey_color_B"].AsString();
+            string hexColorC = "#000000";
+            if (team.ContainsKey("jersey_color_C"))
+                hexColorC = team["jersey_color_C"].AsString();
+            string shortsColor = team["shorts"].AsString();
+            string socksColor = team["socks"].AsString();
+            colorHexComboJerseyA.Add(country, hexColor);
+            colorHexComboJerseyB.Add(country, hexColorB);
+            colorHexComboJerseyC.Add(country, hexColorC);
+            shortsCombo.Add(country, shortsColor);
+            socksCombo.Add(country, socksColor);
 
             if (!squads.ContainsKey(country))
                 squads[country] = new List<PlayerResource>();
@@ -41,7 +60,8 @@ public partial class DataLoader : Node
             {
                 var player = playerVariant.AsGodotDictionary();
                 string fullname = player["name"].AsString();
-                var skin = (PlayerCharacter.SkinColor)(int)player["skin"];
+                string skin = player["skin"].AsString();
+                skinColorCombo.Add(fullname, skin);
                 var role = (PlayerCharacter.Role)(int)player["role"];
                 float speed = (float)player["speed"];
                 float power = (float)player["power"];
@@ -65,5 +85,37 @@ public partial class DataLoader : Node
     public List<string> GetCountries()
     {
         return countries;
+    }
+
+    public string GetJerseyColorA(string country)
+    {
+        return colorHexComboJerseyA[country];
+    }
+
+    public string GetJerseyColorB(string country)
+    {
+        return colorHexComboJerseyB[country];
+    }
+
+    public string GetJerseyColorC(string country)
+    {
+        if (colorHexComboJerseyC.ContainsKey(country))
+            return colorHexComboJerseyC[country];
+        return "#000000";
+    }
+
+    public string GetSocksColor(string country)
+    {
+        return socksCombo[country];
+    }
+
+    public string GetShortsColor(string country)
+    {
+        return shortsCombo[country];
+    }
+
+    public string GetSkinHex(string plyrName)
+    {
+        return skinColorCombo[plyrName];
     }
 }

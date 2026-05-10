@@ -18,7 +18,7 @@ public partial class PlayerCharacter : CharacterBody2D
     public const float BallControlHeightMax = 10.0f;
     public const float Gravity = 8.0f;
     public const float WalkAnimThreshold = 0.6f;
-    
+
     private Vector2 passTargetPosition;
 
     // Enums
@@ -77,7 +77,7 @@ public partial class PlayerCharacter : CharacterBody2D
     public string team = "";
     public string fullname = "";
     public Role role = Role.MIDFIELD;
-    public SkinColor skinColor = SkinColor.MEDIUM;
+    public string skinColor = "#9c7250";
 
     public GameEvents gameEvents;
     public GameManager gameManager;
@@ -93,6 +93,10 @@ public partial class PlayerCharacter : CharacterBody2D
         opponentDetectionArea = GetNode<Area2D>("OpponentDetectionArea");
         permanentDamageEmitterArea = GetNode<Area2D>("PermanentDamageEmitterArea");
         playerSprite = GetNode<Sprite2D>("PlayerSprite");
+        if (team == "USA" || team == "ARGENTINA")
+        {
+            playerSprite.Texture = GD.Load<Texture2D>("res://assets/art/characters/nibley4.png");
+        }
         rootParticles = GetNode<Node2D>("RootParticles");
         runParticles = GetNode<GpuParticles2D>("RootParticles/RunParticles");
         tackleDamageEmitterArea = GetNode<Area2D>("TackleDamageEmitterArea");
@@ -146,16 +150,46 @@ public partial class PlayerCharacter : CharacterBody2D
     private void SetShaderProperties()
     {
         var shaderMat = playerSprite.Material as ShaderMaterial;
-        if (shaderMat != null)
+        if (shaderMat == null) return;
+
+        // 1. Set Skin Tone
+        shaderMat.SetShaderParameter("skin_color", Color.FromHtml(skinColor));
+
+        // 2. Set Team Color
+        var jerseyA = dataLoader.GetJerseyColorA(team); // 'team' is likely a string like "FRANCE"
+        var jerseyB = dataLoader.GetJerseyColorB(team); // 'team' is likely a string like "FRANCE"
+        var jerseyC = dataLoader.GetJerseyColorC(team);
+        var shorts = dataLoader.GetShortsColor(team); // 'team' is likely a string like "FRANCE"
+        var socksColor = dataLoader.GetSocksColor(team); // 'team' is likely a string like "FRANCE"
+
+        if (jerseyA != null && !string.IsNullOrEmpty(jerseyA))
         {
-            shaderMat.SetShaderParameter("skin_color", (int)skinColor);
+            shaderMat.SetShaderParameter("team_color", Color.FromHtml(jerseyA));
+            shaderMat.SetShaderParameter("team_colorB", Color.FromHtml(jerseyB));
+            shaderMat.SetShaderParameter("team_colorC", Color.FromHtml(jerseyC));
+            shaderMat.SetShaderParameter("shorts", Color.FromHtml(shorts));
+            shaderMat.SetShaderParameter("socks", Color.FromHtml(socksColor));
         }
+        else
+        {
+            // Fallback color (e.g., White) if country isn't found
+            shaderMat.SetShaderParameter("team_color", new Color(1, 1, 1));
+        }
+    }
 
-        var countries = dataLoader.GetCountries();
-        int countryColor = countries.FindIndex(c => c == team);
-        countryColor = Mathf.Clamp(countryColor, 0, countries.Count - 1);
-
-        shaderMat?.SetShaderParameter("team_color", countryColor);
+    public void Initialize(Vector2 contextPosition, Vector2 contextKickoffPosition, Ball contextBall,
+        PlayerResource contextPlayerData, string contextCountry, bool homeTeam)
+    {
+        Position = contextPosition;
+        kickoffPosition = contextKickoffPosition;
+        ball = contextBall;
+        speed = contextPlayerData.Speed;
+        power = contextPlayerData.Power;
+        role = contextPlayerData.Role;
+        skinColor = contextPlayerData.SkinColor;
+        fullname = contextPlayerData.FullName;
+        heading = homeTeam ? Vector2.Left : Vector2.Right;
+        team = contextCountry;
     }
 
     public void Initialize(Vector2 contextPosition, Vector2 contextKickoffPosition, Ball contextBall,

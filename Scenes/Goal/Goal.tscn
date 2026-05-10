@@ -1,8 +1,8 @@
 [gd_scene load_steps=8 format=3 uid="uid://dm3olt4s4cok1"]
 
 [ext_resource type="Script" uid="uid://bg4j8c3fehkci" path="res://Scenes/Goal/Goal.cs" id="1_cq5p3"]
-[ext_resource type="Texture2D" uid="uid://dxkakrgarw5c2" path="res://assets/art/backgrounds/goal-bottom.png" id="1_r84s2"]
 [ext_resource type="Texture2D" uid="uid://dufevlakt0y8l" path="res://assets/art/backgrounds/goal-top.png" id="2_0ivff"]
+[ext_resource type="Texture2D" uid="uid://bi7ujh3dyjigs" path="res://assets/art/backgrounds/goal.png" id="2_cq5p3"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_0ivff"]
 size = Vector2(26, 2)
@@ -14,18 +14,19 @@ size = Vector2(26, 2)
 size = Vector2(6, 60)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8q8dj"]
-size = Vector2(6, 60)
+size = Vector2(6, 91)
 
 [node name="Goal" type="Node2D"]
 y_sort_enabled = true
 script = ExtResource("1_cq5p3")
 
 [node name="BottomFrameSprite" type="Sprite2D" parent="."]
-texture = ExtResource("1_r84s2")
+texture = ExtResource("2_cq5p3")
 centered = false
-offset = Vector2(-23, -125)
+offset = Vector2(-23, -100)
 
 [node name="TopFrameSprite" type="Sprite2D" parent="."]
+visible = false
 position = Vector2(0, -65)
 texture = ExtResource("2_0ivff")
 centered = false
@@ -81,5 +82,5 @@ collision_layer = 16
 collision_mask = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ScoringArea"]
-position = Vector2(11, -35)
+position = Vector2(11, -49.5)
 shape = SubResource("RectangleShape2D_8q8dj")
