@@ -15,27 +15,27 @@ public partial class Tournament : Node
         { Stage.Final, new List<Match>() }
     };
 
-    public string Winner { get; private set; } = "";
+    public int Winner { get; private set; } = -1;
 
     public override void _Ready()
     {
         dataLoader = GetNode<DataLoader>("/root/DataLoader");
-        var allCountries = dataLoader.GetCountries();
-        var tournamentCountries = allCountries.GetRange(1, 8);
+        var allTeams = dataLoader.GetTeams();
+        var tournamenTeams = allTeams.GetRange(0, 8);
         Random random = new Random();
-        for (int i = tournamentCountries.Count - 1; i > 0; i--)
+        for (int i = tournamenTeams.Count - 1; i > 0; i--)
         {
             int j = random.Next(i + 1);
-            (tournamentCountries[i], tournamentCountries[j]) = (tournamentCountries[j], tournamentCountries[i]);
+            (tournamenTeams[i], tournamenTeams[j]) = (tournamenTeams[j], tournamenTeams[i]);
         }
-        CreateBracket(Stage.QuarterFinals, tournamentCountries);
+        CreateBracket(Stage.QuarterFinals, tournamenTeams);
     }
 
-    private void CreateBracket(Stage stage, List<string> countries)
+    private void CreateBracket(Stage stage, List<int> teams)
     {
-        for (int i = 0; i < countries.Count / 2; i++)
+        for (int i = 0; i < teams.Count / 2; i++)
         {
-            var match = new Match(countries[i * 2], countries[i * 2 + 1]);
+            var match = new Match(teams[i * 2], teams[i * 2 + 1]);
             Matches[stage].Add(match);
         }
     }
@@ -46,7 +46,7 @@ public partial class Tournament : Node
             return;
 
         var stageMatches = Matches[CurrentStage];
-        var stageWinners = new List<string>();
+        var stageWinners = new List<int>();
 
         foreach (var match in stageMatches)
         {

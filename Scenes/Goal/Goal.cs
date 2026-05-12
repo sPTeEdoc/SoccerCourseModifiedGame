@@ -6,7 +6,7 @@ public partial class Goal : Node2D
     [Export] private Area2D scoringArea;
     [Export] private Node targets;
 
-    private string country = "";
+    private int teamID = -1;
 
     private GameEvents gameEvents;
     private SoundPlayer soundPlayer;
@@ -23,9 +23,9 @@ public partial class Goal : Node2D
         soundPlayer = GetNode<SoundPlayer>("/root/SoundPlayer");
     }
 
-    public void Initialize(string contextCountry)
+    public void Initialize(int contextTeam)
     {
-        country = contextCountry;
+        teamID = contextTeam;
     }
 
     private void OnBallEnterBackNet(Node body)
@@ -39,7 +39,7 @@ public partial class Goal : Node2D
         if (body is Ball)
         {
             soundPlayer.Play(SoundPlayer.Sound.WHISTLE);
-            gameEvents.EmitSignal("TeamScored", country);
+            gameEvents.EmitSignal("TeamScored", teamID);
         }
     }
 

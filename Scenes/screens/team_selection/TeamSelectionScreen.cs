@@ -68,7 +68,8 @@ public partial class TeamSelectionScreen : Screen
         {
             selection[selectorIndex] = newSelection;
             int flagIndex = newSelection.X + newSelection.Y * NB_COLS;
-            gameManager.playerSetup[selectorIndex] = dataLoader.GetCountries()[1 + flagIndex];
+            gameManager.playerSetup[selectorIndex] = 
+                GameManagement.teamsDictionary[dataLoader.GetTeams()[flagIndex]].TeamID;
             selectors[selectorIndex].Position = flagsContainer.GetChild<TextureRect>(flagIndex).Position;
             soundPlayer.Play(SoundPlayer.Sound.UI_NAV);
         }
@@ -83,7 +84,8 @@ public partial class TeamSelectionScreen : Screen
                 var flagTexture = new TextureRect
                 {
                     Position = FLAG_ANCHOR_POINT + new Vector2(55 * i, 50 * j),
-                    Texture = FlagHelper.GetTexture(dataLoader.GetCountries()[1 + i + j * NB_COLS]),
+                    Texture = FlagHelper.GetTexture(
+                        GameManagement.teamsDictionary[dataLoader.GetTeams()[0 + i + j * NB_COLS]].Name),
                     Scale = new Vector2(2, 2),
                     ZIndex = 1
                 };
@@ -96,7 +98,7 @@ public partial class TeamSelectionScreen : Screen
     {
         AddSelector(PlayerCharacter.ControlScheme.P1);
 
-        if (!String.IsNullOrEmpty(gameManager.playerSetup[1]))
+        if (gameManager.playerSetup[1] > -2)
         {
             AddSelector(PlayerCharacter.ControlScheme.P2);
         }
@@ -120,12 +122,12 @@ public partial class TeamSelectionScreen : Screen
                 return;
         }
 
-        var countryP1 = gameManager.playerSetup[0];
-        var countryP2 = gameManager.playerSetup[1];
+        var teamP1 = gameManager.playerSetup[0];
+        var teamP2 = gameManager.playerSetup[1];
 
-        if (!String.IsNullOrEmpty(countryP2) && countryP1 != countryP2)
+        if (teamP2 > -1 && teamP1 != teamP2)
         {
-            gameManager.currentMatch = new Match(countryP2, countryP1);
+            gameManager.currentMatch = new Match(teamP2, teamP1);
             TransitionScreen(SoccerGame.ScreenType.InGame);
         }
         else

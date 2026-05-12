@@ -5,13 +5,6 @@ using System.Linq; // Required for .FirstOrDefault()
 
 public partial class DataLoader : Node
 {
-    private List<string> countries = new() { "DEFAULT" };
-    private Dictionary<string, List<PlayerResource>> squads = new();
-    private Dictionary<string, string> colorHexComboJerseyA = new Dictionary<string, string>();
-    private Dictionary<string, string> colorHexComboJerseyB = new Dictionary<string, string>();
-    private Dictionary<string, string> colorHexComboJerseyC = new Dictionary<string, string>();
-    private Dictionary<string, string> socksCombo = new Dictionary<string, string>();
-    private Dictionary<string, string> shortsCombo = new Dictionary<string, string>();
     private Dictionary<string, string> skinColorCombo = new Dictionary<string, string>();
 
     public override void _Ready()
@@ -37,8 +30,10 @@ public partial class DataLoader : Node
         foreach (Godot.Variant teamVariant in data)
         {
             var team = teamVariant.AsGodotDictionary();
-            string country = team["country"].AsString();
-            countries.Add(country);
+            var teamID = team["teamID"].AsString();
+
+            int tID = Int32.Parse(teamID);
+            string teamName = team["teamName"].AsString();
             string hexColor = team["jersey_color"].AsString();
             string hexColorB = team["jersey_color_B"].AsString();
             string hexColorC = "#000000";
@@ -46,14 +41,8 @@ public partial class DataLoader : Node
                 hexColorC = team["jersey_color_C"].AsString();
             string shortsColor = team["shorts"].AsString();
             string socksColor = team["socks"].AsString();
-            colorHexComboJerseyA.Add(country, hexColor);
-            colorHexComboJerseyB.Add(country, hexColorB);
-            colorHexComboJerseyC.Add(country, hexColorC);
-            shortsCombo.Add(country, shortsColor);
-            socksCombo.Add(country, socksColor);
-
-            if (!squads.ContainsKey(country))
-                squads[country] = new List<PlayerResource>();
+            Team club = new Team(tID, teamName, hexColor, hexColorB, hexColorC,
+                shortsColor, socksColor);
 
             var players = team["players"].AsGodotArray();
             foreach (Godot.Variant playerVariant in players)
@@ -67,51 +56,56 @@ public partial class DataLoader : Node
                 float power = (float)player["power"];
 
                 var resource = new PlayerResource(fullname, skin, role, speed, power);
-                squads[country].Add(resource);
+                club.startingRoster.Add(resource);
             }
 
+            GameManagement.teamsDictionary.Add(club.TeamID, club);
+
             if (players.Count != 6)
-                GD.PrintErr($"Squad for {country} does not have exactly 6 players.");
+                GD.PrintErr($"Squad for {teamName} does not have exactly 6 players.");
         }
 
         file.Close();
     }
 
-    public List<PlayerResource> GetSquad(string country)
+    public List<PlayerResource> GetSquad(int teamID)
     {
-        return squads.TryGetValue(country, out var list) ? list : new List<PlayerResource>();
+        return GameManagement.teamsDictionary[teamID].startingRoster;
     }
 
-    public List<string> GetCountries()
+    public List<int> GetTeams()
     {
-        return countries;
+        List<int> teams = new List<int>();
+        foreach(KeyValuePair<int, Team> t in GameManagement.teamsDictionary)
+        {
+            teams.Add(t.Value.TeamID);
+        }
+        return teams;
     }
 
-    public string GetJerseyColorA(string country)
+    public string GetJerseyColorA(int teamID)
     {
-        return colorHexComboJerseyA[country];
+        return GameManagement.teamsDictionary[teamID].JerseyColorA;
     }
 
-    public string GetJerseyColorB(string country)
+    public string GetJerseyColorB(int teamID)
     {
-        return colorHexComboJerseyB[country];
+        return GameManagement.teamsDictionary[teamID].Jersey_color_B;
     }
 
-    public string GetJerseyColorC(string country)
+    public string GetJerseyColorC(int teamID)
     {
-        if (colorHexComboJerseyC.ContainsKey(country))
-            return colorHexComboJerseyC[country];
-        return "#000000";
+        return GameManagement.teamsDictionary[teamID].Jersey_color_C;
     }
 
-    public string GetSocksColor(string country)
+    public string GetSocksColor(int teamID)
     {
-        return socksCombo[country];
+        return GameManagement.teamsDictionary[teamID].SocksColor;
     }
 
-    public string GetShortsColor(string country)
+    public string GetShortsColor(int teamID)
     {
-        return shortsCombo[country];
+        return GameManagement.teamsDictionary[teamID].ShortsColor;
     }
 
     public string GetSkinHex(string plyrName)

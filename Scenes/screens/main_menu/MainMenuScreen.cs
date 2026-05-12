@@ -75,10 +75,10 @@ public partial class MainMenuScreen : Screen
     {
         soundPlayer.Play(SoundPlayer.Sound.UI_SELECT);
 
-        var countryDefault = dataLoader.GetCountries()[1];
-        var playerTwo = currentSelectedIndex == 0 ? "" : countryDefault;
+        var teamDefault = dataLoader.GetTeams()[0];
+        var playerTwo = currentSelectedIndex == 0 ? -2 : teamDefault;
 
-        gameManager.playerSetup = new string[] { countryDefault, playerTwo };
+        gameManager.playerSetup = new int[] { teamDefault, playerTwo };
         TransitionScreen(SoccerGame.ScreenType.TeamSelection);
     }
 

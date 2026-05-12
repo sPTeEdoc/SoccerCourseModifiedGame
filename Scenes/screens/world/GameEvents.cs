@@ -5,17 +5,17 @@ public partial class GameEvents : Node
 {
     [Signal] public delegate void BallPossessedEventHandler(string playerName);
     [Signal] public delegate void BallReleasedEventHandler();
-    [Signal] public delegate void GameOverEventHandler(string countryWinner);
+    [Signal] public delegate void GameOverEventHandler(int winningTeamID);
     [Signal] public delegate void KickoffReadyEventHandler();
     [Signal] public delegate void KickoffStartedEventHandler();
     [Signal] public delegate void ImpactReceivedEventHandler(Vector2 impactPosition, bool isHighImpact);
     [Signal] public delegate void ScoreChangedEventHandler();
     [Signal] public delegate void TeamResetEventTriggeredEventHandler();
-    [Signal] public delegate void TeamScoredEventHandler(string countryScoredOn);
+    [Signal] public delegate void TeamScoredEventHandler(int teamScoredOn);
 
-    public void EmitGameOver(string winnerCountry)
+    public void EmitGameOver(int winningTeamID)
     {
-        EmitSignal("GameOver", winnerCountry);
+        EmitSignal("GameOver", winningTeamID);
     }
 
     public void EmitReset()

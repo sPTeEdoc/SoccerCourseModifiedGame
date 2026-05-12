@@ -55,14 +55,15 @@ public partial class UI : CanvasLayer
 
     private void UpdateFlags()
     {
-        string[] countries = {
-            gameManager.currentMatch.CountryHome,
-            gameManager.currentMatch.CountryAway
+        int[] teams = {
+            gameManager.currentMatch.TeamHome,
+            gameManager.currentMatch.TeamAway
         };
 
         for (int i = 0; i < flagTextures.Count; i++)
         {
-            flagTextures[i].Texture = FlagHelper.GetTexture(countries[i]);
+            flagTextures[i].Texture = FlagHelper.GetTexture(
+                GameManagement.teamsDictionary[teams[i]].Name);
         }
     }
 
@@ -103,7 +104,7 @@ public partial class UI : CanvasLayer
             animationPlayer.Play("goal_hide");
     }
 
-    private void OnGameOver(string countryWinner)
+    private void OnGameOver(string winningTeamID)
     {
         scoreInfoLabel.Text = ScoreHelper.GetFinalScoreInfo(gameManager.currentMatch);
         animationPlayer.Play("game_over");

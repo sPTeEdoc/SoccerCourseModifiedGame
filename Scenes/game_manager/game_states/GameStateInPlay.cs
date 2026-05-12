@@ -34,11 +34,11 @@ public partial class GameStateInPlay : GameState
         }
     }
 
-    private void OnTeamScored(string countryScoredOn)
+    private void OnTeamScored(int teamScoredOn)
     {
         TransitionState(
             GameManager.State.SCORED,
-            GameStateData.Build().SetCountryScoredOn(countryScoredOn)
+            GameStateData.Build().SetTeamScoredOn(teamScoredOn)
         );
     }
 }

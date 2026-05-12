@@ -32,6 +32,7 @@ script = ExtResource("2_tn6w8")
 
 [node name="Grass" type="Sprite2D" parent="Backgrounds"]
 modulate = Color(0.517647, 0.803922, 0.164706, 1)
+scale = Vector2(1.99294, 1.96111)
 texture = ExtResource("2_xdlr3")
 centered = false
 

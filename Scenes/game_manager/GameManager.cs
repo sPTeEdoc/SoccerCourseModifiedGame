@@ -10,7 +10,7 @@ public partial class GameManager : Node
 
     public Match currentMatch = null;
     public GameState currentState = null;
-    public string[] playerSetup = new string[] { "FRANCE", "" };
+    public int[] playerSetup = new int[] { 0, -2 };
     public GameStateFactory stateFactory = new GameStateFactory();
     public float timeLeft;
     public ulong timeSincePaused = Time.GetTicksMsec();
@@ -62,17 +62,17 @@ public partial class GameManager : Node
     }
 
     public bool IsCoop() => playerSetup[0] == playerSetup[1];
-    public bool IsSinglePlayer() => string.IsNullOrEmpty(playerSetup[1]);
+    public bool IsSinglePlayer() => playerSetup[1] == -2;
     public bool IsTimeUp() => timeLeft <= 0;
 
-    public string GetWinnerCountry()
+    public int GetWinningTeam()
     {
         return currentMatch.Winner;
     }
 
-    public void IncreaseScore(string countryScoredOn)
+    public void IncreaseScore(int intScoredOn)
     {
-        currentMatch.IncreaseScore(countryScoredOn);
+        currentMatch.IncreaseScore(intScoredOn);
         gameEvents.EmitScoreChanged();
     }
 

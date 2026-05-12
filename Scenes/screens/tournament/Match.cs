@@ -3,19 +3,19 @@ using System;
 
 public partial class Match : Node
 {
-    public string CountryHome { get; private set; }
-    public string CountryAway { get; private set; }
+    public int TeamHome { get; private set; }
+    public int TeamAway { get; private set; }
 
     public int GoalsHome { get; private set; } = 0;
     public int GoalsAway { get; private set; } = 0;
 
     public string FinalScore { get; private set; } = "";
-    public string Winner { get; private set; } = "";
+    public int Winner { get; private set; } = -1;
 
-    public Match(string teamHome, string teamAway)
+    public Match(int teamHome, int teamAway)
     {
-        CountryHome = teamHome;
-        CountryAway = teamAway;
+        TeamHome = teamHome;
+        TeamAway = teamAway;
     }
 
     public bool IsTied()
@@ -28,9 +28,9 @@ public partial class Match : Node
         return GoalsHome > 0 || GoalsAway > 0;
     }
 
-    public void IncreaseScore(string countryScoredOn)
+    public void IncreaseScore(int teamScoredOn)
     {
-        if (countryScoredOn == CountryHome)
+        if (teamScoredOn == TeamHome)
             GoalsAway += 1;
         else
             GoalsHome += 1;
@@ -40,7 +40,7 @@ public partial class Match : Node
 
     private void UpdateMatchInfo()
     {
-        Winner = (GoalsHome > GoalsAway) ? CountryHome : CountryAway;
+        Winner = (GoalsHome > GoalsAway) ? TeamHome : TeamAway;
         FinalScore = $"{Math.Max(GoalsHome, GoalsAway)} - {Math.Min(GoalsHome, GoalsAway)}";
     }
 

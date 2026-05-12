@@ -8,7 +8,7 @@ public partial class GameStateScored : GameState
 
     public override void _EnterTree()
     {
-        manager.IncreaseScore(stateData.CountryScoredOn);
+        manager.IncreaseScore(stateData.TeamScoredOn);
         timeSinceCelebration = Time.GetTicksMsec();
     }
 

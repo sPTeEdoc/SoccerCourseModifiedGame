@@ -3,16 +3,16 @@ using Godot;
 [GlobalClass]
 public partial class GameStateData : GodotObject
 {
-    public string CountryScoredOn { get; private set; } = "";
+    public int TeamScoredOn { get; private set; } = -1;
 
     public static GameStateData Build()
     {
         return new GameStateData();
     }
 
-    public GameStateData SetCountryScoredOn(string country)
+    public GameStateData SetTeamScoredOn(int teamID)
     {
-        CountryScoredOn = country;
+        TeamScoredOn = teamID;
         return this;
     }
 }

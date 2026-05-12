@@ -12,7 +12,7 @@ config_version=5
 
 config/name="Nibley"
 run/main_scene="uid://brj16q8ttvqfc"
-config/features=PackedStringArray("4.4", "C#", "Forward Plus")
+config/features=PackedStringArray("4.4", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
@@ -33,10 +33,11 @@ window/size/window_width_override=1250
 window/size/window_height_override=500
 window/subwindows/embed_subwindows=false
 window/stretch/mode="viewport"
+<<<<<<<HEADwindow/size/viewport_width=560
 
 [dotnet]
 
-project/assembly_name="MeetTheGlazers"
+project/assembly_name="NibleysBigAdventure"
 
 [gui]
 

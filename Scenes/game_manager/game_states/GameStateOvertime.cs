@@ -17,9 +17,9 @@ public partial class GameStateOvertime : GameState
     }
 
 
-    private void OnTeamScored(string countryScoredOn)
+    private void OnTeamScored(int teamScoredOn)
     {
-        manager.IncreaseScore(countryScoredOn);
+        manager.IncreaseScore(teamScoredOn);
         TransitionState(GameManager.State.GAMEOVER);
     }
 }

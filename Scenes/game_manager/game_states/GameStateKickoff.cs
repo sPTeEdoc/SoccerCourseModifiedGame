@@ -14,15 +14,15 @@ public partial class GameStateKickoff : GameState
         soundPlayer = GetNode<SoundPlayer>("/root/SoundPlayer");
         gameEvents = GetNode<GameEvents>("/root/GameEvents");
 
-        string countryStarting = stateData.CountryScoredOn;
+        int startingTeamID = stateData.TeamScoredOn;
 
-        if (string.IsNullOrEmpty(countryStarting))
-            countryStarting = manager.currentMatch.CountryHome;
+        if (startingTeamID > -1)
+            startingTeamID = manager.currentMatch.TeamHome;
 
-        if (countryStarting == manager.playerSetup[0])
+        if (startingTeamID == manager.playerSetup[0])
             validControlSchemes.Add(PlayerCharacter.ControlScheme.P1);
 
-        if (countryStarting == manager.playerSetup[1])
+        if (startingTeamID == manager.playerSetup[1])
             validControlSchemes.Add(PlayerCharacter.ControlScheme.P2);
 
         if (validControlSchemes.Count == 0)

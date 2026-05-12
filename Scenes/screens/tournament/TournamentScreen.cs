@@ -16,7 +16,7 @@ public partial class TournamentScreen : Screen
 
     private TextureRect stageTexture;
     private Tournament tournament;
-    private string playerCountry;
+    private int playerTeam;
 
     public GameManager gameManager;
 
@@ -27,7 +27,7 @@ public partial class TournamentScreen : Screen
         soundPlayer = GetNode<SoundPlayer>("/root/SoundPlayer");
         gameManager = GetNode<GameManager>("/root/GameManager");
         tournament = screenData.Tournament;
-        playerCountry = gameManager.playerSetup[0];
+        playerTeam = gameManager.playerSetup[0];
         stageTexture = GetNode<TextureRect>("Background/StageTexture");
 
         flagContainers = new()
@@ -93,20 +93,20 @@ public partial class TournamentScreen : Screen
                 BracketFlag flagHome = flagNodes[i * 2];
                 BracketFlag flagAway = flagNodes[i * 2 + 1];
 
-                flagHome.Texture = FlagHelper.GetTexture(currentMatch.CountryHome);
-                flagAway.Texture = FlagHelper.GetTexture(currentMatch.CountryAway);
+                flagHome.Texture = FlagHelper.GetTexture(GameManagement.teamsDictionary[currentMatch.TeamHome].Name);
+                flagAway.Texture = FlagHelper.GetTexture(GameManagement.teamsDictionary[currentMatch.TeamAway].Name);
 
-                if (!string.IsNullOrEmpty(currentMatch.Winner))
+                if (currentMatch.Winner > -1)
                 {
-                    var flagWinner = currentMatch.Winner == currentMatch.CountryHome ? flagHome : flagAway;
+                    var flagWinner = currentMatch.Winner == currentMatch.TeamHome ? flagHome : flagAway;
                     var flagLoser = flagWinner == flagHome ? flagAway : flagHome;
 
                     flagWinner.SetAsWinner(currentMatch.FinalScore);
                     flagLoser.SetAsLoser();
                 }
-                else if ((currentMatch.CountryHome == playerCountry || currentMatch.CountryAway == playerCountry) && stage == tournament.CurrentStage)
+                else if ((currentMatch.TeamHome == playerTeam || currentMatch.TeamAway == playerTeam) && stage == tournament.CurrentStage)
                 {
-                    var flagPlayer = currentMatch.CountryHome == playerCountry ? flagHome : flagAway;
+                    var flagPlayer = currentMatch.TeamHome == playerTeam ? flagHome : flagAway;
                     flagPlayer.SetAsCurrentTeam();
                     gameManager.currentMatch = currentMatch;
                 }
@@ -114,7 +114,8 @@ public partial class TournamentScreen : Screen
         }
         else
         {
-            flagNodes[0].Texture = FlagHelper.GetTexture(tournament.Winner);
+            flagNodes[0].Texture = FlagHelper.GetTexture(
+                GameManagement.teamsDictionary[tournament.Winner].Name);
         }
     }
 

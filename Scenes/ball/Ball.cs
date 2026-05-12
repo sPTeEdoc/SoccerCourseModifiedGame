@@ -137,14 +137,14 @@ public partial class Ball : AnimatableBody2D
         return scoringRaycast.GetCollider() == scoringArea;
     }
 
-    public int GetProximityTeammatesCount(string country)
+    public int GetProximityTeammatesCount(int teamID)
     {
         var players = playerProximityArea.GetOverlappingBodies();
         int count = 0;
 
         foreach (var body in players)
         {
-            if (body is PlayerCharacter p && p.team == country)
+            if (body is PlayerCharacter p && p.teamID == teamID)
                 count++;
         }
 

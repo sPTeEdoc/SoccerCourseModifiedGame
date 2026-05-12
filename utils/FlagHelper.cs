@@ -5,14 +5,14 @@ public static class FlagHelper
 {
     private static Dictionary<string, Texture2D> flagTextures = new();
 
-    public static Texture2D GetTexture(string country)
+    public static Texture2D GetTexture(string teamFlagName)
     {
-        if (!flagTextures.ContainsKey(country))
+        if (!flagTextures.ContainsKey(teamFlagName))
         {
-            string path = $"res://assets/art/ui/flags/flag-{country.ToLower()}.png";
+            string path = $"res://assets/art/ui/flags/flag-{teamFlagName.ToLower()}.png";
             var texture = GD.Load<Texture2D>(path);
-            flagTextures[country] = texture;
+            flagTextures[teamFlagName] = texture;
         }
-        return flagTextures[country];
+        return flagTextures[teamFlagName];
     }
 }

@@ -53,11 +53,11 @@ public partial class ActorsContainer2 : Node2D
         gameEvents.TeamResetEventTriggered += OnTeamReset;
         gameEvents.ImpactReceived += OnImpactReceived;
 
-        squadHome = SpawnPlayers(gameManager.currentMatch.CountryHome, true);
+        squadHome = SpawnPlayers(gameManager.currentMatch.TeamHome, true);
         spawns.Scale = new Vector2(-1, spawns.Scale.Y);
         kickoffs.Scale = new Vector2(-1, kickoffs.Scale.Y);
 
-        squadAway = SpawnPlayers(gameManager.currentMatch.CountryAway, false);
+        squadAway = SpawnPlayers(gameManager.currentMatch.TeamAway, false);
 
         SetupControlSchemes();
     }
@@ -76,10 +76,10 @@ public partial class ActorsContainer2 : Node2D
             CheckForKickoffReadiness();
     }
 
-    private List<PlayerCharacter> SpawnPlayers(string country, bool homeTeam)
+    private List<PlayerCharacter> SpawnPlayers(int teamID, bool homeTeam)
     {
         var playerNodes = new List<PlayerCharacter>();
-        var players = dataLoader.GetSquad(country);
+        var players = dataLoader.GetSquad(teamID);
 
         for (int i = 0; i < players.Count; i++)
         {
@@ -87,18 +87,18 @@ public partial class ActorsContainer2 : Node2D
             var playerData = players[i] as PlayerResource;
             Vector2 kickoffPosition = i > 3 ? kickoffs.GetChild<Node2D>(i - 4).GlobalPosition : playerPosition;
 
-            var player = SpawnPlayer2(playerPosition, kickoffPosition, playerData, country, homeTeam);
+            var player = SpawnPlayer2(playerPosition, kickoffPosition, playerData, teamID, homeTeam);
             playerNodes.Add(player);
         }
 
         return playerNodes;
     }
 
-    private PlayerCharacter SpawnPlayer2(Vector2 position, Vector2 kickoffPos, PlayerResource data, string country,
+    private PlayerCharacter SpawnPlayer2(Vector2 position, Vector2 kickoffPos, PlayerResource data, int teamID,
         bool homeTeam)
     {
         var player = playerPrefab.Instantiate<PlayerCharacter>();
-        player.Initialize(position, kickoffPos, Ball, data, country, homeTeam);
+        player.Initialize(position, kickoffPos, Ball, data, teamID, homeTeam);
         player.SwapRequested += OnPlayerSwapRequest;
         AddChild(player);
         return player;
@@ -127,12 +127,12 @@ public partial class ActorsContainer2 : Node2D
         }
 
         if (Ball.Carrier != null &&
-            Ball.Carrier.team == gameManager.playerSetup[0] &&
+            Ball.Carrier.teamID == gameManager.playerSetup[0] &&
             Ball.Carrier.controlScheme != PlayerCharacter.ControlScheme.P1 &&
             Ball.Carrier.controlScheme != PlayerCharacter.ControlScheme.P2)
         {
-            var squad1 = Ball.Carrier.team == squadHome[0].team ? squadHome : squadAway;
-            var squad2 = Ball.Carrier.team == squadHome[0].team ? squadHome : squadAway;
+            var squad1 = Ball.Carrier.teamID == squadHome[0].teamID ? squadHome : squadAway;
+            var squad2 = Ball.Carrier.teamID == squadHome[0].teamID ? squadHome : squadAway;
             var currentHuman1 = squad1.Find(p => p.controlScheme == PlayerCharacter.ControlScheme.P1);
             var currentHuman2 = squad1.Find(p => p.controlScheme == PlayerCharacter.ControlScheme.P2);
 
@@ -146,7 +146,7 @@ public partial class ActorsContainer2 : Node2D
         }
 
 
-        var squad = requester.team == squadHome[0].team ? squadHome : squadAway;
+        var squad = requester.teamID == squadHome[0].teamID ? squadHome : squadAway;
         var cpuPlayers = squad.FindAll(p => p.controlScheme == PlayerCharacter.ControlScheme.CPU && p.role != PlayerCharacter.Role.GOALIE);
         cpuPlayers.Sort((p1, p2) =>
             p1.Position.DistanceSquaredTo(Ball.Position).CompareTo(p2.Position.DistanceSquaredTo(Ball.Position)));
@@ -179,22 +179,22 @@ public partial class ActorsContainer2 : Node2D
     private void SetupControlSchemes()
     {
         ResetControlSchemes();
-        string p1Team = gameManager.playerSetup[0];
+        int p1Team = gameManager.playerSetup[0];
 
         if (gameManager.IsCoop())
         {
-            var playerSquad = squadHome[0].team == p1Team ? squadHome : squadAway;
+            var playerSquad = squadHome[0].teamID == p1Team ? squadHome : squadAway;
             playerSquad[4].SetControlScheme(PlayerCharacter.ControlScheme.P1);
             playerSquad[5].SetControlScheme(PlayerCharacter.ControlScheme.P2);
         }
         else if (gameManager.IsSinglePlayer())
         {
-            var playerSquad = squadHome[0].team == p1Team ? squadHome : squadAway;
+            var playerSquad = squadHome[0].teamID == p1Team ? squadHome : squadAway;
             playerSquad[5].SetControlScheme(PlayerCharacter.ControlScheme.P1);
         }
         else // versus
         {
-            var p1Squad = squadHome[0].team == p1Team ? squadHome : squadAway;
+            var p1Squad = squadHome[0].teamID == p1Team ? squadHome : squadAway;
             var p2Squad = p1Squad == squadAway ? squadHome : squadAway;
             p1Squad[5].SetControlScheme(PlayerCharacter.ControlScheme.P1);
             p2Squad[5].SetControlScheme(PlayerCharacter.ControlScheme.P2);
@@ -231,14 +231,14 @@ public partial class ActorsContainer2 : Node2D
         if (Time.GetTicksMsec() - lastAutoSwitchTime < AUTO_SWITCH_INTERVAL)
             return;
 
-        if (Ball?.Carrier == null || Ball.Carrier.team == null)
+        if (Ball?.Carrier == null || Ball.Carrier.teamID == -1)
             return;
 
-        string playerTeam = gameManager.playerSetup[0];
-        if (Ball.Carrier.team == playerTeam)
+        int playerTeam = gameManager.playerSetup[0];
+        if (Ball.Carrier.teamID == playerTeam)
             return; // Human team is attacking
 
-        var squad = squadHome[0].team == playerTeam ? squadHome : squadAway;
+        var squad = squadHome[0].teamID == playerTeam ? squadHome : squadAway;
 
         // Handle both P1 and P2
         var humans = squad.FindAll(p =>

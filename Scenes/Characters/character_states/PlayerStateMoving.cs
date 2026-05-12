@@ -83,7 +83,7 @@ public partial class PlayerStateMoving : PlayerState
     private bool CanTeammatePassBall()
     {
         return ball.Carrier != null &&
-               ball.Carrier.team == player.team &&
+               ball.Carrier.teamID == player.teamID &&
                ball.Carrier.controlScheme == PlayerCharacter.ControlScheme.CPU;
     }
 

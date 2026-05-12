@@ -5,7 +5,8 @@
 		"#9c7250", 
 		"#4b3021"
 	],
-	"country": "FRANCE",
+	"teamID" : "0",
+	"teamName": "FRANCE",
 	"jersey_color": "#002395",
 	"jersey_color_B": "#0023D5",
 	"shorts": "#002395",
@@ -48,7 +49,8 @@
 		"power": 170
 	}]
 }, {
-	"country": "ARGENTINA",
+	"teamID" : "1",
+	"teamName": "ARGENTINA",
 	"jersey_color": "#FFFFFF",
 	"jersey_color_B": "#FFFFFF",
 	"jersey_color_C": "#74ACDF",
@@ -92,7 +94,8 @@
 		"power": 175
 	}]
 }, {
-	"country": "BRAZIL",
+	"teamID" : "2",
+	"teamName": "BRAZIL",
 	"jersey_color": "#F8DE18",
 	"jersey_color_B": "#289410",
 	"shorts": "#0C297E",
@@ -135,7 +138,8 @@
 		"power": 184
 	}]
 }, {
-	"country": "ENGLAND",
+	"teamID" : "3",
+	"teamName": "ENGLAND",
 	"jersey_color": "#FFFFFF",
 	"jersey_color_B": "#F5EEED",
 	"shorts": "#0F329F",
@@ -178,7 +182,8 @@
 		"power": 165
 	}]
 }, {
-	"country": "GERMANY",
+	"teamID" : "4",
+	"teamName": "GERMANY",
 	"jersey_color": "#FFFFFF",
 	"jersey_color_B": "#000000",
 	"shorts": "#000000",
@@ -221,7 +226,8 @@
 		"power": 178
 	}]
 }, {
-	"country": "ITALY",
+	"teamID" : "5",
+	"teamName": "ITALY",
 	"jersey_color": "#354988",
 	"jersey_color_B": "#000000",
 	"shorts": "#354988",
@@ -264,7 +270,8 @@
 		"power": 175
 	}]
 }, {
-	"country": "SPAIN",
+	"teamID" : "6",
+	"teamName": "SPAIN",
 	"jersey_color": "#C41C1C",
 	"jersey_color_B": "#354988",
 	"shorts": "#354988",
@@ -307,7 +314,8 @@
 		"power": 170
 	}]
 }, {
-	"country": "USA",
+	"teamID" : "7",
+	"teamName": "USA",
 	"jersey_color": "#F5EEED",
 	"jersey_color_B": "#FFFFFF",
 	"jersey_color_C": "#C41C1C",
@@ -351,7 +359,8 @@
 		"power": 167
 	}]
 }, {
-	"country": "CANADA",
+	"teamID" : "8",
+	"teamName": "CANADA",
 	"jersey_color": "#E3333D",
 	"jersey_color_B": "#D64C4C",
 	"shorts": "#E3333D",

@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 
 [GlobalClass]
 public partial class PlayerCharacter : CharacterBody2D
@@ -74,7 +75,8 @@ public partial class PlayerCharacter : CharacterBody2D
     public Vector2 spawnPosition = Vector2.Zero;
     public float weightOnDutySteering = 0f;
 
-    public string team = "";
+    public int playerID = 0;
+    public int teamID = -1;
     public string fullname = "";
     public Role role = Role.MIDFIELD;
     public string skinColor = "#9c7250";
@@ -93,9 +95,12 @@ public partial class PlayerCharacter : CharacterBody2D
         opponentDetectionArea = GetNode<Area2D>("OpponentDetectionArea");
         permanentDamageEmitterArea = GetNode<Area2D>("PermanentDamageEmitterArea");
         playerSprite = GetNode<Sprite2D>("PlayerSprite");
-        if (team == "USA" || team == "ARGENTINA")
+        foreach(KeyValuePair<int, Team> t in GameManagement.teamsDictionary)
         {
-            playerSprite.Texture = GD.Load<Texture2D>("res://assets/art/characters/nibley4.png");
+            if (String.IsNullOrWhiteSpace(t.Value.Jersey_color_C))
+            {
+                playerSprite.Texture = GD.Load<Texture2D>("res://assets/art/characters/nibley4.png");
+            }
         }
         rootParticles = GetNode<Node2D>("RootParticles");
         runParticles = GetNode<GpuParticles2D>("RootParticles/RunParticles");
@@ -120,7 +125,7 @@ public partial class PlayerCharacter : CharacterBody2D
         gameEvents.TeamScored += OnTeamScored;
         gameEvents.GameOver += OnGameOver;
 
-        var initialPosition = team == gameManager.currentMatch.CountryHome ? kickoffPosition : spawnPosition;
+        var initialPosition = teamID == gameManager.currentMatch.TeamHome ? kickoffPosition : spawnPosition;
         CallDeferred(nameof(InitializeResetState));
     }
 
@@ -135,7 +140,7 @@ public partial class PlayerCharacter : CharacterBody2D
 
     private void InitializeResetState()
     {
-        var initialPosition = team == gameManager.currentMatch.CountryHome ? kickoffPosition : spawnPosition;
+        var initialPosition = teamID == gameManager.currentMatch.TeamHome ? kickoffPosition : spawnPosition;
         SwitchState(State.RESETING, PlayerStateData.Build().SetResetPosition(initialPosition));
     }
 
@@ -156,11 +161,11 @@ public partial class PlayerCharacter : CharacterBody2D
         shaderMat.SetShaderParameter("skin_color", Color.FromHtml(skinColor));
 
         // 2. Set Team Color
-        var jerseyA = dataLoader.GetJerseyColorA(team); // 'team' is likely a string like "FRANCE"
-        var jerseyB = dataLoader.GetJerseyColorB(team); // 'team' is likely a string like "FRANCE"
-        var jerseyC = dataLoader.GetJerseyColorC(team);
-        var shorts = dataLoader.GetShortsColor(team); // 'team' is likely a string like "FRANCE"
-        var socksColor = dataLoader.GetSocksColor(team); // 'team' is likely a string like "FRANCE"
+        var jerseyA = dataLoader.GetJerseyColorA(teamID); // 'team' is likely a string like "FRANCE"
+        var jerseyB = dataLoader.GetJerseyColorB(teamID); // 'team' is likely a string like "FRANCE"
+        var jerseyC = dataLoader.GetJerseyColorC(teamID);
+        var shorts = dataLoader.GetShortsColor(teamID); // 'team' is likely a string like "FRANCE"
+        var socksColor = dataLoader.GetSocksColor(teamID); // 'team' is likely a string like "FRANCE"
 
         if (jerseyA != null && !string.IsNullOrEmpty(jerseyA))
         {
@@ -172,13 +177,13 @@ public partial class PlayerCharacter : CharacterBody2D
         }
         else
         {
-            // Fallback color (e.g., White) if country isn't found
+            // Fallback color (e.g., White) if team isn't found
             shaderMat.SetShaderParameter("team_color", new Color(1, 1, 1));
         }
     }
 
     public void Initialize(Vector2 contextPosition, Vector2 contextKickoffPosition, Ball contextBall,
-        PlayerResource contextPlayerData, string contextCountry, bool homeTeam)
+        PlayerResource contextPlayerData, int contextTeamID, bool homeTeam)
     {
         Position = contextPosition;
         kickoffPosition = contextKickoffPosition;
@@ -189,11 +194,12 @@ public partial class PlayerCharacter : CharacterBody2D
         skinColor = contextPlayerData.SkinColor;
         fullname = contextPlayerData.FullName;
         heading = homeTeam ? Vector2.Left : Vector2.Right;
-        team = contextCountry;
+        teamID = contextTeamID;
+        playerID = GameManagement.PlayerID++;
     }
 
     public void Initialize(Vector2 contextPosition, Vector2 contextKickoffPosition, Ball contextBall,
-        Goal contextOwnGoal, Goal contextTargetGoal, PlayerResource contextPlayerData, string contextCountry)
+        Goal contextOwnGoal, Goal contextTargetGoal, PlayerResource contextPlayerData, int contextTeamID)
     {
         Position = contextPosition;
         kickoffPosition = contextKickoffPosition;
@@ -206,7 +212,8 @@ public partial class PlayerCharacter : CharacterBody2D
         skinColor = contextPlayerData.SkinColor;
         fullname = contextPlayerData.FullName;
         heading = targetGoal.Position.X < Position.X ? Vector2.Left : Vector2.Right;
-        team = contextCountry;
+        teamID = contextTeamID;
+        playerID = GameManagement.PlayerID++;
     }
 
     private void SetupAIBehavior()
@@ -356,7 +363,7 @@ public partial class PlayerCharacter : CharacterBody2D
     {
         if (other is PlayerCharacter player &&
             player != this &&
-            player.team != team &&
+            player.teamID != teamID &&
             ball.Carrier == player)
         {
             Vector2 direction = Position.DirectionTo(player.Position);
@@ -369,17 +376,17 @@ public partial class PlayerCharacter : CharacterBody2D
         currentState?.OnAnimationComplete();
     }
 
-    private void OnTeamScored(string teamScoredOn)
+    private void OnTeamScored(int teamScoredOn)
     {
-        if (team == teamScoredOn)
+        if (teamID == teamScoredOn)
             SwitchState(State.MOURNING);
         else
             SwitchState(State.CELEBRATING);
     }
 
-    private void OnGameOver(string winningTeam)
+    private void OnGameOver(int winningTeam)
     {
-        if (team == winningTeam)
+        if (teamID == winningTeam)
             SwitchState(State.CELEBRATING);
         else
             SwitchState(State.MOURNING);

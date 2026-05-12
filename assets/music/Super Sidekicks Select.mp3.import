@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://512v5obah36q"
+path="res://.godot/imported/Super Sidekicks Select.mp3-095e1a8ff6ad58d8d9ca3d9e1df4ab34.mp3str"
+
+[deps]
+
+source_file="res://assets/music/Super Sidekicks Select.mp3"
+dest_files=["res://.godot/imported/Super Sidekicks Select.mp3-095e1a8ff6ad58d8d9ca3d9e1df4ab34.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

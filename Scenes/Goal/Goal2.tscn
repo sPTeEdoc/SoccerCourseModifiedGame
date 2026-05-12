@@ -4,10 +4,10 @@
 [ext_resource type="Script" uid="uid://dnsw2mbiojfmq" path="res://Scenes/Goal/Goal2.cs" id="1_qc3xb"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_84swt"]
-size = Vector2(36, 0)
+size = Vector2(30, 6)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3cm7k"]
-size = Vector2(38, 2)
+size = Vector2(17, 5)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qc3xb"]
 size = Vector2(6, 60)
@@ -391,14 +391,14 @@ collision_mask = 4
 monitorable = false
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="BackNetArea"]
-polygon = PackedVector2Array(-20, -2, -12, -65, -10, -65, -18, -2)
+polygon = PackedVector2Array(-17, 0, -19, -63, -1, -95, 2, -34)
 
 [node name="BottomFrame" type="StaticBody2D" parent="."]
 position = Vector2(-3, -1)
 collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BottomFrame"]
-position = Vector2(-5, -1)
+position = Vector2(3, -1)
 shape = SubResource("RectangleShape2D_84swt")
 
 [node name="TopFrame" type="StaticBody2D" parent="."]
@@ -406,7 +406,7 @@ position = Vector2(7, -67)
 collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TopFrame"]
-position = Vector2(-6, -2)
+position = Vector2(0.5, -26.5)
 shape = SubResource("RectangleShape2D_3cm7k")
 
 [node name="Targets" type="Node2D" parent="."]
@@ -422,7 +422,6 @@ position = Vector2(22, -35)
 position = Vector2(22, -10)
 
 [node name="InvisibleWalls" type="StaticBody2D" parent="."]
-visible = false
 collision_layer = 8
 collision_mask = 0
 
@@ -442,3 +441,11 @@ shape = SubResource("RectangleShape2D_fubm1")
 [node name="TileMapLayer" type="TileMapLayer" parent="."]
 tile_map_data = PackedByteArray("AAD+//v/AQAKAA8AAAD+//z/AQAKABAAAAD+//3/AQAKABEAAAD+//7/AQAKABIAAAD+////AQAKABMAAAD///r/AQALAA4AAAD///v/AQALAA8AAAD///z/AQALABAAAAD///3/AQALABEAAAD///7/AQALABIAAAD/////AQALABMAAAAAAPr/AQAMAA4AAAAAAPv/AQAMAA8AAAAAAPz/AQAMABAAAAAAAP3/AQAMABEAAAAAAP7/AQAMABIAAAAAAP//AQAMABMAAAA=")
 tile_set = SubResource("TileSet_fubm1")
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+visible = false
+collision_mask = 0
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D"]
+position = Vector2(-28, -73)
+polygon = PackedVector2Array(44, 67, 11, 68, 12, 8, 12, -1, 27, -22, 28, -20, 9, 8, 9, 74, 45, 73)

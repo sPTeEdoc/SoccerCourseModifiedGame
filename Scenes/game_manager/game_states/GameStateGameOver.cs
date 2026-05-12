@@ -8,11 +8,11 @@ public partial class GameStateGameOver : GameState
 
     public override void _EnterTree()
     {
-        string countryWinner = manager.GetWinnerCountry();
+        int winningTeamID = manager.GetWinningTeam();
         soundPlayer = GetNode<SoundPlayer>("/root/SoundPlayer");
         gameEvents = GetNode<GameEvents>("/root/GameEvents");
 
         soundPlayer.Play(SoundPlayer.Sound.WHISTLE);
-        gameEvents.EmitGameOver(countryWinner);
+        gameEvents.EmitGameOver(winningTeamID);
     }
 }
