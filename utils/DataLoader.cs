@@ -36,7 +36,7 @@ public partial class DataLoader : Node
             string teamName = team["teamName"].AsString();
             string hexColor = team["jersey_color"].AsString();
             string hexColorB = team["jersey_color_B"].AsString();
-            string hexColorC = "#000000";
+            string hexColorC = "";
             if (team.ContainsKey("jersey_color_C"))
                 hexColorC = team["jersey_color_C"].AsString();
             string shortsColor = team["shorts"].AsString();

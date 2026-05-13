@@ -95,13 +95,6 @@ public partial class PlayerCharacter : CharacterBody2D
         opponentDetectionArea = GetNode<Area2D>("OpponentDetectionArea");
         permanentDamageEmitterArea = GetNode<Area2D>("PermanentDamageEmitterArea");
         playerSprite = GetNode<Sprite2D>("PlayerSprite");
-        foreach(KeyValuePair<int, Team> t in GameManagement.teamsDictionary)
-        {
-            if (String.IsNullOrWhiteSpace(t.Value.Jersey_color_C))
-            {
-                playerSprite.Texture = GD.Load<Texture2D>("res://assets/art/characters/nibley4.png");
-            }
-        }
         rootParticles = GetNode<Node2D>("RootParticles");
         runParticles = GetNode<GpuParticles2D>("RootParticles/RunParticles");
         tackleDamageEmitterArea = GetNode<Area2D>("TackleDamageEmitterArea");
@@ -166,6 +159,17 @@ public partial class PlayerCharacter : CharacterBody2D
         var jerseyC = dataLoader.GetJerseyColorC(teamID);
         var shorts = dataLoader.GetShortsColor(teamID); // 'team' is likely a string like "FRANCE"
         var socksColor = dataLoader.GetSocksColor(teamID); // 'team' is likely a string like "FRANCE"
+
+        Team t = GameManagement.teamsDictionary[teamID];
+
+        if (!String.IsNullOrWhiteSpace(jerseyC))
+        {
+            playerSprite.Texture = GD.Load<Texture2D>("res://assets/art/characters/nibley4.png");
+        }
+        else
+        {
+            playerSprite.Texture = GD.Load<Texture2D>("res://assets/art/characters/nibley3.png");
+        }
 
         if (jerseyA != null && !string.IsNullOrEmpty(jerseyA))
         {

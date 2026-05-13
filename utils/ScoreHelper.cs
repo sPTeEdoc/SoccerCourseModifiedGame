@@ -15,12 +15,12 @@ public static class ScoreHelper
         }
         else
         {
-            return $"{currentMatch.Winner} LEADS {currentMatch.FinalScore}";
+            return $"{GameManagement.teamsDictionary[currentMatch.Winner].Name} LEADS {currentMatch.FinalScore}";
         }
     }
 
     public static string GetFinalScoreInfo(Match currentMatch)
     {
-        return $"{currentMatch.Winner} WINS {currentMatch.FinalScore}";
+        return $"{GameManagement.teamsDictionary[currentMatch.Winner].Name} WINS {currentMatch.FinalScore}";
     }
 }
