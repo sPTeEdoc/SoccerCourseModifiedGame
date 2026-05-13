@@ -160,8 +160,6 @@ public partial class PlayerCharacter : CharacterBody2D
         var shorts = dataLoader.GetShortsColor(teamID); // 'team' is likely a string like "FRANCE"
         var socksColor = dataLoader.GetSocksColor(teamID); // 'team' is likely a string like "FRANCE"
 
-        Team t = GameManagement.teamsDictionary[teamID];
-
         if (!String.IsNullOrWhiteSpace(jerseyC))
         {
             playerSprite.Texture = GD.Load<Texture2D>("res://assets/art/characters/nibley4.png");
