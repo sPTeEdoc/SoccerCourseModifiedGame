@@ -119,6 +119,8 @@ public partial class ActorsContainer : Node2D
         // Because both types are PlayerCharacters, this method works seamlessly on either.
         player.Initialize(position, kickoffPos, Ball, ownGoal, targetGoal, data, teamID);
 
+        player.SwapRequested += OnPlayerSwapRequest;
+
         // 3. Add to the scene tree and return
         AddChild(player);
         return player;
