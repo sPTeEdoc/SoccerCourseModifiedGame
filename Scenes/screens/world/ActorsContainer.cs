@@ -7,8 +7,8 @@ public partial class ActorsContainer : Node2D
 {
     private const int DurationWeightCache = 200;
 
-    private PackedScene playerPrefab = GD.Load<PackedScene>("res://scenes/characters/PlayerCharacter.tscn");
-    private PackedScene sparkPrefab = GD.Load<PackedScene>("res://scenes/spark/spark.tscn");
+    private readonly PackedScene outfielderPrefab = GD.Load<PackedScene>("res://Scenes/Characters/Outfielder.tscn");
+    private readonly PackedScene goalkeeperPrefab = GD.Load<PackedScene>("res://Scenes/Characters/Goalkeeper.tscn"); private PackedScene sparkPrefab = GD.Load<PackedScene>("res://scenes/spark/spark.tscn");
 
     [Export] public Ball Ball { get; set; }
     [Export] public Goal GoalHome { get; set; }
@@ -103,9 +103,23 @@ public partial class ActorsContainer : Node2D
 
     private PlayerCharacter SpawnPlayer(Vector2 position, Vector2 kickoffPos, Goal ownGoal, Goal targetGoal, PlayerResource data, int teamID)
     {
-        var player = playerPrefab.Instantiate<PlayerCharacter>();
+        PlayerCharacter player;
+
+        // 1. Determine which prefab to use based on the player's role
+        if (data.Role == PlayerCharacter.Role.GOALIE)
+        {
+            player = goalkeeperPrefab.Instantiate<GoalKeeper>();
+        }
+        else
+        {
+            player = outfielderPrefab.Instantiate<Outfielder>();
+        }
+
+        // 2. Initialize the common fields exactly like before!
+        // Because both types are PlayerCharacters, this method works seamlessly on either.
         player.Initialize(position, kickoffPos, Ball, ownGoal, targetGoal, data, teamID);
-        player.SwapRequested += OnPlayerSwapRequest;
+
+        // 3. Add to the scene tree and return
         AddChild(player);
         return player;
     }

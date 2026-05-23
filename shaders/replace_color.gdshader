@@ -16,20 +16,20 @@ void fragment() {
     }
 
     vec4 col = tex;
-    
+
     // #C7DCD0 (Main Jersey)
     vec3 jersey_ref = vec3(0.78, 0.86, 0.81);
-    
+
     // Pure White (Second Jersey Color)
     vec3 jersey_b_ref = vec3(1.0, 1.0, 1.0);
 	vec3 jersey_c_ref = vec3(0.24, 0.21, 0.27);
-	
+
 	vec3 shorts_ref = vec3(0.5686, 0.8588, 0.4118);
-	
+
 	vec3 shorts_refB = vec3(0.1176, 0.7373, 0.4510);
-	
+
 	vec3 socks_ref = vec3(0.9843, 1, 0.5255);
-    
+
     float tolerance = 0.05;
 
     // 1. DETECT JERSEY A (#C7DCD0)

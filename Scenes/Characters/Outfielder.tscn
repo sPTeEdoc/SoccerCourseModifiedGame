@@ -1,0 +1,36 @@
+[gd_scene load_steps=6 format=3 uid="uid://bsbpaajsp7qk7"]
+
+[ext_resource type="PackedScene" uid="uid://b0sas5bowddqr" path="res://Scenes/Characters/PlayerCharacter.tscn" id="1_qj1f7"]
+[ext_resource type="Script" uid="uid://di1o7sbyuti05" path="res://Scenes/Characters/Outfielder.cs" id="2_1j5sn"]
+[ext_resource type="Shader" uid="uid://wnc3mm3c827x" path="res://shaders/replace_color.gdshader" id="2_difb7"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1j5sn"]
+resource_local_to_scene = true
+shader = ExtResource("2_difb7")
+shader_parameter/team_color = Color(0, 0, 0, 1)
+shader_parameter/team_colorB = Color(0, 0, 0, 1)
+shader_parameter/team_colorC = Color(0, 0, 0, 1)
+shader_parameter/skin_color = Color(0, 0, 0, 1)
+shader_parameter/shorts = Color(0, 0, 0, 1)
+shader_parameter/socks = Color(0, 0, 0, 1)
+shader_parameter/unavailable = false
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qj1f7"]
+size = Vector2(7, 7)
+
+[node name="PlayerCharacter" instance=ExtResource("1_qj1f7")]
+script = ExtResource("2_1j5sn")
+
+[node name="PlayerSprite" parent="." index="1"]
+material = SubResource("ShaderMaterial_1j5sn")
+
+[node name="TackleDamageEmitterArea" type="Area2D" parent="." index="9"]
+unique_name_in_owner = true
+collision_layer = 0
+collision_mask = 2
+monitoring = false
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TackleDamageEmitterArea" index="0"]
+position = Vector2(13, -3)
+shape = SubResource("RectangleShape2D_qj1f7")

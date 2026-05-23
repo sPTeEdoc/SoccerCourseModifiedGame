@@ -22,21 +22,27 @@ public partial class PlayerState : Node
     protected Area2D tackleDamageEmitterArea;
     protected Area2D teammateDetectionArea;
 
-    public void Setup(PlayerCharacter contextPlayer, PlayerStateData contextData, AnimationPlayer contextAnimationPlayer,
-                      Ball contextBall, Area2D contextTeammateDetectionArea, Area2D contextBallDetectionArea,
-                      Goal contextOwnGoal, Goal contextTargetGoal, Area2D contextTackleDamageEmitterArea,
-                      AIBehavior contextAIBehavior)
+    public void Setup(PlayerCharacter contextPlayer, PlayerStateData contextData)
     {
         player = contextPlayer;
-        animationPlayer = contextAnimationPlayer;
         stateData = contextData;
-        ball = contextBall;
-        teammateDetectionArea = contextTeammateDetectionArea;
-        ballDetectionArea = contextBallDetectionArea;
-        ownGoal = contextOwnGoal;
-        targetGoal = contextTargetGoal;
-        aiBehavior = contextAIBehavior;
-        tackleDamageEmitterArea = contextTackleDamageEmitterArea;
+
+        // Pull common dependencies directly from the player!
+        animationPlayer = player.animationPlayer;
+        ball = player.ball;
+        teammateDetectionArea = player.teammateDetectionArea;
+        ballDetectionArea = player.ballDetectionArea;
+        ownGoal = player.ownGoal;
+        targetGoal = player.targetGoal;
+        aiBehavior = player.currentAIBehavior;
+
+        // Handle specialized dependencies cleanly by casting
+        if (player is Outfielder outfielder)
+        {
+            tackleDamageEmitterArea = outfielder.tackleDamageEmitterArea;
+        }
+        // If you ever need Goalkeeper specific nodes in a state:
+        // else if (player is Goalkeeper goalkeeper) { ... }
     }
 
     public void TransitionState(PlayerCharacter.State newState, PlayerStateData data = null)

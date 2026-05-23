@@ -53,13 +53,10 @@ public partial class PlayerCharacter : CharacterBody2D
     public AnimationPlayer animationPlayer;
     public Area2D ballDetectionArea;
     public Sprite2D controlSprite;
-    public CollisionShape2D goalieHandsCollider;
     public Area2D opponentDetectionArea;
-    public Area2D permanentDamageEmitterArea;
     public Sprite2D playerSprite;
     public Node2D rootParticles;
     public GpuParticles2D runParticles;
-    public Area2D tackleDamageEmitterArea;
     public Area2D teammateDetectionArea;
 
     // Internal State
@@ -91,13 +88,10 @@ public partial class PlayerCharacter : CharacterBody2D
         animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
         ballDetectionArea = GetNode<Area2D>("BallDetectionArea");
         controlSprite = GetNode<Sprite2D>("PlayerSprite/ControlSprite");
-        goalieHandsCollider = GetNode<CollisionShape2D>("GoalieHands/GoalieHandsCollider");
         opponentDetectionArea = GetNode<Area2D>("OpponentDetectionArea");
-        permanentDamageEmitterArea = GetNode<Area2D>("PermanentDamageEmitterArea");
         playerSprite = GetNode<Sprite2D>("PlayerSprite");
         rootParticles = GetNode<Node2D>("RootParticles");
         runParticles = GetNode<GpuParticles2D>("RootParticles/RunParticles");
-        tackleDamageEmitterArea = GetNode<Area2D>("TackleDamageEmitterArea");
         teammateDetectionArea = GetNode<Area2D>("TeammateDetectionArea");
         gameEvents = GetNode<GameEvents>("/root/GameEvents");
         gameManager = GetNode<GameManager>("/root/GameManager");
@@ -106,12 +100,6 @@ public partial class PlayerCharacter : CharacterBody2D
         SetControlTexture();
         SetupAIBehavior();
         SetShaderProperties();
-
-        permanentDamageEmitterArea.Monitoring = role == Role.GOALIE;
-        goalieHandsCollider.Disabled = role != Role.GOALIE;
-
-        tackleDamageEmitterArea.BodyEntered += OnTacklePlayer;
-        permanentDamageEmitterArea.BodyEntered += OnTacklePlayer;
 
         spawnPosition = Position;
 
@@ -240,9 +228,7 @@ public partial class PlayerCharacter : CharacterBody2D
 
         // Create and set up the new state
         currentState = stateFactory.GetFreshState(state, this);
-        currentState.Setup(this, stateData, animationPlayer, ball,
-            teammateDetectionArea, ballDetectionArea, ownGoal, targetGoal,
-            tackleDamageEmitterArea, currentAIBehavior);
+        currentState.Setup(this, stateData);
 
         currentState.Name = $"PlayerStateMachine: {state}";
 
@@ -300,14 +286,13 @@ public partial class PlayerCharacter : CharacterBody2D
             heading *= -1;
     }
 
-    private void FlipSprites()
+    public virtual void FlipSprites() // Added 'virtual'
     {
         bool facingRight = heading == Vector2.Right;
 
         playerSprite.FlipH = !facingRight;
         float scale = facingRight ? 1 : -1;
 
-        tackleDamageEmitterArea.Scale = new Vector2(scale, tackleDamageEmitterArea.Scale.Y);
         opponentDetectionArea.Scale = new Vector2(scale, opponentDetectionArea.Scale.Y);
         rootParticles.Scale = new Vector2(scale, rootParticles.Scale.Y);
     }
@@ -361,18 +346,6 @@ public partial class PlayerCharacter : CharacterBody2D
 
     public bool CanCarryBall() => currentState != null && currentState.CanCarryBall();
 
-    private void OnTacklePlayer(Node other)
-    {
-        if (other is PlayerCharacter player &&
-            player != this &&
-            player.teamID != teamID &&
-            ball.Carrier == player)
-        {
-            Vector2 direction = Position.DirectionTo(player.Position);
-            player.GetHurt(direction);
-        }
-    }
-
     public void OnAnimationComplete()
     {
         currentState?.OnAnimationComplete();
@@ -410,6 +383,21 @@ public partial class PlayerCharacter : CharacterBody2D
     public Vector2 GetPassTarget()
     {
         return passTargetPosition;
+    }
+
+    // Virtual method for subclasses to override
+    protected virtual void SubclassReady() { }
+
+    public virtual void OnTacklePlayer(Node other)
+    {
+        if (other is PlayerCharacter player &&
+            player != this &&
+            player.teamID != teamID &&
+            ball.Carrier == player)
+        {
+            Vector2 direction = Position.DirectionTo(player.Position);
+            player.GetHurt(direction);
+        }
     }
 
 }

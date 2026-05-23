@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=3 uid="uid://b0sas5bowddqr"]
+[gd_scene load_steps=32 format=3 uid="uid://b0sas5bowddqr"]
 
 [ext_resource type="Script" uid="uid://jxughe5rpnfi" path="res://Scenes/Characters/PlayerCharacter.cs" id="1_2e7x2"]
 [ext_resource type="Texture2D" uid="uid://cu2obamurss5p" path="res://assets/art/particles/white-circle.png" id="2_4t8qp"]
@@ -410,18 +410,9 @@ height = 18.0
 radius = 6.0
 height = 20.0
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_6eyoc"]
-size = Vector2(7, 7)
-
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_6eyoc"]
 radius = 40.0
 height = 120.0
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_eojnx"]
-size = Vector2(7, 7)
-
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_eojnx"]
-radius = 3.0
 
 [node name="PlayerCharacter" type="CharacterBody2D"]
 collision_layer = 2
@@ -495,17 +486,6 @@ monitorable = false
 rotation = 1.5708
 shape = SubResource("CapsuleShape2D_dyp2m")
 
-[node name="TackleDamageEmitterArea" type="Area2D" parent="."]
-unique_name_in_owner = true
-collision_layer = 0
-collision_mask = 2
-monitoring = false
-monitorable = false
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="TackleDamageEmitterArea"]
-position = Vector2(13, -3)
-shape = SubResource("RectangleShape2D_6eyoc")
-
 [node name="OpponentDetectionArea" type="Area2D" parent="."]
 unique_name_in_owner = true
 visible = false
@@ -517,26 +497,5 @@ monitorable = false
 position = Vector2(20, 0)
 rotation = 1.5708
 shape = SubResource("CapsuleShape2D_6eyoc")
-
-[node name="PermanentDamageEmitterArea" type="Area2D" parent="."]
-unique_name_in_owner = true
-collision_layer = 0
-collision_mask = 2
-monitoring = false
-monitorable = false
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PermanentDamageEmitterArea"]
-position = Vector2(0, -6)
-shape = SubResource("RectangleShape2D_eojnx")
-
-[node name="GoalieHands" type="AnimatableBody2D" parent="."]
-collision_layer = 32
-collision_mask = 0
-sync_to_physics = false
-
-[node name="GoalieHandsCollider" type="CollisionShape2D" parent="GoalieHands"]
-unique_name_in_owner = true
-position = Vector2(0, -14)
-shape = SubResource("CapsuleShape2D_eojnx")
 
 [node name="PlayerStateMachine" type="Node2D" parent="."]

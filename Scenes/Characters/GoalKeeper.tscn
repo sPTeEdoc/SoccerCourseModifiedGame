@@ -1,0 +1,49 @@
+[gd_scene load_steps=7 format=3 uid="uid://dgp6epyy5px2t"]
+
+[ext_resource type="PackedScene" uid="uid://b0sas5bowddqr" path="res://Scenes/Characters/PlayerCharacter.tscn" id="1_hawva"]
+[ext_resource type="Shader" uid="uid://wnc3mm3c827x" path="res://shaders/replace_color.gdshader" id="2_81o5a"]
+[ext_resource type="Script" uid="uid://dm6a4kg3fhdke" path="res://Scenes/Characters/GoalKeeper.cs" id="2_lp7fa"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0h2ym"]
+resource_local_to_scene = true
+shader = ExtResource("2_81o5a")
+shader_parameter/team_color = Color(0, 0, 0, 1)
+shader_parameter/team_colorB = Color(0, 0, 0, 1)
+shader_parameter/team_colorC = Color(0, 0, 0, 1)
+shader_parameter/skin_color = Color(0, 0, 0, 1)
+shader_parameter/shorts = Color(0, 0, 0, 1)
+shader_parameter/socks = Color(0, 0, 0, 1)
+shader_parameter/unavailable = false
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ocxji"]
+radius = 3.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ocxji"]
+size = Vector2(7, 7)
+
+[node name="PlayerCharacter" instance=ExtResource("1_hawva")]
+script = ExtResource("2_lp7fa")
+
+[node name="PlayerSprite" parent="." index="1"]
+material = SubResource("ShaderMaterial_0h2ym")
+
+[node name="GoalieHands" type="AnimatableBody2D" parent="." index="9"]
+collision_layer = 32
+collision_mask = 0
+sync_to_physics = false
+
+[node name="GoalieHandsCollider" type="CollisionShape2D" parent="GoalieHands" index="0"]
+unique_name_in_owner = true
+position = Vector2(0, -14)
+shape = SubResource("CapsuleShape2D_ocxji")
+
+[node name="PermanentDamageEmitterArea" type="Area2D" parent="." index="10"]
+unique_name_in_owner = true
+collision_layer = 0
+collision_mask = 2
+monitoring = false
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PermanentDamageEmitterArea" index="0"]
+position = Vector2(0, -6)
+shape = SubResource("RectangleShape2D_ocxji")
