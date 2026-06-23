@@ -15,7 +15,7 @@ public partial class PlayerStateHeader : PlayerState
     public override void _EnterTree()
     {
         soundPlayer = GetNode<SoundPlayer>("/root/SoundPlayer");
-        animationPlayer.Play("header");
+        animationPlayer.Play($"{player.AnimPrefix}header");
         player.height = HEIGHT_START;
         player.heightVelocity = HEIGHT_VELOCITY;
 

@@ -35,7 +35,7 @@ public partial class PlayerStateCelebrating : PlayerState
 
     private void Celebrate()
     {
-        animationPlayer.Play("celebrate");
+        animationPlayer.Play($"{player.AnimPrefix}celebrate");
         player.height = 0.1f;
         player.heightVelocity = CelebratingHeight;
     }

@@ -12,7 +12,10 @@ public partial class PlayerStateTackling : PlayerState
 
     public override void _EnterTree()
     {
-        animationPlayer.Play("tackle");
+        // If player is a Goalkeeper, this evaluates to e.g., "gk_tackle"
+        // If it's a regular player, it just evaluates to "tackle"
+        animationPlayer.Play($"{player.AnimPrefix}tackle");
+
         tackleDamageEmitterArea.Monitoring = true;
     }
 

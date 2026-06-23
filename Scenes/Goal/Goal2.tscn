@@ -10,10 +10,10 @@ size = Vector2(30, 6)
 size = Vector2(17, 5)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qc3xb"]
-size = Vector2(6, 60)
+size = Vector2(6, 96)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_fubm1"]
-size = Vector2(6, 60)
+size = Vector2(6, 86)
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_qc3xb"]
 texture = ExtResource("1_3cm7k")
@@ -391,7 +391,7 @@ collision_mask = 4
 monitorable = false
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="BackNetArea"]
-polygon = PackedVector2Array(-17, 0, -19, -63, -1, -95, 2, -34)
+polygon = PackedVector2Array(-17, 0, -19, -63, -1, -95, 11, -95, 12, -34, 11, 0)
 
 [node name="BottomFrame" type="StaticBody2D" parent="."]
 position = Vector2(-3, -1)
@@ -413,10 +413,10 @@ shape = SubResource("RectangleShape2D_3cm7k")
 unique_name_in_owner = true
 
 [node name="TopTarget" type="Node2D" parent="Targets"]
-position = Vector2(22, -56)
+position = Vector2(22, -76)
 
 [node name="MiddleTarget" type="Node2D" parent="Targets"]
-position = Vector2(22, -35)
+position = Vector2(22, -45)
 
 [node name="BottomTarget" type="Node2D" parent="Targets"]
 position = Vector2(22, -10)
@@ -426,7 +426,7 @@ collision_layer = 8
 collision_mask = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="InvisibleWalls"]
-position = Vector2(20, -35)
+position = Vector2(20, -48)
 shape = SubResource("RectangleShape2D_qc3xb")
 
 [node name="ScoringArea" type="Area2D" parent="."]
@@ -435,7 +435,7 @@ collision_layer = 16
 collision_mask = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ScoringArea"]
-position = Vector2(11, -35)
+position = Vector2(11, -48)
 shape = SubResource("RectangleShape2D_fubm1")
 
 [node name="TileMapLayer" type="TileMapLayer" parent="."]

@@ -9,7 +9,7 @@ public partial class PlayerStateChestControl : PlayerState
 
     public override void _EnterTree()
     {
-        animationPlayer.Play("chest_control");
+        animationPlayer.Play($"{player.AnimPrefix}chest_control");
         player.Velocity = Vector2.Zero;
         timeSinceControl = (int)Time.GetTicksMsec();
     }

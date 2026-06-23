@@ -3883,16 +3883,16 @@ unique_name_in_owner = true
 position = Vector2(425, 254)
 
 [node name="GoaliePosition" type="Node2D" parent="ActorsContainer/Spawns"]
-position = Vector2(-355, 60)
+position = Vector2(-355, 6)
 
 [node name="DefensePosition" type="Node2D" parent="ActorsContainer/Spawns"]
-position = Vector2(-235, -30)
+position = Vector2(-235, -106)
 
 [node name="DefensePosition2" type="Node2D" parent="ActorsContainer/Spawns"]
 position = Vector2(-235, 120)
 
 [node name="MidfieldPosition" type="Node2D" parent="ActorsContainer/Spawns"]
-position = Vector2(-125, 60)
+position = Vector2(-129, 12)
 
 [node name="OffensePosition" type="Node2D" parent="ActorsContainer/Spawns"]
 position = Vector2(-25, -60)
@@ -3936,7 +3936,7 @@ collision_mask = 0
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D"]
 position = Vector2(17, 50)
-polygon = PackedVector2Array(6, 161, 10, -4, 804, -1, 807, 158, 795, 158, 792, 16, 75, 14, 18, 16, 15, 161)
+polygon = PackedVector2Array(4, 163, 10, -4, 804, -1, 810, 162, 794, 162, 792, 16, 75, 14, 18, 16, 21, 163)
 
 [node name="StaticBody2D2" type="StaticBody2D" parent="."]
 collision_mask = 0

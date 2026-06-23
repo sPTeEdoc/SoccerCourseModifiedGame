@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public partial class Ball : AnimatableBody2D
+public partial class Ball : CharacterBody2D
 {
     public const float BOUNCINESS = 0.8f;
     private const int DISTANCE_HIGH_PASS = 90;
@@ -49,6 +49,52 @@ public partial class Ball : AnimatableBody2D
     {
         ballSprite.Position = Vector2.Up * Height;
         scoringRaycast.Rotation = Velocity.Angle();
+    }
+
+    public override void _PhysicsProcess(double delta)
+    {
+        // Apply state-specific velocity modifications, friction, etc.
+        // If FREEFORM or SHOT, move using Godot's collision system:
+        if (CurrentState is BallStateFreeform || CurrentState is BallStateShot)
+        {
+            Velocity = Velocity.MoveToward(Vector2.Zero, FrictionGround * (float)delta);
+
+            // MoveAndCollide returns a kinematic collision if it hits a defender mid-flight!
+            var collision = MoveAndCollide(Velocity * (float)delta);
+            if (collision != null)
+            {
+                HandleBallCollision(collision);
+            }
+        }
+    }
+
+    private void HandleBallCollision(KinematicCollision2D collision)
+    {
+        var collider = collision.GetCollider();
+
+        if (collider is PlayerCharacter player)
+        {
+            // 1. If it hits an opponent or teammate mid-flight, they intercept/block it
+            // (Assuming you have a way to check if they are capable or ready to intercept)
+            if (player.teamID != Carrier?.teamID)
+            {
+                // Trigger defender interception/block logic
+                Velocity = Vector2.Zero;
+                player.ControlBall();
+                this.Carrier = player;
+                SwitchState(State.CARRIED);
+            }
+            else
+            {
+                // Simple bounce off teammate body if they weren't the intended receiver
+                Velocity = Velocity.Bounce(collision.GetNormal()) * BOUNCINESS;
+            }
+        }
+        else
+        {
+            // Hits environment/posts/walls
+            Velocity = Velocity.Bounce(collision.GetNormal()) * BOUNCINESS;
+        }
     }
 
     public void SwitchState(State state, BallStateData data = null)
@@ -162,7 +208,7 @@ public partial class Ball : AnimatableBody2D
     private void OnKickoffStarted()
     {
         Velocity = Vector2.Zero;
-        HeightVelocity = 0; 
+        HeightVelocity = 0;
         PassTo(spawnPosition + Vector2.Down * KICKOFF_PASS_DISTANCE, 0);
     }
 
@@ -180,6 +226,6 @@ public partial class Ball : AnimatableBody2D
         {
             gameEvents.KickoffStarted -= OnKickoffStarted;
             gameEvents.TeamResetEventTriggered -= OnTeamReset; // ✅ add this
-        }   
+        }
     }
 }

@@ -45,7 +45,48 @@ public partial class AIBehaviorField : AIBehavior
         }
 
         totalSteeringForce = totalSteeringForce.LimitLength(1.0f);
-        player.Velocity = totalSteeringForce * player.speed;
+
+        // Calculate if the AI should sprint
+        float currentSpeed = player.speed;
+        if (ShouldAIEngageSprint())
+        {
+            currentSpeed *= 1.5f; // Match your human sprint multiplier
+
+            // If the CPU is sprinting with the ball, trigger the micro-kick rule!
+            if (player.HasBall())
+            {
+                TriggerCPUMicroKick(totalSteeringForce, currentSpeed);
+            }
+        }
+
+        player.Velocity = totalSteeringForce * currentSpeed;
+    }
+
+    private bool ShouldAIEngageSprint()
+    {
+        // Case 1: Chasing a completely loose ball
+        if (ball.Carrier == null && player.Position.DistanceTo(ball.Position) > 40f)
+        {
+            return true;
+        }
+
+        // Case 2: Carrier has clear grass ahead towards goal
+        if (player.HasBall() && !HasOpponentsNearby())
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private void TriggerCPUMicroKick(Vector2 direction, float currentSpeed)
+    {
+        // Every few frames (or handled by a small timer logic inside player character)
+        // Push the ball forward into FREEFORM, allowing defenders a chance to intercept
+        Vector2 pushVelocity = direction * (currentSpeed * 1.3f);
+        ball.Velocity = pushVelocity;
+        ball.Carrier = null;
+        ball.SwitchState(Ball.State.FREEFORM, BallStateData.Build().SetLockDuration(150));
     }
 
     public override void PerformAIDecisions()
@@ -67,6 +108,9 @@ public partial class AIBehaviorField : AIBehavior
             {
                 shotProbability /= 10f;
             }
+            Random random = new Random();
+            double bonus = random.NextDouble();
+            float shotPower = player.power * (1.2f + (float)bonus);
 
             if (player.Position.DistanceTo(target) < SHOT_DISTANCE && GD.Randf() < shotProbability)
             {
@@ -74,7 +118,7 @@ public partial class AIBehaviorField : AIBehavior
                 Vector2 shotDirection = player.Position.DirectionTo(player.targetGoal.GetRandomTargetPosition());
 
                 var data = PlayerStateData.Build()
-                    .SetShotPower(player.power)
+                    .SetShotPower(shotPower)
                     .SetShotDirection(shotDirection);
 
                 player.SwitchState(PlayerCharacter.State.SHOOTING, data);

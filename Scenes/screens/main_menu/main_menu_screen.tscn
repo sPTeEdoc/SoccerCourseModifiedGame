@@ -1,9 +1,9 @@
 [gd_scene load_steps=16 format=3 uid="uid://ei3j4377wuyi"]
 
-[ext_resource type="Texture2D" uid="uid://cdkq3rdcj5kud" path="res://assets/art/ui/mainmenu/menu-background.png" id="1_du1io"]
 [ext_resource type="Script" uid="uid://ca81cpoxnx3gn" path="res://Scenes/screens/main_menu/MainMenuScreen.cs" id="1_y4s1m"]
-[ext_resource type="Texture2D" uid="uid://db3nh5qo06ph8" path="res://assets/art/ui/mainmenu/title.png" id="2_ai35v"]
+[ext_resource type="Texture2D" uid="uid://bl03x22wfw1p0" path="res://assets/art/backgrounds/nibley title.png" id="2_y4s1m"]
 [ext_resource type="Texture2D" uid="uid://crpesblnk5qk4" path="res://assets/art/ui/mainmenu/menu-mask.png" id="3_nawi7"]
+[ext_resource type="Texture2D" uid="uid://2ufb4jadjdn0" path="res://assets/art/ui/mainmenu/nibleysbigadventure.png" id="3_y4s1m"]
 [ext_resource type="Texture2D" uid="uid://dbfvuee4aid5b" path="res://assets/art/ui/mainmenu/layout-p1.png" id="4_1h8ap"]
 [ext_resource type="Texture2D" uid="uid://c4pak3q7sqjxy" path="res://assets/art/ui/mainmenu/layout-p2.png" id="5_u4ap7"]
 [ext_resource type="Texture2D" uid="uid://ixyov1ay4i0a" path="res://assets/art/ui/mainmenu/ball-selection.png" id="6_1jwuw"]
@@ -147,7 +147,7 @@ tracks/3/keys = {
 "times": PackedFloat32Array(0.5, 0.8),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [Vector2(155, 180), Vector2(155, 0)]
+"values": [Vector2(437, 360), Vector2(437, 180)]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
@@ -250,17 +250,21 @@ script = ExtResource("1_y4s1m")
 Music = 2
 
 [node name="Background" type="TextureRect" parent="."]
-offset_right = 40.0
-offset_bottom = 40.0
-texture = ExtResource("1_du1io")
+offset_right = 560.0
+offset_bottom = 360.0
+texture = ExtResource("2_y4s1m")
+expand_mode = 1
 
 [node name="TitleTexture" type="TextureRect" parent="Background"]
+texture_filter = 2
 layout_mode = 1
 offset_left = 25.0
-offset_top = -70.0
-offset_right = 164.0
-offset_bottom = -5.0
-texture = ExtResource("2_ai35v")
+offset_top = 20.0
+offset_right = 375.0
+offset_bottom = 137.0
+scale = Vector2(0.998573, 0.993289)
+texture = ExtResource("3_y4s1m")
+stretch_mode = 2
 
 [node name="Mask" type="TextureRect" parent="Background"]
 modulate = Color(0, 0, 0, 0.784314)
@@ -268,9 +272,9 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -125.0
-offset_top = 180.0
-offset_bottom = 360.0
+offset_left = -405.0
+offset_right = -280.0
+offset_bottom = 180.0
 grow_horizontal = 0
 texture = ExtResource("3_nawi7")
 
@@ -307,9 +311,9 @@ texture = ExtResource("5_u4ap7")
 [node name="SinglePlayerTexture" type="TextureRect" parent="Background"]
 unique_name_in_owner = true
 layout_mode = 1
-offset_left = -150.0
+offset_left = 35.0
 offset_top = 100.0
-offset_right = -8.0
+offset_right = 177.0
 offset_bottom = 121.0
 texture = ExtResource("7_41loo")
 stretch_mode = 2
@@ -318,9 +322,9 @@ metadata/_edit_use_anchors_ = true
 [node name="TwoPlayersTexture" type="TextureRect" parent="Background"]
 unique_name_in_owner = true
 layout_mode = 1
-offset_left = -150.0
+offset_left = 35.0
 offset_top = 125.0
-offset_right = -8.0
+offset_right = 177.0
 offset_bottom = 146.0
 texture = ExtResource("8_iuc4d")
 stretch_mode = 2

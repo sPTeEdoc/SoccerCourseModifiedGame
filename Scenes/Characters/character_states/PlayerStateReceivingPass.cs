@@ -28,7 +28,7 @@ public partial class PlayerStateReceivingPass : PlayerState
         // Use pass rating to scale anticipation trust
         float trustFactor = Mathf.InverseLerp(50f, 99f, passerRating);
         float anticipationWindow = Mathf.Lerp(0.2f, 0.6f, trustFactor);
-        Vector2 anticipatedPosition = ball.Position + ball.ConstantLinearVelocity * anticipationWindow;
+        Vector2 anticipatedPosition = ball.Position + ball.Velocity * anticipationWindow;
 
         // Vector2 anticipatedPosition = ball.Position + ball.ConstantLinearVelocity * anticipationWindow;
 

@@ -55,7 +55,7 @@ unique_name_in_owner = true
 position = Vector2(425, 180)
 
 [node name="GoaliePosition" type="Node2D" parent="ActorsContainer/Spawns"]
-position = Vector2(-345, 1)
+position = Vector2(-339, -34)
 
 [node name="DefensePosition" type="Node2D" parent="ActorsContainer/Spawns"]
 position = Vector2(-235, -30)

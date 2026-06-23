@@ -83,6 +83,9 @@ public partial class PlayerCharacter : CharacterBody2D
     public DataLoader dataLoader;
 
     public double passerRating = 0;
+    public virtual string AnimPrefix => "";
+    protected virtual string DefaultSpriteSheet => "res://assets/art/characters/nibley3.png";
+    protected virtual string AlternateSpriteSheet => "res://assets/art/characters/nibley4.png";
     public override void _Ready()
     {
         animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
@@ -150,11 +153,11 @@ public partial class PlayerCharacter : CharacterBody2D
 
         if (!String.IsNullOrWhiteSpace(jerseyC))
         {
-            playerSprite.Texture = GD.Load<Texture2D>("res://assets/art/characters/nibley4.png");
+            playerSprite.Texture = GD.Load<Texture2D>(AlternateSpriteSheet);
         }
         else
         {
-            playerSprite.Texture = GD.Load<Texture2D>("res://assets/art/characters/nibley3.png");
+            playerSprite.Texture = GD.Load<Texture2D>(DefaultSpriteSheet);
         }
 
         if (jerseyA != null && !string.IsNullOrEmpty(jerseyA))
@@ -249,11 +252,11 @@ public partial class PlayerCharacter : CharacterBody2D
     {
         float velLength = Velocity.Length();
         if (velLength < 1)
-            animationPlayer.Play("idle");
+            animationPlayer.Play($"{AnimPrefix}idle");
         else if (velLength < speed * WalkAnimThreshold)
-            animationPlayer.Play("walk");
+            animationPlayer.Play($"{AnimPrefix}walk");
         else
-            animationPlayer.Play("run");
+            animationPlayer.Play($"{AnimPrefix}run");
     }
 
     private void ProcessGravity(float delta)
@@ -399,5 +402,4 @@ public partial class PlayerCharacter : CharacterBody2D
             player.GetHurt(direction);
         }
     }
-
 }

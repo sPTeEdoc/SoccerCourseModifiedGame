@@ -9,7 +9,7 @@ public partial class PlayerStatePassing : PlayerState
     public override void _EnterTree()
     {
         soundPlayer = GetNode<SoundPlayer>("/root/SoundPlayer");
-        animationPlayer.Play("kick");
+        animationPlayer.Play($"{player.AnimPrefix}kick");
         player.Velocity = Vector2.Zero;
         soundPlayer.Play(SoundPlayer.Sound.PASS);
     }

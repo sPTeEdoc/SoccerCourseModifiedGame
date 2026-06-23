@@ -3,7 +3,9 @@ using System;
 
 public partial class Outfielder : PlayerCharacter
 {
+        // Each subclass will define its own prefix
     public Area2D tackleDamageEmitterArea;
+    public override string AnimPrefix => "outfielder/";
 
     public override void _Ready()
     {

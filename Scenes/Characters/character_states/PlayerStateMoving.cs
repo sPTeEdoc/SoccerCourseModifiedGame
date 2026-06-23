@@ -22,11 +22,30 @@ public partial class PlayerStateMoving : PlayerState
     private void HandleHumanMovement()
     {
         Vector2 direction = KeyUtils.GetInputVector(player.controlScheme);
-        player.Velocity = direction * player.speed;
+
+        // Determine speed based on whether they are sprinting
+        bool isSprinting = KeyUtils.IsActionPressed(player.controlScheme, KeyUtils.Action.SPRINT);
+        float currentSpeed = isSprinting ? player.speed * 1.8f : player.speed;
+
+        player.Velocity = direction * currentSpeed;
 
         if (player.Velocity != Vector2.Zero)
         {
             teammateDetectionArea.Rotation = player.Velocity.Angle();
+
+            // SPRINT LOGIC: If carrying the ball, knock it ahead!
+            if (player.HasBall() && isSprinting)
+            {
+                // Knock it ahead 35-40 pixels into a short freeform state
+                Vector2 pushVelocity = direction * (currentSpeed * 1.3f);
+
+                // Release carrier temporarily so a defender can step in
+                ball.Velocity = pushVelocity;
+                ball.Carrier = null;
+
+                // Lock the ball for a tiny window (~150ms) so the user doesn't instantly recapture it
+                ball.SwitchState(Ball.State.FREEFORM, BallStateData.Build().SetLockDuration(150));
+            }
         }
 
         if (KeyUtils.IsActionJustPressed(player.controlScheme, KeyUtils.Action.PASS))
@@ -77,7 +96,8 @@ public partial class PlayerStateMoving : PlayerState
 
     public override bool CanCarryBall()
     {
-        return player.role != PlayerCharacter.Role.GOALIE;
+        // Goalies can now absolutely possess and carry the ball!
+        return true;
     }
 
     private bool CanTeammatePassBall()

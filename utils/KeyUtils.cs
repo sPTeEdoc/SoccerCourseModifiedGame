@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public static class KeyUtils
 {
-    public enum Action { LEFT, RIGHT, UP, DOWN, SHOOT, PASS }
+    public enum Action { LEFT, RIGHT, UP, DOWN, SHOOT, PASS, SPRINT }
 
     public static readonly Dictionary<PlayerCharacter.ControlScheme, Dictionary<Action, string>> ACTIONS_MAP =
         new()
@@ -16,7 +16,8 @@ public static class KeyUtils
                     { Action.UP, "p1_up" },
                     { Action.DOWN, "p1_down" },
                     { Action.SHOOT, "p1_shoot" },
-                    { Action.PASS, "p1_pass" }
+                    { Action.PASS, "p1_pass" },
+                    { Action.SPRINT, "p1_sprint"}
                 }
             },
             {
