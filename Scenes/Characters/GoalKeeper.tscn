@@ -202,6 +202,9 @@ _data = {
 [node name="PlayerCharacter" instance=ExtResource("1_esuv2")]
 script = ExtResource("2_drbef")
 
+[node name="RootParticles" parent="." index="0"]
+visible = false
+
 [node name="PlayerSprite" parent="." index="1"]
 material = SubResource("ShaderMaterial_drbef")
 texture = ExtResource("4_0dpbv")

@@ -11,7 +11,7 @@ public partial class PlayerStateBicycleKick : PlayerState
 
     public override void _EnterTree()
     {
-        animationPlayer.Play("bicycle_kick");
+        animationPlayer.Play($"{player.AnimPrefix}bicycle_kick");
         ballDetectionArea.BodyEntered += OnBallEntered;
     }
 

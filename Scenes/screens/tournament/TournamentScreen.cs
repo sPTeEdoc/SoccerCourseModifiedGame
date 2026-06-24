@@ -57,7 +57,7 @@ public partial class TournamentScreen : Screen
 
     public override void _Process(double delta)
     {
-        if (KeyUtils.IsActionJustPressed(PlayerCharacter.ControlScheme.P1, KeyUtils.Action.SHOOT))
+        if (KeyUtils.IsActionJustPressed(PlayerCharacter.ControlScheme.P1, KeyUtils.Action.AButton))
         {
             if (tournament.CurrentStage < Tournament.Stage.Complete)
                 TransitionScreen(SoccerGame.ScreenType.InGame, screenData);

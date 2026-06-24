@@ -21,10 +21,29 @@ public partial class PlayerStateMoving : PlayerState
 
     private void HandleHumanMovement()
     {
-        Vector2 direction = KeyUtils.GetInputVector(player.controlScheme);
+        bool isPressing = KeyUtils.IsActionPressed(player.controlScheme, KeyUtils.Action.AButton);
+        Vector2 direction = Vector2.Zero;
+
+        if (isPressing && ball.Carrier != null && ball.Carrier.teamID != player.teamID)
+        {
+            // PES AUTOMATED PRESS: Guide the player directly toward the ball carrier
+            direction = player.Position.DirectionTo(ball.Position);
+
+            // Automatically execute a standing tackle if the press gets them within range
+            if (player.Position.DistanceTo(ball.Position) < 24f)
+            {
+                TransitionState(PlayerCharacter.State.STANDING_TACKLE);
+                return;
+            }
+        }
+        else
+        {
+            // Standard manual stick movement
+            direction = KeyUtils.GetInputVector(player.controlScheme);
+        }
 
         // Determine speed based on whether they are sprinting
-        bool isSprinting = KeyUtils.IsActionPressed(player.controlScheme, KeyUtils.Action.SPRINT);
+        bool isSprinting = KeyUtils.IsActionPressed(player.controlScheme, KeyUtils.Action.R1Button);
         float currentSpeed = isSprinting ? player.speed * 1.8f : player.speed;
 
         player.Velocity = direction * currentSpeed;
@@ -48,7 +67,7 @@ public partial class PlayerStateMoving : PlayerState
             }
         }
 
-        if (KeyUtils.IsActionJustPressed(player.controlScheme, KeyUtils.Action.PASS))
+        if (KeyUtils.IsActionJustPressed(player.controlScheme, KeyUtils.Action.AButton))
         {
             if (player.HasBall())
             {
@@ -58,12 +77,12 @@ public partial class PlayerStateMoving : PlayerState
             {
                 ball.Carrier?.GetPassRequest(player);
             }
-            else
-            {
-                player.EmitSwapRequest(player);
-            }
         }
-        else if (KeyUtils.IsActionJustPressed(player.controlScheme, KeyUtils.Action.SHOOT))
+        else if (KeyUtils.IsActionJustPressed(player.controlScheme, KeyUtils.Action.L1Button))
+        {
+            player.EmitSwapRequest(player);
+        }
+        else if ((KeyUtils.IsActionJustPressed(player.controlScheme, KeyUtils.Action.XButton)))
         {
             if (player.HasBall())
             {
@@ -87,10 +106,29 @@ public partial class PlayerStateMoving : PlayerState
                     TransitionState(PlayerCharacter.State.HEADER);
                 }
             }
-            else if (player.Velocity != Vector2.Zero)
+        }
+        else if (KeyUtils.IsActionJustPressed(player.controlScheme, KeyUtils.Action.BButton))
+        {
+            if (!player.HasBall())
             {
                 TransitionState(PlayerCharacter.State.TACKLING);
             }
+            // else if (player.Velocity != Vector2.Zero)
+            // {
+            //     TransitionState(PlayerCharacter.State.TACKLING);
+            // // Check if the human player is moving fast enough to warrant a slide
+            // // Let's say if they are moving at more than 70% of baseline speed
+            // if (player.Velocity.Length() > player.speed * 0.7f)
+            // {
+            //     // High risk / High reward slide lunge!
+            //     TransitionState(PlayerCharacter.State.TACKLING);
+            // }
+            // else
+            // {
+            //     // Controlled, quick standing challenge / poke tackle
+            //     TransitionState(PlayerCharacter.State.STANDING_TACKLE);
+            // }
+            // }
         }
     }
 

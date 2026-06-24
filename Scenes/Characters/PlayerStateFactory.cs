@@ -22,6 +22,7 @@ public partial class PlayerStateFactory : Node
         { PlayerCharacter.State.RECOVERING, typeof(PlayerStateRecovering) },
         { PlayerCharacter.State.SHOOTING, typeof(PlayerStateShooting) },
         { PlayerCharacter.State.TACKLING, typeof(PlayerStateTackling) },
+        { PlayerCharacter.State.STANDING_TACKLE, typeof(PlayerStateStandingTackle) },
         { PlayerCharacter.State.VOLLEY_KICK, typeof(PlayerStateVolleyKick) }
     };
 

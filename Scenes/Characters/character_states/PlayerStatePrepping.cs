@@ -26,7 +26,7 @@ public partial class PlayerStatePreppingShot : PlayerState
     {
         int elapsed = (int)Time.GetTicksMsec() - timeStartShot;
 
-        if (KeyUtils.IsActionJustReleased(player.controlScheme, KeyUtils.Action.SHOOT) || elapsed >= DURATION_FORCE_RELEASE)
+        if (KeyUtils.IsActionJustReleased(player.controlScheme, KeyUtils.Action.XButton) || elapsed >= DURATION_FORCE_RELEASE)
         {
             Vector2 goalCenter = player.targetGoal.GetCenterTargetPosition();
             Vector2 baseDirToGoal = player.Position.DirectionTo(goalCenter);

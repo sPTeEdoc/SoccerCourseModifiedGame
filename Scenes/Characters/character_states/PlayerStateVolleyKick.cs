@@ -13,7 +13,7 @@ public partial class PlayerStateVolleyKick : PlayerState
     public override void _EnterTree()
     {
         soundPlayer = GetNode<SoundPlayer>("/root/SoundPlayer");
-        animationPlayer.Play("volley_kick");
+        animationPlayer.Play($"{player.AnimPrefix}volley_kick");
         ballDetectionArea.BodyEntered += OnBallEntered;
     }
 

@@ -42,7 +42,7 @@ public partial class PlayerStateShooting : PlayerState
                 return;
             
             // Optional: If the ball was overcharged from the prep state, give it an upward trajectory arc
-            if (stateData.ShotPower < player.power * 1.2f && KeyUtils.IsActionPressed(player.controlScheme, KeyUtils.Action.SHOOT))
+            if (stateData.ShotPower < player.power * 1.2f && KeyUtils.IsActionPressed(player.controlScheme, KeyUtils.Action.XButton))
             {
                // You can feed vertical lift variables straight into ball.HeightVelocity here if needed!
             }

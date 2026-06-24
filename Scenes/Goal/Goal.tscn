@@ -13,7 +13,7 @@ size = Vector2(17, 5)
 size = Vector2(3, 91)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8wmlk"]
-size = Vector2(1, 60)
+size = Vector2(1, 90)
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_q14ev"]
 texture = ExtResource("2_ljf6b")
@@ -382,6 +382,7 @@ y_sort_enabled = true
 script = ExtResource("1_cq5p3")
 
 [node name="BottomFrameSprite" type="Sprite2D" parent="."]
+visible = false
 centered = false
 offset = Vector2(-23, -125)
 
@@ -392,7 +393,7 @@ collision_mask = 4
 monitorable = false
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="BackNetArea"]
-polygon = PackedVector2Array(-18, 0, -19, -62, 0, -90, -2, -35)
+polygon = PackedVector2Array(-18, 0, -18, -64, 0, -96, 16, -96, 16, -32, 1, -31)
 
 [node name="BottomFrame" type="StaticBody2D" parent="."]
 position = Vector2(-3, -1)
@@ -414,10 +415,10 @@ shape = SubResource("RectangleShape2D_v2brs")
 unique_name_in_owner = true
 
 [node name="TopTarget" type="Node2D" parent="Targets"]
-position = Vector2(22, -56)
+position = Vector2(22, -85)
 
 [node name="MiddleTarget" type="Node2D" parent="Targets"]
-position = Vector2(22, -35)
+position = Vector2(22, -45)
 
 [node name="BottomTarget" type="Node2D" parent="Targets"]
 position = Vector2(22, -10)
@@ -436,7 +437,7 @@ collision_layer = 16
 collision_mask = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ScoringArea"]
-position = Vector2(8.5, -35)
+position = Vector2(8.5, -48)
 shape = SubResource("RectangleShape2D_8wmlk")
 
 [node name="TileMapLayer" type="TileMapLayer" parent="."]

@@ -16,6 +16,28 @@ public partial class AIBehaviorField : AIBehavior
 
     public override void PerformAIMovement()
     {
+        if (IsBallPossessedByOpponent() && player.Position.DistanceTo(ball.Position) < TACKLE_DISTANCE)
+        {
+            if (GD.Randf() < TACKLE_PROBABILITY)
+            {
+                var opponent = ball.Carrier;
+                bool opponentIsSprinting = opponent != null && opponent.Velocity.Length() > opponent.speed * 1.1f;
+
+                // Stop steering velocity immediately on the frame they choose to strike
+                player.Velocity = Vector2.Zero;
+
+                if (opponentIsSprinting && GD.Randf() < 0.3f)
+                {
+                    player.SwitchState(PlayerCharacter.State.TACKLING);
+                }
+                else
+                {
+                    player.SwitchState(PlayerCharacter.State.STANDING_TACKLE);
+                }
+                return;
+            }
+        }
+        
         Vector2 totalSteeringForce = Vector2.Zero;
 
         if (player.HasBall())
@@ -95,7 +117,21 @@ public partial class AIBehaviorField : AIBehavior
             player.Position.DistanceTo(ball.Position) < TACKLE_DISTANCE &&
             GD.Randf() < TACKLE_PROBABILITY)
         {
-            player.SwitchState(PlayerCharacter.State.TACKLING);
+            // Determine whether the CPU defender should slide or stay on its feet
+            var opponent = ball.Carrier;
+            bool opponentIsSprinting = opponent != null && opponent.Velocity.Length() > opponent.speed * 1.1f;
+
+            // If the opponent is flying down the wing or sprinting, try a desperate slide lunge
+            if (opponentIsSprinting && GD.Randf() < 0.4f)
+            {
+                player.SwitchState(PlayerCharacter.State.TACKLING);
+            }
+            // Otherwise, make the default choice a realistic, delayed standing poke
+            else
+            {
+                player.SwitchState(PlayerCharacter.State.STANDING_TACKLE);
+            }
+            return; // Exit decision frame early once state switches
         }
 
         if (ball.Carrier == player)

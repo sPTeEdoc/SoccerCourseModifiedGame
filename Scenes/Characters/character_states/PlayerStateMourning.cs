@@ -7,7 +7,10 @@ public partial class PlayerStateMourning : PlayerState
     public GameEvents gameEvents;
     public override void _EnterTree()
     {
-        animationPlayer.Play($"{player.AnimPrefix}mourn");
+        if (player.role == PlayerCharacter.Role.GOALIE)
+            animationPlayer.Play($"{player.AnimPrefix}idle");
+        else
+            animationPlayer.Play($"{player.AnimPrefix}mourn");
         player.Velocity = Vector2.Zero;     
     }
 

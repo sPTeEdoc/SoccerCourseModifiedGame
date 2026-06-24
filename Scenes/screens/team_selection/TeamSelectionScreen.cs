@@ -52,7 +52,7 @@ public partial class TeamSelectionScreen : Screen
         }
 
         if (!selectors[0].IsSelected &&
-            KeyUtils.IsActionJustPressed(PlayerCharacter.ControlScheme.P1, KeyUtils.Action.PASS))
+            KeyUtils.IsActionJustPressed(PlayerCharacter.ControlScheme.P1, KeyUtils.Action.AButton))
         {
             soundPlayer.Play(SoundPlayer.Sound.UI_NAV);
             TransitionScreen(SoccerGame.ScreenType.MainMenu);

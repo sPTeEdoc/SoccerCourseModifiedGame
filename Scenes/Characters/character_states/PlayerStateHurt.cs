@@ -18,8 +18,8 @@ public partial class PlayerStateHurt : PlayerState
     {
         animationPlayer.Play($"{player.AnimPrefix}hurt");
         timeStartHurt = (int)Time.GetTicksMsec();
-        player.heightVelocity = HURT_HEIGHT_VELOCITY;
-        player.height = 0.1f;
+        // player.heightVelocity = HURT_HEIGHT_VELOCITY;
+        // player.height = 0.1f;
 
         if (ball.Carrier == player)
         {
