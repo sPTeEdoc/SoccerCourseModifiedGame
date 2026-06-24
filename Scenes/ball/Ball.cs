@@ -28,7 +28,6 @@ public partial class Ball : CharacterBody2D
     public float HeightVelocity = 0f;
     public Vector2 spawnPosition = Vector2.Zero;
     private BallStateFactory stateFactory = new BallStateFactory();
-    public Vector2 Velocity = Vector2.Zero;
     public GameEvents gameEvents;
 
     public override void _Ready()
