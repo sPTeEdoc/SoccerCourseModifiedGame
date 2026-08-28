@@ -33,7 +33,7 @@ public partial class GameStateKickoff : GameState
     {
         foreach (var controlScheme in validControlSchemes)
         {
-            if (KeyUtils.IsActionJustPressed(controlScheme, KeyUtils.Action.AButton))
+            if (KeyUtils.IsActionJustPressed(controlScheme, KeyUtils.Action.SHOOT))
             {
                 gameEvents.EmitKickOffStarted();
                 soundPlayer.Play(SoundPlayer.Sound.WHISTLE);

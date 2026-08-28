@@ -3905,10 +3905,10 @@ unique_name_in_owner = true
 position = Vector2(425, 254)
 
 [node name="KickOffPosition" type="Node2D" parent="ActorsContainer/KickOffs"]
-position = Vector2(-10, 0)
+position = Vector2(-9, -6)
 
 [node name="KickOffPosition2" type="Node2D" parent="ActorsContainer/KickOffs"]
-position = Vector2(-5, 30)
+position = Vector2(-9, 26)
 
 [node name="PitchObjects" type="Node2D" parent="ActorsContainer"]
 y_sort_enabled = true

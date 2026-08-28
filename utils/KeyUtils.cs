@@ -3,24 +3,19 @@ using System.Collections.Generic;
 
 public static class KeyUtils
 {
-    public enum Action { LEFT, RIGHT, UP, DOWN, BButton, AButton, R1Button, YButton, XButton, L1Button }
-
+    public enum Action { LEFT, RIGHT, UP, DOWN, SHOOT, PASS }
     public static readonly Dictionary<PlayerCharacter.ControlScheme, Dictionary<Action, string>> ACTIONS_MAP =
         new()
         {
             {
                 PlayerCharacter.ControlScheme.P1, new Dictionary<Action, string>
                 {
-                    { Action.LEFT, "p1_left" },
+                                        { Action.LEFT, "p1_left" },
                     { Action.RIGHT, "p1_right" },
                     { Action.UP, "p1_up" },
                     { Action.DOWN, "p1_down" },
-                    { Action.BButton, "B" },
-                    { Action.AButton, "A" },
-                    { Action.R1Button, "R1"},
-                    { Action.YButton, "Y" },
-                    { Action.XButton, "X" },
-                    { Action.L1Button, "L1"},
+                    { Action.SHOOT, "p1_shoot" },
+                    { Action.PASS, "p1_pass" }
                 }
             },
             {
@@ -30,8 +25,8 @@ public static class KeyUtils
                     { Action.RIGHT, "p2_right" },
                     { Action.UP, "p2_up" },
                     { Action.DOWN, "p2_down" },
-                    { Action.BButton, "p2_shoot" },
-                    { Action.AButton, "p2_pass" }
+                    { Action.SHOOT, "p2_shoot" },
+                    { Action.PASS, "p2_pass" }
                 }
             }
         };

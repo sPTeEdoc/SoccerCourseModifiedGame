@@ -52,7 +52,7 @@ public partial class TeamSelectionScreen : Screen
         }
 
         if (!selectors[0].IsSelected &&
-            KeyUtils.IsActionJustPressed(PlayerCharacter.ControlScheme.P1, KeyUtils.Action.AButton))
+            KeyUtils.IsActionJustPressed(PlayerCharacter.ControlScheme.P1, KeyUtils.Action.SHOOT))
         {
             soundPlayer.Play(SoundPlayer.Sound.UI_NAV);
             TransitionScreen(SoccerGame.ScreenType.MainMenu);
@@ -69,7 +69,7 @@ public partial class TeamSelectionScreen : Screen
             selection[selectorIndex] = newSelection;
             int flagIndex = newSelection.X + newSelection.Y * NB_COLS;
             gameManager.playerSetup[selectorIndex] = 
-                GameManagement.teamsDictionary[dataLoader.GetTeams()[flagIndex]].TeamID;
+                GameManagement.Instance.TeamsDictionary[dataLoader.GetTeams()[flagIndex]].TeamID;
             selectors[selectorIndex].Position = flagsContainer.GetChild<TextureRect>(flagIndex).Position;
             soundPlayer.Play(SoundPlayer.Sound.UI_NAV);
         }
@@ -85,7 +85,7 @@ public partial class TeamSelectionScreen : Screen
                 {
                     Position = FLAG_ANCHOR_POINT + new Vector2(55 * i, 50 * j),
                     Texture = FlagHelper.GetTexture(
-                        GameManagement.teamsDictionary[dataLoader.GetTeams()[0 + i + j * NB_COLS]].Name),
+                        GameManagement.Instance.TeamsDictionary[dataLoader.GetTeams()[0 + i + j * NB_COLS]].Name),
                     Scale = new Vector2(2, 2),
                     ZIndex = 1
                 };

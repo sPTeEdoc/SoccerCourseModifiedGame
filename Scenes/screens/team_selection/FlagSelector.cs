@@ -27,14 +27,14 @@ public partial class FlagSelector : Control
 
     public override void _Process(double delta)
     {
-        if (!IsSelected && KeyUtils.IsActionJustPressed(ControlScheme, KeyUtils.Action.AButton))
+        if (!IsSelected && KeyUtils.IsActionJustPressed(ControlScheme, KeyUtils.Action.SHOOT))
         {
             IsSelected = true;
             animationPlayer.Play("selected");
             soundPlayer.Play(SoundPlayer.Sound.UI_SELECT);
             EmitSignal(SignalName.Selected);
         }
-        else if (IsSelected && KeyUtils.IsActionJustPressed(ControlScheme, KeyUtils.Action.BButton))
+        else if (IsSelected && KeyUtils.IsActionJustPressed(ControlScheme, KeyUtils.Action.PASS))
         {
             IsSelected = false;
             animationPlayer.Play("selecting");

@@ -1,9 +1,8 @@
-[gd_scene load_steps=16 format=3 uid="uid://ei3j4377wuyi"]
+[gd_scene load_steps=15 format=3 uid="uid://ei3j4377wuyi"]
 
 [ext_resource type="Script" uid="uid://ca81cpoxnx3gn" path="res://Scenes/screens/main_menu/MainMenuScreen.cs" id="1_y4s1m"]
-[ext_resource type="Texture2D" uid="uid://bl03x22wfw1p0" path="res://assets/art/backgrounds/nibley title.png" id="2_y4s1m"]
+[ext_resource type="Texture2D" uid="uid://c7ha7w5q8q0l7" path="res://assets/art/backgrounds/five futsal logo.png" id="2_61l26"]
 [ext_resource type="Texture2D" uid="uid://crpesblnk5qk4" path="res://assets/art/ui/mainmenu/menu-mask.png" id="3_nawi7"]
-[ext_resource type="Texture2D" uid="uid://2ufb4jadjdn0" path="res://assets/art/ui/mainmenu/nibleysbigadventure.png" id="3_y4s1m"]
 [ext_resource type="Texture2D" uid="uid://dbfvuee4aid5b" path="res://assets/art/ui/mainmenu/layout-p1.png" id="4_1h8ap"]
 [ext_resource type="Texture2D" uid="uid://c4pak3q7sqjxy" path="res://assets/art/ui/mainmenu/layout-p2.png" id="5_u4ap7"]
 [ext_resource type="Texture2D" uid="uid://ixyov1ay4i0a" path="res://assets/art/ui/mainmenu/ball-selection.png" id="6_1jwuw"]
@@ -15,55 +14,55 @@ length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Background/TitleTexture:position")
+tracks/0/path = NodePath("Background/SinglePlayerTexture:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(25, 20)]
+"values": [Vector2(35, 100)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("Background/SinglePlayerTexture:position")
+tracks/1/path = NodePath("Background/TwoPlayersTexture:position")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(35, 100)]
+"values": [Vector2(35, 125)]
 }
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("Background/TwoPlayersTexture:position")
+tracks/2/path = NodePath("Background/Mask:position")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(35, 125)]
+"values": [Vector2(155, 0)]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("Background/Mask:position")
+tracks/3/path = NodePath("Background/PlayerOneControls:modulate")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(155, 0)]
+"values": [Color(1, 1, 1, 1)]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("Background/PlayerOneControls:modulate")
+tracks/4/path = NodePath("Background/PlayerTwoControls:modulate")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
@@ -75,22 +74,10 @@ tracks/4/keys = {
 tracks/5/type = "value"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("Background/PlayerTwoControls:modulate")
+tracks/5/path = NodePath("Background/SelectionIcon:modulate")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Color(1, 1, 1, 1)]
-}
-tracks/6/type = "value"
-tracks/6/imported = false
-tracks/6/enabled = true
-tracks/6/path = NodePath("Background/SelectionIcon:modulate")
-tracks/6/interp = 1
-tracks/6/loop_wrap = true
-tracks/6/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
@@ -104,59 +91,59 @@ step = 0.1
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Background/TitleTexture:position")
+tracks/0/path = NodePath("Background/SinglePlayerTexture:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.4),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [Vector2(25, -70), Vector2(25, 20)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Background/SinglePlayerTexture:position")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
 "times": PackedFloat32Array(0.5, 0.8),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Vector2(-150, 100), Vector2(35, 100)]
 }
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Background/TwoPlayersTexture:position")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Background/TwoPlayersTexture:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
 "times": PackedFloat32Array(0.6, 0.9),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Vector2(-150, 125), Vector2(35, 125)]
 }
-tracks/3/type = "value"
-tracks/3/imported = false
-tracks/3/enabled = true
-tracks/3/path = NodePath("Background/Mask:position")
-tracks/3/interp = 1
-tracks/3/loop_wrap = true
-tracks/3/keys = {
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Background/Mask:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
 "times": PackedFloat32Array(0.5, 0.8),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Vector2(437, 360), Vector2(437, 180)]
 }
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Background/PlayerOneControls:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0.8, 1.1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("Background/PlayerOneControls:modulate")
+tracks/4/path = NodePath("Background/PlayerTwoControls:modulate")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
-"times": PackedFloat32Array(0.8, 1.1),
+"times": PackedFloat32Array(0.9, 1.2),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
@@ -164,34 +151,22 @@ tracks/4/keys = {
 tracks/5/type = "value"
 tracks/5/imported = false
 tracks/5/enabled = true
-tracks/5/path = NodePath("Background/PlayerTwoControls:modulate")
+tracks/5/path = NodePath("Background/SelectionIcon:modulate")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
-"times": PackedFloat32Array(0.9, 1.2),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
-}
-tracks/6/type = "value"
-tracks/6/imported = false
-tracks/6/enabled = true
-tracks/6/path = NodePath("Background/SelectionIcon:modulate")
-tracks/6/interp = 1
-tracks/6/loop_wrap = true
-tracks/6/keys = {
 "times": PackedFloat32Array(1, 1.2),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
 }
-tracks/7/type = "method"
-tracks/7/imported = false
-tracks/7/enabled = true
-tracks/7/path = NodePath(".")
-tracks/7/interp = 1
-tracks/7/loop_wrap = true
-tracks/7/keys = {
+tracks/6/type = "method"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath(".")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
 "times": PackedFloat32Array(1.2),
 "transitions": PackedFloat32Array(1),
 "values": [{
@@ -252,19 +227,8 @@ Music = 2
 [node name="Background" type="TextureRect" parent="."]
 offset_right = 560.0
 offset_bottom = 360.0
-texture = ExtResource("2_y4s1m")
+texture = ExtResource("2_61l26")
 expand_mode = 1
-
-[node name="TitleTexture" type="TextureRect" parent="Background"]
-texture_filter = 2
-layout_mode = 1
-offset_left = 25.0
-offset_top = 20.0
-offset_right = 375.0
-offset_bottom = 137.0
-scale = Vector2(0.998573, 0.993289)
-texture = ExtResource("3_y4s1m")
-stretch_mode = 2
 
 [node name="Mask" type="TextureRect" parent="Background"]
 modulate = Color(0, 0, 0, 0.784314)

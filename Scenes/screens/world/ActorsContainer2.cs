@@ -127,12 +127,12 @@ public partial class ActorsContainer2 : Node2D
         }
 
         if (Ball.Carrier != null &&
-            Ball.Carrier.teamID == gameManager.playerSetup[0] &&
+            Ball.Carrier.TeamID == gameManager.playerSetup[0] &&
             Ball.Carrier.controlScheme != PlayerCharacter.ControlScheme.P1 &&
             Ball.Carrier.controlScheme != PlayerCharacter.ControlScheme.P2)
         {
-            var squad1 = Ball.Carrier.teamID == squadHome[0].teamID ? squadHome : squadAway;
-            var squad2 = Ball.Carrier.teamID == squadHome[0].teamID ? squadHome : squadAway;
+            var squad1 = Ball.Carrier.TeamID == squadHome[0].TeamID ? squadHome : squadAway;
+            var squad2 = Ball.Carrier.TeamID == squadHome[0].TeamID ? squadHome : squadAway;
             var currentHuman1 = squad1.Find(p => p.controlScheme == PlayerCharacter.ControlScheme.P1);
             var currentHuman2 = squad1.Find(p => p.controlScheme == PlayerCharacter.ControlScheme.P2);
 
@@ -146,7 +146,7 @@ public partial class ActorsContainer2 : Node2D
         }
 
 
-        var squad = requester.teamID == squadHome[0].teamID ? squadHome : squadAway;
+        var squad = requester.TeamID == squadHome[0].TeamID ? squadHome : squadAway;
         var cpuPlayers = squad.FindAll(p => p.controlScheme == PlayerCharacter.ControlScheme.CPU && p.role != PlayerCharacter.Role.GOALIE);
         cpuPlayers.Sort((p1, p2) =>
             p1.Position.DistanceSquaredTo(Ball.Position).CompareTo(p2.Position.DistanceSquaredTo(Ball.Position)));
@@ -183,18 +183,18 @@ public partial class ActorsContainer2 : Node2D
 
         if (gameManager.IsCoop())
         {
-            var playerSquad = squadHome[0].teamID == p1Team ? squadHome : squadAway;
+            var playerSquad = squadHome[0].TeamID == p1Team ? squadHome : squadAway;
             playerSquad[4].SetControlScheme(PlayerCharacter.ControlScheme.P1);
             playerSquad[5].SetControlScheme(PlayerCharacter.ControlScheme.P2);
         }
         else if (gameManager.IsSinglePlayer())
         {
-            var playerSquad = squadHome[0].teamID == p1Team ? squadHome : squadAway;
+            var playerSquad = squadHome[0].TeamID == p1Team ? squadHome : squadAway;
             playerSquad[5].SetControlScheme(PlayerCharacter.ControlScheme.P1);
         }
         else // versus
         {
-            var p1Squad = squadHome[0].teamID == p1Team ? squadHome : squadAway;
+            var p1Squad = squadHome[0].TeamID == p1Team ? squadHome : squadAway;
             var p2Squad = p1Squad == squadAway ? squadHome : squadAway;
             p1Squad[5].SetControlScheme(PlayerCharacter.ControlScheme.P1);
             p2Squad[5].SetControlScheme(PlayerCharacter.ControlScheme.P2);
@@ -231,14 +231,14 @@ public partial class ActorsContainer2 : Node2D
         if (Time.GetTicksMsec() - lastAutoSwitchTime < AUTO_SWITCH_INTERVAL)
             return;
 
-        if (Ball?.Carrier == null || Ball.Carrier.teamID == -1)
+        if (Ball?.Carrier == null || Ball.Carrier.TeamID == -1)
             return;
 
         int playerTeam = gameManager.playerSetup[0];
-        if (Ball.Carrier.teamID == playerTeam)
+        if (Ball.Carrier.TeamID == playerTeam)
             return; // Human team is attacking
 
-        var squad = squadHome[0].teamID == playerTeam ? squadHome : squadAway;
+        var squad = squadHome[0].TeamID == playerTeam ? squadHome : squadAway;
 
         // Handle both P1 and P2
         var humans = squad.FindAll(p =>

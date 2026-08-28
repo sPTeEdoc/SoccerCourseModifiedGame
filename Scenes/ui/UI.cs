@@ -63,7 +63,7 @@ public partial class UI : CanvasLayer
         for (int i = 0; i < flagTextures.Count; i++)
         {
             flagTextures[i].Texture = FlagHelper.GetTexture(
-                GameManagement.teamsDictionary[teams[i]].Name);
+                GameManagement.Instance.TeamsDictionary[teams[i]].Name);
         }
     }
 

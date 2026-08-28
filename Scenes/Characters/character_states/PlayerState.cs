@@ -12,7 +12,6 @@ public partial class PlayerState : Node
         EmitSignal("StateTransitionRequested", (int)nextState);
     }
     protected AIBehavior aiBehavior;
-    protected AnimationPlayer animationPlayer;
     protected Ball ball;
     protected Area2D ballDetectionArea;
     protected Goal ownGoal;
@@ -22,27 +21,20 @@ public partial class PlayerState : Node
     protected Area2D tackleDamageEmitterArea;
     protected Area2D teammateDetectionArea;
 
-    public void Setup(PlayerCharacter contextPlayer, PlayerStateData contextData)
+    public void Setup(PlayerCharacter contextPlayer, PlayerStateData contextData,
+                      Ball contextBall, Area2D contextTeammateDetectionArea, Area2D contextBallDetectionArea,
+                      Goal contextOwnGoal, Goal contextTargetGoal, Area2D contextTackleDamageEmitterArea,
+                      AIBehavior contextAIBehavior)
     {
         player = contextPlayer;
         stateData = contextData;
-
-        // Pull common dependencies directly from the player!
-        animationPlayer = player.animationPlayer;
-        ball = player.ball;
-        teammateDetectionArea = player.teammateDetectionArea;
-        ballDetectionArea = player.ballDetectionArea;
-        ownGoal = player.ownGoal;
-        targetGoal = player.targetGoal;
-        aiBehavior = player.currentAIBehavior;
-
-        // Handle specialized dependencies cleanly by casting
-        if (player is Outfielder outfielder)
-        {
-            tackleDamageEmitterArea = outfielder.tackleDamageEmitterArea;
-        }
-        // If you ever need Goalkeeper specific nodes in a state:
-        // else if (player is Goalkeeper goalkeeper) { ... }
+        ball = contextBall;
+        teammateDetectionArea = contextTeammateDetectionArea;
+        ballDetectionArea = contextBallDetectionArea;
+        ownGoal = contextOwnGoal;
+        targetGoal = contextTargetGoal;
+        aiBehavior = contextAIBehavior;
+        tackleDamageEmitterArea = contextTackleDamageEmitterArea;
     }
 
     public void TransitionState(PlayerCharacter.State newState, PlayerStateData data = null)

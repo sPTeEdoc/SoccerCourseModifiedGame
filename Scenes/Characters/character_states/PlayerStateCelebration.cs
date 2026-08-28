@@ -35,15 +35,9 @@ public partial class PlayerStateCelebrating : PlayerState
 
     private void Celebrate()
     {
-        if (player.role == PlayerCharacter.Role.GOALIE)
-            animationPlayer.Play($"{player.AnimPrefix}idle");
-        else
-        {
-            animationPlayer.Play($"{player.AnimPrefix}celebrate");
-            player.height = 0.1f;
-            player.heightVelocity = CelebratingHeight;
-        }
-        player.Velocity = Vector2.Zero;
+        // animationPlayer.Play("celebrate");
+        player.height = 0.1f;
+        player.heightVelocity = CelebratingHeight;
     }
 
     private void OnTeamReset()

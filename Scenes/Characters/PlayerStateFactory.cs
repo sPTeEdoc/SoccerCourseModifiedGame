@@ -16,13 +16,11 @@ public partial class PlayerStateFactory : Node
         { PlayerCharacter.State.MOURNING, typeof(PlayerStateMourning) },
         { PlayerCharacter.State.MOVING, typeof(PlayerStateMoving) },
         { PlayerCharacter.State.PASSING, typeof(PlayerStatePassing) },
-        { PlayerCharacter.State.RECEIVING_PASS, typeof(PlayerStateReceivingPass) },
         { PlayerCharacter.State.PREPPING_SHOT, typeof(PlayerStatePreppingShot) },
         { PlayerCharacter.State.RESETING, typeof(PlayerStateReseting) },
         { PlayerCharacter.State.RECOVERING, typeof(PlayerStateRecovering) },
         { PlayerCharacter.State.SHOOTING, typeof(PlayerStateShooting) },
         { PlayerCharacter.State.TACKLING, typeof(PlayerStateTackling) },
-        { PlayerCharacter.State.STANDING_TACKLE, typeof(PlayerStateStandingTackle) },
         { PlayerCharacter.State.VOLLEY_KICK, typeof(PlayerStateVolleyKick) }
     };
 

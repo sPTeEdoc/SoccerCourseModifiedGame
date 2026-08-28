@@ -56,15 +56,15 @@ public partial class AIBehavior : Node
     }
 
     public bool IsBallPossessedByOpponent() =>
-        ball.Carrier != null && ball.Carrier.teamID != player.teamID;
+        ball.Carrier != null && ball.Carrier.TeamID != player.TeamID;
 
     public bool IsBallCarriedByTeammate() =>
-        ball.Carrier != null && ball.Carrier != player && ball.Carrier.teamID == player.teamID;
+        ball.Carrier != null && ball.Carrier != player && ball.Carrier.TeamID == player.TeamID;
 
     public bool HasOpponentsNearby()
     {
         return opponentDetectionArea.GetOverlappingBodies()
             .OfType<PlayerCharacter>()
-            .Any(p => p.teamID != player.teamID);
+            .Any(p => p.TeamID != player.TeamID);
     }
 }

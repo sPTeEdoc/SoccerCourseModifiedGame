@@ -11,7 +11,7 @@ public partial class PlayerStateRecovering : PlayerState
     {
         timeStartRecovery = (int)Time.GetTicksMsec();
         player.Velocity = Vector2.Zero;
-        animationPlayer.Play($"{player.AnimPrefix}recover");
+        // animationPlayer.Play("recover");
     }
 
     public override void _Process(double delta)

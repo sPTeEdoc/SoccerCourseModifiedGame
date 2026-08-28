@@ -57,7 +57,7 @@ public partial class TournamentScreen : Screen
 
     public override void _Process(double delta)
     {
-        if (KeyUtils.IsActionJustPressed(PlayerCharacter.ControlScheme.P1, KeyUtils.Action.AButton))
+        if (KeyUtils.IsActionJustPressed(PlayerCharacter.ControlScheme.P1, KeyUtils.Action.SHOOT))
         {
             if (tournament.CurrentStage < Tournament.Stage.Complete)
                 TransitionScreen(SoccerGame.ScreenType.InGame, screenData);
@@ -93,8 +93,8 @@ public partial class TournamentScreen : Screen
                 BracketFlag flagHome = flagNodes[i * 2];
                 BracketFlag flagAway = flagNodes[i * 2 + 1];
 
-                flagHome.Texture = FlagHelper.GetTexture(GameManagement.teamsDictionary[currentMatch.TeamHome].Name);
-                flagAway.Texture = FlagHelper.GetTexture(GameManagement.teamsDictionary[currentMatch.TeamAway].Name);
+                flagHome.Texture = FlagHelper.GetTexture(GameManagement.Instance.TeamsDictionary[currentMatch.TeamHome].Name);
+                flagAway.Texture = FlagHelper.GetTexture(GameManagement.Instance.TeamsDictionary[currentMatch.TeamAway].Name);
 
                 if (currentMatch.Winner > -1)
                 {
@@ -115,7 +115,7 @@ public partial class TournamentScreen : Screen
         else
         {
             flagNodes[0].Texture = FlagHelper.GetTexture(
-                GameManagement.teamsDictionary[tournament.Winner].Name);
+                GameManagement.Instance.TeamsDictionary[tournament.Winner].Name);
         }
     }
 

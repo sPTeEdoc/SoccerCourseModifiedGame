@@ -1,13 +1,13 @@
 using Godot;
 using System;
 
-public partial class Ball : CharacterBody2D
+public partial class Ball : AnimatableBody2D
 {
     public const float BOUNCINESS = 0.8f;
     private const int DISTANCE_HIGH_PASS = 90;
     private const int DURATION_TUMBLE_LOCK = 200;
     private const int DURATION_PASS_LOCK = 500;
-    private const float KICKOFF_PASS_DISTANCE = 30f;
+    private const float KICKOFF_PASS_DISTANCE = 80f;
     private const float TUMBLE_HEIGHT_VELOCITY = 3f;
 
     public enum State { CARRIED, FREEFORM, SHOT }
@@ -17,6 +17,8 @@ public partial class Ball : CharacterBody2D
 
     private AnimationPlayer animationPlayer;
     private Sprite2D ballSprite;
+    private Sprite2D shadowSprite;
+    private CollisionShape2D collisionShape;
     private Area2D playerDetectionArea;
     private Area2D playerProximityArea;
     private RayCast2D scoringRaycast;
@@ -28,12 +30,15 @@ public partial class Ball : CharacterBody2D
     public float HeightVelocity = 0f;
     public Vector2 spawnPosition = Vector2.Zero;
     private BallStateFactory stateFactory = new BallStateFactory();
+    public Vector2 Velocity = Vector2.Zero;
     public GameEvents gameEvents;
 
     public override void _Ready()
     {
         animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
         ballSprite = GetNode<Sprite2D>("BallSprite");
+        shadowSprite = GetNode<Sprite2D>("ShadowSprite");
+        collisionShape = GetNode<CollisionShape2D>("CollisionShape2D");
         playerDetectionArea = GetNode<Area2D>("PlayerDetectionArea");
         playerProximityArea = GetNode<Area2D>("PlayerProximityArea");
         scoringRaycast = GetNode<RayCast2D>("ScoringRaycast");
@@ -48,52 +53,6 @@ public partial class Ball : CharacterBody2D
     {
         ballSprite.Position = Vector2.Up * Height;
         scoringRaycast.Rotation = Velocity.Angle();
-    }
-
-    public override void _PhysicsProcess(double delta)
-    {
-        // Apply state-specific velocity modifications, friction, etc.
-        // If FREEFORM or SHOT, move using Godot's collision system:
-        if (CurrentState is BallStateFreeform || CurrentState is BallStateShot)
-        {
-            Velocity = Velocity.MoveToward(Vector2.Zero, FrictionGround * (float)delta);
-
-            // MoveAndCollide returns a kinematic collision if it hits a defender mid-flight!
-            var collision = MoveAndCollide(Velocity * (float)delta);
-            if (collision != null)
-            {
-                HandleBallCollision(collision);
-            }
-        }
-    }
-
-    private void HandleBallCollision(KinematicCollision2D collision)
-    {
-        var collider = collision.GetCollider();
-
-        if (collider is PlayerCharacter player)
-        {
-            // 1. If it hits an opponent or teammate mid-flight, they intercept/block it
-            // (Assuming you have a way to check if they are capable or ready to intercept)
-            if (player.teamID != Carrier?.teamID)
-            {
-                // Trigger defender interception/block logic
-                Velocity = Vector2.Zero;
-                player.ControlBall();
-                this.Carrier = player;
-                SwitchState(State.CARRIED);
-            }
-            else
-            {
-                // Simple bounce off teammate body if they weren't the intended receiver
-                Velocity = Velocity.Bounce(collision.GetNormal()) * BOUNCINESS;
-            }
-        }
-        else
-        {
-            // Hits environment/posts/walls
-            Velocity = Velocity.Bounce(collision.GetNormal()) * BOUNCINESS;
-        }
     }
 
     public void SwitchState(State state, BallStateData data = null)
@@ -134,9 +93,8 @@ public partial class Ball : CharacterBody2D
 
         if (Carrier != null)
         {
-            // float ratingFactor = Mathf.InverseLerp(50f, 99f, Carrier.ShortPassRating);
             float ratingFactor = Mathf.InverseLerp(50f, 99f, Carrier.power);
-            intensity *= Mathf.Lerp(0.9f, 1.1f, ratingFactor); // more skilled players add zip
+            intensity *= Mathf.Lerp(0.9f, 1.1f, ratingFactor);
         }
 
         Velocity = intensity * direction;
@@ -146,18 +104,9 @@ public partial class Ball : CharacterBody2D
             HeightVelocity = BallState.Gravity * distance / (1.85f * intensity);
         }
 
-        if (receiver != null && Carrier != null)
-        {// we are only keeping null for kickoffs. Even then, this is temporary.
-         // soon kickoffs will be going backward to one of two players.
-         // Notify receiver to prepare
-            receiver.FaceDirectionOfBall();
-            receiver.ReceiveIncomingPass(destination, Carrier.power);
-        }
-
         Carrier = null;
         SwitchState(State.FREEFORM, BallStateData.Build().SetLockDuration(lockDuration));
     }
-
 
     public void Stop()
     {
@@ -189,11 +138,28 @@ public partial class Ball : CharacterBody2D
 
         foreach (var body in players)
         {
-            if (body is PlayerCharacter p && p.teamID == teamID)
+            if (body is PlayerCharacter p && p.TeamID == teamID)
                 count++;
         }
 
         return count;
+    }
+
+    private void SetBallVisibility(bool visible)
+    {
+        ballSprite.Visible = visible;
+        if (shadowSprite != null)
+            shadowSprite.Visible = visible;
+    }
+
+    private void SetInteractionsEnabled(bool enabled)
+    {
+        // Defer physics changes so Godot doesn't complain about modifying collision state mid-frame
+        playerDetectionArea.SetDeferred(Area2D.PropertyName.Monitoring, enabled);
+        playerDetectionArea.SetDeferred(Area2D.PropertyName.Monitorable, enabled);
+
+        if (collisionShape != null)
+            collisionShape.SetDeferred(CollisionShape2D.PropertyName.Disabled, !enabled);
     }
 
     private void OnTeamReset()
@@ -201,13 +167,22 @@ public partial class Ball : CharacterBody2D
         Position = spawnPosition;
         Velocity = Vector2.Zero;
         Height = 0f;
+
+        // Hide and prevent player interaction while resetting positions
+        // SetBallVisibility(false);
+        SetInteractionsEnabled(false);
+
         SwitchState(State.FREEFORM);
     }
 
     private void OnKickoffStarted()
     {
+        // Restore ball visibility and physics interaction
+        // SetBallVisibility(true);
+        SetInteractionsEnabled(true);
+
         Velocity = Vector2.Zero;
-        HeightVelocity = 0;
+        HeightVelocity = 0; 
         PassTo(spawnPosition + Vector2.Down * KICKOFF_PASS_DISTANCE, 0);
     }
 
@@ -218,13 +193,12 @@ public partial class Ball : CharacterBody2D
         gameEvents.KickoffStarted += OnKickoffStarted;
     }
 
-
     public override void _ExitTree()
     {
         if (gameEvents != null)
         {
             gameEvents.KickoffStarted -= OnKickoffStarted;
-            gameEvents.TeamResetEventTriggered -= OnTeamReset; // ✅ add this
-        }
+            gameEvents.TeamResetEventTriggered -= OnTeamReset;
+        }   
     }
 }

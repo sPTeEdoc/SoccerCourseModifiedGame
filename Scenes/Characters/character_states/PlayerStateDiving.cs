@@ -9,23 +9,19 @@ public partial class PlayerStateDiving : PlayerState
 
     public override void _EnterTree()
     {
-        // Dive directly toward the ball's dynamic trajectory or current position rather than the goal-line rail
-        Vector2 targetDive = ball.Position;
+        Vector2 targetDive = new Vector2(player.spawnPosition.X, ball.Position.Y);
         Vector2 direction = player.Position.DirectionTo(targetDive);
 
-        // Select side-scrolling dive animations based on vertical launch direction
         if (direction.Y > 0)
         {
-            animationPlayer.Play($"{player.AnimPrefix}dive_one_hand"); // Diving Low/Down
+            // animationPlayer.Play("dive_down");
         }
         else
         {
-            animationPlayer.Play($"{player.AnimPrefix}dive_two_hands"); // Diving High/Up
+            // animationPlayer.Play("dive_up");
         }
 
-        // Give the goalkeeper an explosive speed boost during the dive execution
-        // This provides that sharp, responsive arcade reflex timing
-        player.Velocity = direction * (player.speed * 1.6f);
+        player.Velocity = direction * player.speed;
         timeStartDive = (int)Time.GetTicksMsec();
     }
 

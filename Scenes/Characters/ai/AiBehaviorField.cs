@@ -9,35 +9,13 @@ public partial class AIBehaviorField : AIBehavior
     public const float SHOT_DISTANCE = 150f;
     public const float SHOT_PROBABILITY = 0.3f;
     public const float SPREAD_ASSIST_FACTOR = 0.8f;
-    public const float TACKLE_DISTANCE = 15f;
+    public const float TACKLE_DISTANCE = 45f;
     public const float TACKLE_PROBABILITY = 0.3f;
 
     public GameManager gameManager;
 
     public override void PerformAIMovement()
     {
-        if (IsBallPossessedByOpponent() && player.Position.DistanceTo(ball.Position) < TACKLE_DISTANCE)
-        {
-            if (GD.Randf() < TACKLE_PROBABILITY)
-            {
-                var opponent = ball.Carrier;
-                bool opponentIsSprinting = opponent != null && opponent.Velocity.Length() > opponent.speed * 1.1f;
-
-                // Stop steering velocity immediately on the frame they choose to strike
-                player.Velocity = Vector2.Zero;
-
-                if (opponentIsSprinting && GD.Randf() < 0.3f)
-                {
-                    player.SwitchState(PlayerCharacter.State.TACKLING);
-                }
-                else
-                {
-                    player.SwitchState(PlayerCharacter.State.STANDING_TACKLE);
-                }
-                return;
-            }
-        }
-        
         Vector2 totalSteeringForce = Vector2.Zero;
 
         if (player.HasBall())
@@ -67,48 +45,7 @@ public partial class AIBehaviorField : AIBehavior
         }
 
         totalSteeringForce = totalSteeringForce.LimitLength(1.0f);
-
-        // Calculate if the AI should sprint
-        float currentSpeed = player.speed;
-        if (ShouldAIEngageSprint())
-        {
-            currentSpeed *= 1.5f; // Match your human sprint multiplier
-
-            // If the CPU is sprinting with the ball, trigger the micro-kick rule!
-            if (player.HasBall())
-            {
-                TriggerCPUMicroKick(totalSteeringForce, currentSpeed);
-            }
-        }
-
-        player.Velocity = totalSteeringForce * currentSpeed;
-    }
-
-    private bool ShouldAIEngageSprint()
-    {
-        // Case 1: Chasing a completely loose ball
-        if (ball.Carrier == null && player.Position.DistanceTo(ball.Position) > 40f)
-        {
-            return true;
-        }
-
-        // Case 2: Carrier has clear grass ahead towards goal
-        if (player.HasBall() && !HasOpponentsNearby())
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    private void TriggerCPUMicroKick(Vector2 direction, float currentSpeed)
-    {
-        // Every few frames (or handled by a small timer logic inside player character)
-        // Push the ball forward into FREEFORM, allowing defenders a chance to intercept
-        Vector2 pushVelocity = direction * (currentSpeed * 1.3f);
-        ball.Velocity = pushVelocity;
-        ball.Carrier = null;
-        ball.SwitchState(Ball.State.FREEFORM, BallStateData.Build().SetLockDuration(150));
+        player.Velocity = totalSteeringForce * player.speed;
     }
 
     public override void PerformAIDecisions()
@@ -117,21 +54,7 @@ public partial class AIBehaviorField : AIBehavior
             player.Position.DistanceTo(ball.Position) < TACKLE_DISTANCE &&
             GD.Randf() < TACKLE_PROBABILITY)
         {
-            // Determine whether the CPU defender should slide or stay on its feet
-            var opponent = ball.Carrier;
-            bool opponentIsSprinting = opponent != null && opponent.Velocity.Length() > opponent.speed * 1.1f;
-
-            // If the opponent is flying down the wing or sprinting, try a desperate slide lunge
-            if (opponentIsSprinting && GD.Randf() < 0.4f)
-            {
-                player.SwitchState(PlayerCharacter.State.TACKLING);
-            }
-            // Otherwise, make the default choice a realistic, delayed standing poke
-            else
-            {
-                player.SwitchState(PlayerCharacter.State.STANDING_TACKLE);
-            }
-            return; // Exit decision frame early once state switches
+            player.SwitchState(PlayerCharacter.State.TACKLING);
         }
 
         if (ball.Carrier == player)
@@ -140,13 +63,10 @@ public partial class AIBehaviorField : AIBehavior
             float shotProbability = SHOT_PROBABILITY;
             gameManager = GetNode<GameManager>("/root/GameManager");
 
-            if (gameManager.playerSetup[0] == player.teamID || gameManager.playerSetup[1] == player.teamID)
+            if (gameManager.playerSetup[0] == player.TeamID || gameManager.playerSetup[1] == player.TeamID)
             {
                 shotProbability /= 10f;
             }
-            Random random = new Random();
-            double bonus = random.NextDouble();
-            float shotPower = player.power * (1.2f + (float)bonus);
 
             if (player.Position.DistanceTo(target) < SHOT_DISTANCE && GD.Randf() < shotProbability)
             {
@@ -154,7 +74,7 @@ public partial class AIBehaviorField : AIBehavior
                 Vector2 shotDirection = player.Position.DirectionTo(player.targetGoal.GetRandomTargetPosition());
 
                 var data = PlayerStateData.Build()
-                    .SetShotPower(shotPower)
+                    .SetShotPower(player.power)
                     .SetShotDirection(shotDirection);
 
                 player.SwitchState(PlayerCharacter.State.SHOOTING, data);
@@ -202,7 +122,7 @@ public partial class AIBehaviorField : AIBehavior
 
     public Vector2 GetDensityAroundBallSteeringForce()
     {
-        int nearbyCount = ball.GetProximityTeammatesCount(player.teamID);
+        int nearbyCount = ball.GetProximityTeammatesCount(player.TeamID);
         if (nearbyCount == 0)
             return Vector2.Zero;
 
@@ -215,7 +135,7 @@ public partial class AIBehaviorField : AIBehavior
     {
         var teammates = teammateDetectionArea.GetOverlappingBodies()
             .OfType<PlayerCharacter>()
-            .Where(p => p != player && p.teamID == player.teamID);
+            .Where(p => p != player && p.TeamID == player.TeamID);
 
         return teammates.Any();
     }

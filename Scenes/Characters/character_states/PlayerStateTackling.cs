@@ -4,102 +4,84 @@ using System;
 [GlobalClass]
 public partial class PlayerStateTackling : PlayerState
 {
-    private const float GROUND_FRICTION = 250.0f;
-    private const int DURATION_PRIOR_RECOVERY = 500; // Increased penalty window for missing (500ms)
+    private const float GROUND_FRICTION = 350.0f;
+    private const float TACKLE_LUNGE_FACTOR = 1.35f; // Lunge speed relative to base speed
+    private const int DURATION_PRIOR_RECOVERY = 200;
 
     private bool isTackleComplete = false;
-    private bool hasConnectedWithBall = false;
-    private bool hasRecovered = false;
     private int timeFinishTackle = (int)Time.GetTicksMsec();
 
     public override void _EnterTree()
     {
-        isTackleComplete = false;
-        hasConnectedWithBall = false;
-
-        animationPlayer.Play($"{player.AnimPrefix}tackle");
         tackleDamageEmitterArea.Monitoring = true;
 
-        // FORCE THE SLIDE: If they are moving, give them a lunging velocity burst along their heading!
-        Vector2 slideDirection = player.heading != Vector2.Zero ? player.heading.Normalized() : Vector2.Right;
-        player.Velocity = slideDirection * (player.speed * 1.6f);
+        // 1. Determine tackle direction: prefer pointing toward ball carrier if within range
+        Vector2 tackleDir = player.heading;
 
-        // Track the exact time the lunge started
-        timeFinishTackle = (int)Time.GetTicksMsec();
+        if (ball != null && ball.Carrier != null && ball.Carrier != player)
+        {
+            Vector2 toCarrier = player.Position.DirectionTo(ball.Carrier.Position);
+            if (toCarrier != Vector2.Zero)
+            {
+                tackleDir = toCarrier;
+            }
+        }
+        else if (player.Velocity.LengthSquared() > 1.0f)
+        {
+            tackleDir = player.Velocity.Normalized();
+        }
+
+        // 2. Update player heading to match full 2D direction
+        player.heading = tackleDir;
+
+        // 3. Apply initial tackle lunge impulse toward target
+        player.Velocity = tackleDir * (player.speed * TACKLE_LUNGE_FACTOR);
+
+        // 4. Play corresponding 8-directional animation
+        string directionStr = GetDirectionString(tackleDir);
+        player.animatedSprite2D.Play("tackle_" + directionStr);
     }
 
     public override void _Process(double delta)
     {
-        int timeElapsed = (int)Time.GetTicksMsec() - timeFinishTackle;
-
-        // 1. Proximity Check with a micro-delay (Must be sliding for at least 100ms before connecting)
-        if (!hasConnectedWithBall && ball.Carrier != null && ball.Carrier.teamID != player.teamID && !isTackleComplete)
-        {
-            if (timeElapsed > 100 && player.Position.DistanceTo(ball.Position) < 20f)
-            {
-                ExecuteSuccessfulTackle();
-                return;
-            }
-        }
-
-        // 2. Physical slide momentum management
         if (!isTackleComplete)
         {
+            // Decelerate during the tackle slide
             player.Velocity = player.Velocity.MoveToward(Vector2.Zero, (float)delta * GROUND_FRICTION);
-
             if (player.Velocity == Vector2.Zero)
             {
                 isTackleComplete = true;
-                timeFinishTackle = (int)Time.GetTicksMsec(); // Reset timer to mark recovery start
-
-                if (!hasConnectedWithBall)
-                {
-                    if (!hasRecovered)
-                        TransitionState(PlayerCharacter.State.RECOVERING);
-                    hasRecovered = true;
-                }
+                timeFinishTackle = (int)Time.GetTicksMsec();
             }
         }
-        // 3. Penalty recovery window if they missed
         else if ((int)Time.GetTicksMsec() - timeFinishTackle > DURATION_PRIOR_RECOVERY)
         {
-            if (!hasRecovered)
-                TransitionState(PlayerCharacter.State.RECOVERING);
+            TransitionState(PlayerCharacter.State.RECOVERING);
         }
-    }
-
-    private void ExecuteSuccessfulTackle()
-    {
-        hasConnectedWithBall = true;
-
-        // 1. Tell the opponent explicitly they no longer own this ball
-        if (ball.Carrier != null)
-        {
-            var oldCarrier = ball.Carrier;
-            // Force the old carrier into a brief "stumble" or "stagger" state if you have one
-            // oldCarrier.SwitchState(PlayerCharacter.State.STUMBLING);
-        }
-
-        // 2. Clear the carrier ref completely BEFORE applying physics
-        ball.Carrier = null;
-
-        // 3. Push the ball slightly outside the player's immediate collision circle 
-        // so it doesn't instantly re-trigger an overlap collection
-        Vector2 tacklePopDirection = player.heading != Vector2.Zero ? player.heading.Normalized() : Vector2.Up;
-        ball.Position += tacklePopDirection * 5f;
-
-        // 4. Fire it away
-        ball.Velocity = tacklePopDirection * 250f; // Crank up the force to break away from running hitboxes
-        ball.SwitchState(Ball.State.FREEFORM, BallStateData.Build().SetLockDuration(200));
-
-        player.Velocity = Vector2.Zero;
-        isTackleComplete = true;
-
-        TransitionState(PlayerCharacter.State.MOVING);
     }
 
     public override void _ExitTree()
     {
         tackleDamageEmitterArea.Monitoring = false;
+    }
+
+    private string GetDirectionString(Vector2 dir)
+    {
+        float angleDeg = Mathf.RadToDeg(dir.Angle());
+        int snappedAngle = (int)(Mathf.Round(angleDeg / 45f) * 45f);
+        if (snappedAngle == -180) snappedAngle = 180;
+
+        return snappedAngle switch
+        {
+            0 => "east",
+            45 => "southeast",
+            90 => "south",
+            135 => "southwest",
+            180 => "west",
+            -135 => "northwest",
+            -90 => "north",
+            -45 => "northeast",
+            _ => "south"
+        };
     }
 }

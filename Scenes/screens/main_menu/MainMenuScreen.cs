@@ -50,7 +50,7 @@ public partial class MainMenuScreen : Screen
             ChangeSelectedIndex(currentSelectedIndex - 1);
         else if (KeyUtils.IsActionJustPressed(PlayerCharacter.ControlScheme.P1, KeyUtils.Action.DOWN))
             ChangeSelectedIndex(currentSelectedIndex + 1);
-        else if (KeyUtils.IsActionJustPressed(PlayerCharacter.ControlScheme.P1, KeyUtils.Action.AButton))
+        else if (KeyUtils.IsActionJustPressed(PlayerCharacter.ControlScheme.P1, KeyUtils.Action.SHOOT))
             SubmitSelection();
     }
 

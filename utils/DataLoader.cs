@@ -59,7 +59,7 @@ public partial class DataLoader : Node
                 club.startingRoster.Add(resource);
             }
 
-            GameManagement.teamsDictionary.Add(club.TeamID, club);
+            GameManagement.Instance.TeamsDictionary.Add(club.TeamID, club);
 
             if (players.Count != 6)
                 GD.PrintErr($"Squad for {teamName} does not have exactly 6 players.");
@@ -70,13 +70,13 @@ public partial class DataLoader : Node
 
     public List<PlayerResource> GetSquad(int teamID)
     {
-        return GameManagement.teamsDictionary[teamID].startingRoster;
+        return GameManagement.Instance.TeamsDictionary[teamID].startingRoster;
     }
 
     public List<int> GetTeams()
     {
         List<int> teams = new List<int>();
-        foreach(KeyValuePair<int, Team> t in GameManagement.teamsDictionary)
+        foreach(KeyValuePair<int, Team> t in GameManagement.Instance.TeamsDictionary)
         {
             teams.Add(t.Value.TeamID);
         }
@@ -85,31 +85,56 @@ public partial class DataLoader : Node
 
     public string GetJerseyColorA(int teamID)
     {
-        return GameManagement.teamsDictionary[teamID].JerseyColorA;
+        return GameManagement.Instance.TeamsDictionary[teamID].JerseyColorA;
     }
 
     public string GetJerseyColorB(int teamID)
     {
-        return GameManagement.teamsDictionary[teamID].Jersey_color_B;
+        return GameManagement.Instance.TeamsDictionary[teamID].Jersey_color_B;
     }
 
     public string GetJerseyColorC(int teamID)
     {
-        return GameManagement.teamsDictionary[teamID].Jersey_color_C;
+        return GameManagement.Instance.TeamsDictionary[teamID].Jersey_color_C;
     }
 
     public string GetSocksColor(int teamID)
     {
-        return GameManagement.teamsDictionary[teamID].SocksColor;
+        return GameManagement.Instance.TeamsDictionary[teamID].SocksColor;
     }
 
     public string GetShortsColor(int teamID)
     {
-        return GameManagement.teamsDictionary[teamID].ShortsColor;
+        return GameManagement.Instance.TeamsDictionary[teamID].ShortsColor;
     }
 
     public string GetSkinHex(string plyrName)
     {
         return skinColorCombo[plyrName];
     }
+
+    public string GetJerseyColor(int teamID)
+    {
+        return GameManagement.Instance.TeamsDictionary[teamID].JerseyColorA;
+    }
+
+    public string GetSocks(int teamID)
+    {
+        return GameManagement.Instance.TeamsDictionary[teamID].SocksColor;
+    }
+
+    // public string GetKeeperJerseyColor(int teamID)
+    // {
+    //     return GameManagement.Instance.TeamsDictionary[teamID].keeper_jersey;
+    // }
+
+    // public string GetKeeperShorts(int teamID)
+    // {
+    //     return GameManagement.Instance.TeamsDictionary[teamID].keeper_shorts;
+    // }
+
+    // public string GetKeeperSocks(int teamID)
+    // {
+    //     return GameManagement.Instance.TeamsDictionary[teamID].keeper_socks;
+    // }
 }

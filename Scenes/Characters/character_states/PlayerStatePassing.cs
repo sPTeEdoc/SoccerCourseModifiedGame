@@ -9,9 +9,30 @@ public partial class PlayerStatePassing : PlayerState
     public override void _EnterTree()
     {
         soundPlayer = GetNode<SoundPlayer>("/root/SoundPlayer");
-        animationPlayer.Play($"{player.AnimPrefix}kick");
+        // animationPlayer.Play("kick");
         player.Velocity = Vector2.Zero;
         soundPlayer.Play(SoundPlayer.Sound.PASS);
+
+        // Snap the visual rendering angle for your sprite selection
+        float snappedAngle = Mathf.Round(player.heading.Angle() * 180f / MathF.PI / 45f) * 45f;
+        int angleCheck = (int)snappedAngle;
+        if (angleCheck == -180) angleCheck = 180;
+
+        string animPrefix = "kick_";
+        string directionStr = "south";
+
+        if (angleCheck == 0) directionStr = "east";
+        else if (angleCheck == -45) directionStr = "northeast";
+        else if (angleCheck == -90) directionStr = "north";
+        else if (angleCheck == -135) directionStr = "northwest";
+        else if (angleCheck == 180) directionStr = "west";
+        else if (angleCheck == 135) directionStr = "southwest";
+        else if (angleCheck == 90) directionStr = "south";
+        else if (angleCheck == 45) directionStr = "southeast";
+
+        player.animatedSprite2D.Play(animPrefix + directionStr);
+
+        OnAnimationComplete();
     }
 
     public override void OnAnimationComplete()
@@ -41,7 +62,7 @@ public partial class PlayerStatePassing : PlayerState
     {
         var playersInView = teammateDetectionArea.GetOverlappingBodies()
             .OfType<PlayerCharacter>()
-            .Where(p => p != player && p.teamID == player.teamID)
+            .Where(p => p != player && p.TeamID == player.TeamID)
             .ToList();
 
         playersInView.Sort((p1, p2) =>
