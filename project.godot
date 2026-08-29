@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Behold the Kickmen Semi Clone"
-run/main_scene="uid://brj16q8ttvqfc"
+run/main_scene="uid://bxmti20vssxjy"
 config/features=PackedStringArray("4.4", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -28,8 +28,8 @@ GameManager="*res://Scenes/game_manager/GameManager.cs"
 
 [display]
 
-window/size/viewport_width=560
-window/size/viewport_height=360
+window/size/viewport_width=1200
+window/size/viewport_height=800
 window/size/window_width_override=1250
 window/size/window_height_override=500
 window/subwindows/embed_subwindows=false

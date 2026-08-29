@@ -57,13 +57,13 @@ public partial class ActorsContainer : Node2D
         gameEvents.TeamResetEventTriggered += OnTeamReset;
         gameEvents.ImpactReceived += OnImpactReceived;
 
-        squadHome = SpawnPlayers(gameManager.currentMatch.TeamHome, GoalHome);
-        GoalHome.Initialize(gameManager.currentMatch.TeamHome);
+        squadHome = SpawnPlayers(gameManager.currentMatch.HomeTeam, GoalHome);
+        GoalHome.Initialize(gameManager.currentMatch.HomeTeam);
         spawns.Scale = new Vector2(-1, spawns.Scale.Y);
         kickoffs.Scale = new Vector2(-1, kickoffs.Scale.Y);
 
-        squadAway = SpawnPlayers(gameManager.currentMatch.TeamAway, GoalAway);
-        GoalAway.Initialize(gameManager.currentMatch.TeamAway);
+        squadAway = SpawnPlayers(gameManager.currentMatch.AwayTeam, GoalAway);
+        GoalAway.Initialize(gameManager.currentMatch.AwayTeam);
 
         SetupControlSchemes();
     }
@@ -107,7 +107,7 @@ public partial class ActorsContainer : Node2D
 
         // 2. Initialize the common fields exactly like before!
         // Because both types are PlayerCharacters, this method works seamlessly on either.
-        player.Initialize(position, kickoffPos, Ball, ownGoal, targetGoal, data, teamID);
+        // player.Initialize(position, kickoffPos, Ball, ownGoal, targetGoal, data, teamID);
 
         player.SwapRequested += OnPlayerSwapRequest;
 

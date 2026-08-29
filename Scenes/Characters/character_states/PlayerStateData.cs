@@ -6,6 +6,8 @@ public partial class PlayerStateData : GodotObject
     public Vector2 HurtDirection { get; private set; } = Vector2.Zero;
     public PlayerCharacter PassTarget { get; private set; } = null;
     public Vector2 ResetPosition { get; private set; } = Vector2.Zero;
+    public Vector2 PreEntrancePosition { get; private set; } = Vector2.Zero;
+    public Vector2 EntrancePosition { get; private set; } = Vector2.Zero;
     public Vector2 ShotDirection { get; private set; } = Vector2.Zero;
     public float ShotPower { get; private set; } = 0f;
 
@@ -41,6 +43,18 @@ public partial class PlayerStateData : GodotObject
     public PlayerStateData SetResetPosition(Vector2 position)
     {
         ResetPosition = position;
+        return this;
+    }
+
+    public PlayerStateData SetPreEntrancePosition(Vector2 position)
+    {
+        PreEntrancePosition = position;
+        return this;
+    }
+
+    public PlayerStateData SetEntrancePosition(Vector2 position)
+    {
+        EntrancePosition = position;
         return this;
     }
 }

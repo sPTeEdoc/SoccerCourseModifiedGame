@@ -21,7 +21,9 @@ public partial class PlayerStateFactory : Node
         { PlayerCharacter.State.RECOVERING, typeof(PlayerStateRecovering) },
         { PlayerCharacter.State.SHOOTING, typeof(PlayerStateShooting) },
         { PlayerCharacter.State.TACKLING, typeof(PlayerStateTackling) },
-        { PlayerCharacter.State.VOLLEY_KICK, typeof(PlayerStateVolleyKick) }
+        { PlayerCharacter.State.VOLLEY_KICK, typeof(PlayerStateVolleyKick) },
+        { PlayerCharacter.State.ENTRANCE, typeof(PlayerStateEntrance)},
+        { PlayerCharacter.State.PREENTRANCE, typeof(PlayerStatePreEntrance) }
     };
 
     public PlayerState GetFreshState(PlayerCharacter.State state, Node parent)

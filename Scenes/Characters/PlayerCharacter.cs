@@ -30,7 +30,8 @@ public partial class PlayerCharacter : CharacterBody2D
     {
         MOVING, TACKLING, RECOVERING, PREPPING_SHOT, SHOOTING, PASSING, HEADER, RECEIVING_PASS,
         VOLLEY_KICK, BICYCLE_KICK, CHEST_CONTROL, HURT, DIVING,
-        CELEBRATING, MOURNING, RESETING
+        CELEBRATING, MOURNING, RESETING, ENTRANCE,
+        PREENTRANCE
     }
 
     // Control Sprites Map
@@ -44,10 +45,10 @@ public partial class PlayerCharacter : CharacterBody2D
     // Exported Fields
     [Export] public Ball ball;
     [Export] public ControlScheme controlScheme;
-    [Export] public Goal ownGoal;
+    [Export] public ArenaGoal ownGoal;
     [Export] public float power;
     [Export] public float speed;
-    [Export] public Goal targetGoal;
+    [Export] public ArenaGoal targetGoal;
 
     // Node References
     public AnimationPlayer animationPlayer;
@@ -67,10 +68,12 @@ public partial class PlayerCharacter : CharacterBody2D
     public AIBehavior currentAIBehavior = null;
     public PlayerStateFactory stateFactory = new();
     public PlayerState currentState = null;
-    public Vector2 heading = Vector2.Right;
+    public Vector2 heading = Vector2.Up;
     public float height = 0f;
     public float heightVelocity = 0f;
     public Vector2 kickoffPosition = Vector2.Zero;
+    public Vector2 preentracePosition = Vector2.Zero;
+    public Vector2 entrancePosition = Vector2.Zero;
     public Vector2 spawnPosition = Vector2.Zero;
     public float weightOnDutySteering = 0f;
 
@@ -87,6 +90,7 @@ public partial class PlayerCharacter : CharacterBody2D
     public AnimatedSprite2D animatedSprite2D;
     public Vector2 _bufferedDirection = Vector2.Down;
     private bool _materialDuplicated { get; set; } = false;
+    public bool IsReadyForKickoff() => currentState != null && currentState.IsReadyForEntrance();
     public override void _Ready()
     {
         animatedSprite2D = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
@@ -109,16 +113,14 @@ public partial class PlayerCharacter : CharacterBody2D
         SetupAIBehavior();
         SetShaderProperties();
 
-        spawnPosition = Position;
-
         gameEvents.TeamScored += OnTeamScored;
         gameEvents.GameOver += OnGameOver;
 
         tackleDamageEmitterArea.BodyEntered += OnTacklePlayer;
         permanentDamageEmitterArea.BodyEntered += OnTacklePlayer;
 
-        var initialPosition = TeamID == gameManager.currentMatch.TeamHome ? kickoffPosition : spawnPosition;
-        CallDeferred(nameof(InitializeResetState));
+        // var initialPosition = TeamID == gameManager.currentMatch.HomeTeam ? kickoffPosition : spawnPosition;
+        CallDeferred(nameof(InitializePreEntrance));
     }
 
     public override void _ExitTree()
@@ -130,9 +132,26 @@ public partial class PlayerCharacter : CharacterBody2D
         }
     }
 
+    private void InitializePreEntrance()
+    {
+        SwitchState(State.PREENTRANCE,
+            PlayerStateData.Build().SetPreEntrancePosition(preentracePosition));
+    }
+
+    private void InitializeKickOffState()
+    {
+        Vector2 initialPosition =
+            TeamID == gameManager.currentMatch.HomeTeam
+            ? kickoffPosition
+            : spawnPosition;
+
+        SwitchState(State.RESETING,
+            PlayerStateData.Build().SetResetPosition(initialPosition));
+    }
+
     private void InitializeResetState()
     {
-        var initialPosition = TeamID == gameManager.currentMatch.TeamHome ? kickoffPosition : spawnPosition;
+        var initialPosition = TeamID == gameManager.currentMatch.HomeTeam ? kickoffPosition : spawnPosition;
         SwitchState(State.RESETING, PlayerStateData.Build().SetResetPosition(initialPosition));
     }
 
@@ -210,16 +229,19 @@ public partial class PlayerCharacter : CharacterBody2D
         role = contextPlayerData.Role;
         skinColor = contextPlayerData.SkinColor;
         fullname = contextPlayerData.FullName;
-        heading = homeTeam ? Vector2.Left : Vector2.Right;
+        heading = homeTeam ? Vector2.Down : Vector2.Up;
         TeamID = contextTeamID;
         playerID = GameManagement.Instance.PlayerID++;
     }
 
     public void Initialize(Vector2 contextPosition, Vector2 contextKickoffPosition, Ball contextBall,
-        Goal contextOwnGoal, Goal contextTargetGoal, PlayerResource contextPlayerData, int contextTeamID)
+        ArenaGoal contextOwnGoal, ArenaGoal contextTargetGoal, PlayerResource contextPlayerData, int contextTeamID,
+        Vector2 contextPreentrancePosition, Vector2 contextEntrancePosition)
     {
-        Position = contextPosition;
+        Position = contextPreentrancePosition;
         kickoffPosition = contextKickoffPosition;
+        spawnPosition = contextPosition;
+
         ball = contextBall;
         ownGoal = contextOwnGoal;
         targetGoal = contextTargetGoal;
@@ -228,9 +250,11 @@ public partial class PlayerCharacter : CharacterBody2D
         role = contextPlayerData.Role;
         skinColor = contextPlayerData.SkinColor;
         fullname = contextPlayerData.FullName;
-        heading = targetGoal.Position.X < Position.X ? Vector2.Left : Vector2.Right;
+        heading = targetGoal.Position.X < Position.X ? Vector2.Down : Vector2.Up;
         TeamID = contextTeamID;
         playerID = GameManagement.Instance.PlayerID++;
+        preentracePosition = contextPreentrancePosition;
+        entrancePosition = contextEntrancePosition;
     }
 
     private void SetupAIBehavior()
@@ -354,8 +378,8 @@ public partial class PlayerCharacter : CharacterBody2D
 
     public void SetHeading()
     {
-        if (Velocity.X > 0) heading = Vector2.Right;
-        else if (Velocity.X < 0) heading = Vector2.Left;
+        if (Velocity.Y > 0) heading = Vector2.Up;
+        else if (Velocity.Y < 0) heading = Vector2.Down;
     }
 
     public void FaceTowardsTargetGoal()
@@ -399,7 +423,6 @@ public partial class PlayerCharacter : CharacterBody2D
     }
 
     public bool HasBall() => ball.Carrier == this;
-    public bool IsReadyForKickoff() => currentState != null && currentState.IsReadyForKickoff();
 
     private void SetControlTexture()
     {
@@ -467,13 +490,21 @@ public partial class PlayerCharacter : CharacterBody2D
 
     public virtual void OnTacklePlayer(Node other)
     {
-        if (other is PlayerCharacter player &&
-            player != this &&
-            player.TeamID != TeamID &&
-            ball.Carrier.playerID == player.playerID)
+        if (ball.Carrier is not null)
         {
-            Vector2 direction = Position.DirectionTo(player.Position);
-            player.GetHurt(direction);
+            if (other is PlayerCharacter player &&
+                player != this &&
+                player.TeamID != TeamID &&
+                ball.Carrier.playerID == player.playerID)
+            {
+                Vector2 direction = Position.DirectionTo(player.Position);
+                player.GetHurt(direction);
+            }
         }
+    }
+
+    public void SetBufferedDirection(Vector2 direction)
+    {
+        _bufferedDirection = direction.Normalized();
     }
 }

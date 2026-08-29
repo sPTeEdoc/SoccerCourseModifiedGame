@@ -17,7 +17,7 @@ public partial class GameStateKickoff : GameState
         int startingTeamID = stateData.TeamScoredOn;
 
         if (startingTeamID > -1)
-            startingTeamID = manager.currentMatch.TeamHome;
+            startingTeamID = manager.currentMatch.HomeTeam;
 
         if (startingTeamID == manager.playerSetup[0])
             validControlSchemes.Add(PlayerCharacter.ControlScheme.P1);

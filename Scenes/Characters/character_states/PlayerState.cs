@@ -14,16 +14,17 @@ public partial class PlayerState : Node
     protected AIBehavior aiBehavior;
     protected Ball ball;
     protected Area2D ballDetectionArea;
-    protected Goal ownGoal;
+    protected ArenaGoal ownGoal;
     protected PlayerCharacter player;
     protected PlayerStateData stateData = new PlayerStateData();
-    protected Goal targetGoal;
+    protected ArenaGoal targetGoal;
     protected Area2D tackleDamageEmitterArea;
     protected Area2D teammateDetectionArea;
+    public virtual bool IsReadyForEntrance() => false;
 
     public void Setup(PlayerCharacter contextPlayer, PlayerStateData contextData,
                       Ball contextBall, Area2D contextTeammateDetectionArea, Area2D contextBallDetectionArea,
-                      Goal contextOwnGoal, Goal contextTargetGoal, Area2D contextTackleDamageEmitterArea,
+                      ArenaGoal contextOwnGoal, ArenaGoal contextTargetGoal, Area2D contextTackleDamageEmitterArea,
                       AIBehavior contextAIBehavior)
     {
         player = contextPlayer;

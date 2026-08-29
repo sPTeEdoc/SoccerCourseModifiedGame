@@ -5,14 +5,19 @@ using System.Linq; // Required for .FirstOrDefault()
 
 public partial class DataLoader : Node
 {
-    private Dictionary<string, string> skinColorCombo = new Dictionary<string, string>();
+    private Dictionary<int, string> skinColorCombo = new Dictionary<int, string>();
 
     public override void _Ready()
     {
-        var file = FileAccess.Open("res://assets/json/squads.json", FileAccess.ModeFlags.Read);
+        LoadSquads("squads2.json");
+    }
+
+    private void LoadSquads(string jsonFilePath)
+    {
+        var file = FileAccess.Open($"res://assets/json/{jsonFilePath}", FileAccess.ModeFlags.Read);
         if (file == null)
         {
-            GD.PushError("Could not find or load squads.json");
+            GD.PushError("Could not find or load squads2.json");
             return;
         }
 
@@ -34,35 +39,38 @@ public partial class DataLoader : Node
 
             int tID = Int32.Parse(teamID);
             string teamName = team["teamName"].AsString();
-            string hexColor = team["jersey_color"].AsString();
-            string hexColorB = team["jersey_color_B"].AsString();
-            string hexColorC = "";
-            if (team.ContainsKey("jersey_color_C"))
-                hexColorC = team["jersey_color_C"].AsString();
-            string shortsColor = team["shorts"].AsString();
-            string socksColor = team["socks"].AsString();
-            Team club = new Team(tID, teamName, hexColor, hexColorB, hexColorC,
-                shortsColor, socksColor);
+            string jersey_color = team["jersey_color"].AsString();
+            string shorts = team["shorts"].AsString();
+            string socks = team["socks"].AsString();
+
+            string keeper_jersey = team["keeper_jersey"].AsString();
+            string keeper_shorts = team["keeper_shorts"].AsString();
+            string keeper_socks = team["keeper_socks"].AsString(); ;
+
+            Team club = new Team(tID, teamName, jersey_color, shorts, socks,
+                keeper_jersey, keeper_shorts, keeper_socks);
 
             var players = team["players"].AsGodotArray();
             foreach (Godot.Variant playerVariant in players)
             {
                 var player = playerVariant.AsGodotDictionary();
+                int playerID = (int)player["id"];
+                int number = (int)player["number"];
                 string fullname = player["name"].AsString();
                 string skin = player["skin"].AsString();
-                skinColorCombo.Add(fullname, skin);
+                string hair = player["hair"].AsString();
+                skinColorCombo.Add(playerID, skin);
                 var role = (PlayerCharacter.Role)(int)player["role"];
                 float speed = (float)player["speed"];
                 float power = (float)player["power"];
+                float pass = (float)player["pass"];
+                float control = (float)player["control"];
 
-                var resource = new PlayerResource(fullname, skin, role, speed, power);
+                var resource = new PlayerResource(playerID, fullname, skin, hair, role, number, pass, control, speed, power);
                 club.startingRoster.Add(resource);
             }
 
             GameManagement.Instance.TeamsDictionary.Add(club.TeamID, club);
-
-            if (players.Count != 6)
-                GD.PrintErr($"Squad for {teamName} does not have exactly 6 players.");
         }
 
         file.Close();
@@ -76,65 +84,45 @@ public partial class DataLoader : Node
     public List<int> GetTeams()
     {
         List<int> teams = new List<int>();
-        foreach(KeyValuePair<int, Team> t in GameManagement.Instance.TeamsDictionary)
+        foreach (KeyValuePair<int, Team> t in GameManagement.Instance.TeamsDictionary)
         {
             teams.Add(t.Value.TeamID);
         }
         return teams;
     }
 
-    public string GetJerseyColorA(int teamID)
+    public string GetJerseyColor(int teamID)
     {
-        return GameManagement.Instance.TeamsDictionary[teamID].JerseyColorA;
-    }
-
-    public string GetJerseyColorB(int teamID)
-    {
-        return GameManagement.Instance.TeamsDictionary[teamID].Jersey_color_B;
-    }
-
-    public string GetJerseyColorC(int teamID)
-    {
-        return GameManagement.Instance.TeamsDictionary[teamID].Jersey_color_C;
-    }
-
-    public string GetSocksColor(int teamID)
-    {
-        return GameManagement.Instance.TeamsDictionary[teamID].SocksColor;
+        return GameManagement.Instance.TeamsDictionary[teamID].jersey_color;
     }
 
     public string GetShortsColor(int teamID)
     {
-        return GameManagement.Instance.TeamsDictionary[teamID].ShortsColor;
-    }
-
-    public string GetSkinHex(string plyrName)
-    {
-        return skinColorCombo[plyrName];
-    }
-
-    public string GetJerseyColor(int teamID)
-    {
-        return GameManagement.Instance.TeamsDictionary[teamID].JerseyColorA;
+        return GameManagement.Instance.TeamsDictionary[teamID].shorts;
     }
 
     public string GetSocks(int teamID)
     {
-        return GameManagement.Instance.TeamsDictionary[teamID].SocksColor;
+        return GameManagement.Instance.TeamsDictionary[teamID].socks;
     }
 
-    // public string GetKeeperJerseyColor(int teamID)
-    // {
-    //     return GameManagement.Instance.TeamsDictionary[teamID].keeper_jersey;
-    // }
+    public string GetKeeperJerseyColor(int teamID)
+    {
+        return GameManagement.Instance.TeamsDictionary[teamID].keeper_jersey;
+    }
 
-    // public string GetKeeperShorts(int teamID)
-    // {
-    //     return GameManagement.Instance.TeamsDictionary[teamID].keeper_shorts;
-    // }
+    public string GetKeeperShorts(int teamID)
+    {
+        return GameManagement.Instance.TeamsDictionary[teamID].keeper_shorts;
+    }
 
-    // public string GetKeeperSocks(int teamID)
-    // {
-    //     return GameManagement.Instance.TeamsDictionary[teamID].keeper_socks;
-    // }
+    public string GetKeeperSocks(int teamID)
+    {
+        return GameManagement.Instance.TeamsDictionary[teamID].keeper_socks;
+    }
+
+    public string GetSkinHex(int plyrID)
+    {
+        return skinColorCombo[plyrID];
+    }
 }

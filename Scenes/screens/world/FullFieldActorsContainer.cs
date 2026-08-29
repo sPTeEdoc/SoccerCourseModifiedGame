@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public partial class ActorsContainer2 : Node2D
+public partial class FullFieldActorsContainer : Node2D
 {
     private const int DurationWeightCache = 200;
 
@@ -11,9 +11,13 @@ public partial class ActorsContainer2 : Node2D
     private PackedScene sparkPrefab = GD.Load<PackedScene>("res://scenes/spark/spark.tscn");
 
     [Export] public Ball Ball { get; set; }
+    [Export] public ArenaGoal NorthGoal { get; set; }
+    [Export] public ArenaGoal SouthGoal { get; set; }
 
     private Node2D kickoffs;
     private Node2D spawns;
+    private Node2D preentrance;
+    private Node2D entrance;
 
     private bool isCheckingForKickoffReadiness = false;
     private List<PlayerCharacter> squadHome = new();
@@ -53,11 +57,17 @@ public partial class ActorsContainer2 : Node2D
         gameEvents.TeamResetEventTriggered += OnTeamReset;
         gameEvents.ImpactReceived += OnImpactReceived;
 
-        squadHome = SpawnPlayers(gameManager.currentMatch.HomeTeam, true);
-        spawns.Scale = new Vector2(-1, spawns.Scale.Y);
-        kickoffs.Scale = new Vector2(-1, kickoffs.Scale.Y);
+        gameManager.currentMatch = new Match(GameManagement.Instance.TeamsDictionary[2].TeamID,
+            GameManagement.Instance.TeamsDictionary[3].TeamID);
 
-        squadAway = SpawnPlayers(gameManager.currentMatch.AwayTeam, false);
+        preentrance = GetNode<Node2D>("Preentrance");
+        entrance = GetNode<Node2D>("Entrance");
+
+        squadHome = SpawnPlayers(gameManager.currentMatch.HomeTeam, SouthGoal);
+        NorthGoal.Initialize(gameManager.currentMatch.HomeTeam);
+
+        squadAway = SpawnPlayers(gameManager.currentMatch.AwayTeam, NorthGoal);
+        SouthGoal.Initialize(gameManager.currentMatch.AwayTeam);
 
         SetupControlSchemes();
     }
@@ -76,30 +86,71 @@ public partial class ActorsContainer2 : Node2D
             CheckForKickoffReadiness();
     }
 
-    private List<PlayerCharacter> SpawnPlayers(int teamID, bool homeTeam)
+    private List<PlayerCharacter> SpawnPlayers(int teamID, ArenaGoal ownGoal)
     {
         var playerNodes = new List<PlayerCharacter>();
         var players = dataLoader.GetSquad(teamID);
+        var targetGoal = ownGoal == SouthGoal ? NorthGoal : SouthGoal;
+
+        float halfwayY = 485f; // midpoint of pitch
 
         for (int i = 0; i < players.Count; i++)
         {
-            Vector2 playerPosition = spawns.GetChild<Node2D>(i).GlobalPosition;
-            var playerData = players[i] as PlayerResource;
-            Vector2 kickoffPosition = i > 3 ? kickoffs.GetChild<Node2D>(i - 4).GlobalPosition : playerPosition;
+            var spawnNode = spawns.GetChild<Node2D>(i);
+            Vector2 playerPosition = spawnNode.GlobalPosition;
+            var entranceNode = entrance.GetChild<Node2D>(i);
+            Vector2 entrancePosition = entranceNode.GlobalPosition;
+            var preentranceNode = preentrance.GetChild<Node2D>(0);
+            Vector2 preentrancePosition = preentranceNode.GlobalPosition;
 
-            var player = SpawnPlayer2(playerPosition, kickoffPosition, playerData, teamID, homeTeam);
+            // If this is the away team, mirror vertically
+            if (ownGoal == NorthGoal)
+            {
+                playerPosition.Y = 2 * halfwayY - playerPosition.Y;
+                entrancePosition.Y = 2 * halfwayY - entrancePosition.Y;
+                preentrancePosition.Y = 2 * halfwayY - preentrancePosition.Y;
+            }
+
+            var playerData = players[i] as PlayerResource;
+
+            Vector2 kickoffPosition;
+            if (i > 8)
+            {
+                // Pull from the dedicated kickoff nodes
+                kickoffPosition = kickoffs.GetChild<Node2D>(i - 9).GlobalPosition;
+
+                // Mirror vertically ONLY if this specific team is playing on the south side
+                if (ownGoal == NorthGoal)
+                {
+                    kickoffPosition.Y = 2 * halfwayY - kickoffPosition.Y + 10;
+                }
+            }
+            else
+            {
+                // Fall back to the player's standard spawn position 
+                // (This has already been correctly mirrored above if they are TeamGoingSouth)
+                kickoffPosition = playerPosition;
+            }
+
+            var player = SpawnPlayer(playerPosition, kickoffPosition, ownGoal, targetGoal, playerData, teamID, preentrancePosition, entrancePosition);
             playerNodes.Add(player);
         }
 
         return playerNodes;
     }
 
-    private PlayerCharacter SpawnPlayer2(Vector2 position, Vector2 kickoffPos, PlayerResource data, int teamID,
-        bool homeTeam)
+    private PlayerCharacter SpawnPlayer(Vector2 position, Vector2 kickoffPos, ArenaGoal ownGoal, ArenaGoal targetGoal, PlayerResource data, int teamID,
+        Vector2 preentrancePosition, Vector2 entrancePosition)
     {
         var player = playerPrefab.Instantiate<PlayerCharacter>();
-        player.Initialize(position, kickoffPos, Ball, data, teamID, homeTeam);
+
+        // 2. Initialize the common fields exactly like before!
+        // Because both types are PlayerCharacters, this method works seamlessly on either.
+        player.Initialize(position, kickoffPos, Ball, ownGoal, targetGoal, data, teamID, preentrancePosition, entrancePosition);
+
         player.SwapRequested += OnPlayerSwapRequest;
+
+        // 3. Add to the scene tree and return
         AddChild(player);
         return player;
     }
@@ -160,17 +211,36 @@ public partial class ActorsContainer2 : Node2D
         }
     }
 
-    private void CheckForKickoffReadiness()
+    private async void CheckForKickoffReadiness()
     {
+        // 1. Verify if EVERY player on both teams has completed their entrance
         foreach (var squad in new[] { squadHome, squadAway })
         {
             foreach (var player in squad)
             {
                 if (!player.IsReadyForKickoff())
-                    return;
+                    return; // Stop here if even one player is still walking in
             }
         }
 
+        await ToSignal(GetTree().CreateTimer(1.0f), SceneTreeTimer.SignalName.Timeout);
+
+        // 2. Everyone has arrived! Now transition all players to RESETING at the same time
+        foreach (var squad in new[] { squadHome, squadAway })
+        {
+            foreach (var player in squad)
+            {
+                bool teamIsKickingOff = player.TeamID == gameManager.currentMatch.HomeTeam;
+                Vector2 initialPosition =
+                    teamIsKickingOff
+                    ? player.kickoffPosition
+                    : player.spawnPosition;
+                player.SwitchState(PlayerCharacter.State.RESETING,
+                    PlayerStateData.Build().SetResetPosition(initialPosition));
+            }
+        }
+
+        // 3. Complete kickoff initialization sequence
         SetupControlSchemes();
         isCheckingForKickoffReadiness = false;
         gameEvents.EmitSignal("KickoffReady");

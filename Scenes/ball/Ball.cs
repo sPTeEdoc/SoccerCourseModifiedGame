@@ -32,6 +32,8 @@ public partial class Ball : AnimatableBody2D
     private BallStateFactory stateFactory = new BallStateFactory();
     public Vector2 Velocity = Vector2.Zero;
     public GameEvents gameEvents;
+    public float CrossbarHeight { get; set; } = 32f; // Adjust to match your art's scale
+    public bool IsInNet { get; set; } = false;
 
     public override void _Ready()
     {
@@ -182,7 +184,7 @@ public partial class Ball : AnimatableBody2D
         SetInteractionsEnabled(true);
 
         Velocity = Vector2.Zero;
-        HeightVelocity = 0; 
+        HeightVelocity = 0;
         PassTo(spawnPosition + Vector2.Down * KICKOFF_PASS_DISTANCE, 0);
     }
 
@@ -199,6 +201,6 @@ public partial class Ball : AnimatableBody2D
         {
             gameEvents.KickoffStarted -= OnKickoffStarted;
             gameEvents.TeamResetEventTriggered -= OnTeamReset;
-        }   
+        }
     }
 }

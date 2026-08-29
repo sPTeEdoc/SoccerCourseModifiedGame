@@ -56,8 +56,8 @@ public partial class UI : CanvasLayer
     private void UpdateFlags()
     {
         int[] teams = {
-            gameManager.currentMatch.TeamHome,
-            gameManager.currentMatch.TeamAway
+            gameManager.currentMatch.HomeTeam,
+            gameManager.currentMatch.AwayTeam
         };
 
         for (int i = 0; i < flagTextures.Count; i++)

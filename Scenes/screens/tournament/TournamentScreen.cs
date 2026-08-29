@@ -93,20 +93,20 @@ public partial class TournamentScreen : Screen
                 BracketFlag flagHome = flagNodes[i * 2];
                 BracketFlag flagAway = flagNodes[i * 2 + 1];
 
-                flagHome.Texture = FlagHelper.GetTexture(GameManagement.Instance.TeamsDictionary[currentMatch.TeamHome].Name);
-                flagAway.Texture = FlagHelper.GetTexture(GameManagement.Instance.TeamsDictionary[currentMatch.TeamAway].Name);
+                flagHome.Texture = FlagHelper.GetTexture(GameManagement.Instance.TeamsDictionary[currentMatch.HomeTeam].Name);
+                flagAway.Texture = FlagHelper.GetTexture(GameManagement.Instance.TeamsDictionary[currentMatch.AwayTeam].Name);
 
                 if (currentMatch.Winner > -1)
                 {
-                    var flagWinner = currentMatch.Winner == currentMatch.TeamHome ? flagHome : flagAway;
+                    var flagWinner = currentMatch.Winner == currentMatch.HomeTeam ? flagHome : flagAway;
                     var flagLoser = flagWinner == flagHome ? flagAway : flagHome;
 
                     flagWinner.SetAsWinner(currentMatch.FinalScore);
                     flagLoser.SetAsLoser();
                 }
-                else if ((currentMatch.TeamHome == playerTeam || currentMatch.TeamAway == playerTeam) && stage == tournament.CurrentStage)
+                else if ((currentMatch.HomeTeam == playerTeam || currentMatch.AwayTeam == playerTeam) && stage == tournament.CurrentStage)
                 {
-                    var flagPlayer = currentMatch.TeamHome == playerTeam ? flagHome : flagAway;
+                    var flagPlayer = currentMatch.HomeTeam == playerTeam ? flagHome : flagAway;
                     flagPlayer.SetAsCurrentTeam();
                     gameManager.currentMatch = currentMatch;
                 }
