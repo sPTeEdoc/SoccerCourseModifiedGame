@@ -3548,6 +3548,7 @@ shape = SubResource("RectangleShape2D_jhlpd")
 [node name="GoalSouth" type="Node2D" parent="." node_paths=PackedStringArray("LeftPost", "RightPost", "backNetAreaUpper", "backNetAreaLeft", "backNetAreaRight", "scoringArea", "layer", "ballAtBackOfNet", "ballAwayFromBackOfNet", "crossBarPlus")]
 position = Vector2(232, 459)
 script = ExtResource("5_3a32w")
+IsNorth = false
 LeftPost = NodePath("LeftPost/LeftPostMarker")
 RightPost = NodePath("RightPost/LeftPostMarker")
 backNetAreaUpper = NodePath("BackNet/BackNetArea")

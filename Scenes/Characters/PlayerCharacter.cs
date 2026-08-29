@@ -91,6 +91,7 @@ public partial class PlayerCharacter : CharacterBody2D
     public Vector2 _bufferedDirection = Vector2.Down;
     private bool _materialDuplicated { get; set; } = false;
     public bool IsReadyForKickoff() => currentState != null && currentState.IsReadyForEntrance();
+    public bool IsKickingOffPlayer = false;
     public override void _Ready()
     {
         animatedSprite2D = GetNode<AnimatedSprite2D>("AnimatedSprite2D");

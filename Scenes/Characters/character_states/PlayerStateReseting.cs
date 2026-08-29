@@ -24,6 +24,16 @@ public partial class PlayerStateReseting : PlayerState
                 hasArrived = true;
                 player.Velocity = Vector2.Zero;
                 player.FaceTowardsTargetGoal();
+                if (player.targetGoal.IsNorth)
+                {
+                    if (player.IsKickingOffPlayer) player.SetBufferedDirection(Vector2.Down);
+                    else player.SetBufferedDirection(Vector2.Up);
+                }
+                else
+                {
+                    if (player.IsKickingOffPlayer) player.SetBufferedDirection(Vector2.Up);
+                    else player.SetBufferedDirection(Vector2.Down);
+                }
             }
             else
             {

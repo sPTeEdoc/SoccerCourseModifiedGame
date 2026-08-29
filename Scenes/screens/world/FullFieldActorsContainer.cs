@@ -133,6 +133,8 @@ public partial class FullFieldActorsContainer : Node2D
             }
 
             var player = SpawnPlayer(playerPosition, kickoffPosition, ownGoal, targetGoal, playerData, teamID, preentrancePosition, entrancePosition);
+            if (i == 10)
+                player.IsKickingOffPlayer = true;
             playerNodes.Add(player);
         }
 
