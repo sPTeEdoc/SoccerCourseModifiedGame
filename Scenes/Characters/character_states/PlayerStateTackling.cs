@@ -4,9 +4,10 @@ using System;
 [GlobalClass]
 public partial class PlayerStateTackling : PlayerState
 {
-    private const float GROUND_FRICTION = 350.0f;
-    private const float TACKLE_LUNGE_FACTOR = 1.35f; // Lunge speed relative to base speed
-    private const int DURATION_PRIOR_RECOVERY = 200;
+    // Tuning Parameters
+    private const float TARGET_SLIDE_DISTANCE = 25.0f; // Distance in pixels to slide
+    private const float GROUND_FRICTION = 450.0f;       // Deceleration rate (px/s^2)
+    private const int DURATION_PRIOR_RECOVERY = 150;    // Milliseconds paused after slide ends
 
     private bool isTackleComplete = false;
     private int timeFinishTackle = (int)Time.GetTicksMsec();
@@ -15,7 +16,7 @@ public partial class PlayerStateTackling : PlayerState
     {
         tackleDamageEmitterArea.Monitoring = true;
 
-        // 1. Determine tackle direction: prefer pointing toward ball carrier if within range
+        // 1. Determine tackle direction vector (towards ball carrier if valid, otherwise current heading/velocity)
         Vector2 tackleDir = player.heading;
 
         if (ball != null && ball.Carrier != null && ball.Carrier != player)
@@ -31,13 +32,13 @@ public partial class PlayerStateTackling : PlayerState
             tackleDir = player.Velocity.Normalized();
         }
 
-        // 2. Update player heading to match full 2D direction
         player.heading = tackleDir;
 
-        // 3. Apply initial tackle lunge impulse toward target
-        player.Velocity = tackleDir * (player.speed * TACKLE_LUNGE_FACTOR);
+        // 2. Calculate exact launch speed needed to travel TARGET_SLIDE_DISTANCE under GROUND_FRICTION
+        float initialSlideSpeed = Mathf.Sqrt(2.0f * GROUND_FRICTION * TARGET_SLIDE_DISTANCE);
+        player.Velocity = tackleDir * initialSlideSpeed;
 
-        // 4. Play corresponding 8-directional animation
+        // 3. Play matching 8-directional animation
         string directionStr = GetDirectionString(tackleDir);
         player.animatedSprite2D.Play("tackle_" + directionStr);
     }
@@ -46,10 +47,12 @@ public partial class PlayerStateTackling : PlayerState
     {
         if (!isTackleComplete)
         {
-            // Decelerate during the tackle slide
+            // Uniform deceleration across grass surface
             player.Velocity = player.Velocity.MoveToward(Vector2.Zero, (float)delta * GROUND_FRICTION);
-            if (player.Velocity == Vector2.Zero)
+
+            if (player.Velocity.LengthSquared() < 1.0f)
             {
+                player.Velocity = Vector2.Zero;
                 isTackleComplete = true;
                 timeFinishTackle = (int)Time.GetTicksMsec();
             }

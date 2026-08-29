@@ -9,7 +9,7 @@ public partial class AIBehaviorField : AIBehavior
     public const float SHOT_DISTANCE = 150f;
     public const float SHOT_PROBABILITY = 0.3f;
     public const float SPREAD_ASSIST_FACTOR = 0.8f;
-    public const float TACKLE_DISTANCE = 45f;
+    public const float TACKLE_DISTANCE = 40f;
     public const float TACKLE_PROBABILITY = 0.3f;
 
     public GameManager gameManager;
