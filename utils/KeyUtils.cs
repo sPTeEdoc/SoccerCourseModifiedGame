@@ -34,7 +34,17 @@ public static class KeyUtils
     public static Vector2 GetInputVector(PlayerCharacter.ControlScheme scheme)
     {
         var map = ACTIONS_MAP[scheme];
-        return Input.GetVector(map[Action.LEFT], map[Action.RIGHT], map[Action.UP], map[Action.DOWN]);
+
+        float x = 0f;
+        float y = 0f;
+
+        if (Input.IsActionPressed(map[Action.LEFT])) x -= 1f;
+        if (Input.IsActionPressed(map[Action.RIGHT])) x += 1f;
+        if (Input.IsActionPressed(map[Action.UP])) y -= 1f;
+        if (Input.IsActionPressed(map[Action.DOWN])) y += 1f;
+
+        Vector2 v = new Vector2(x, y);
+        return v == Vector2.Zero ? Vector2.Zero : v.Normalized();
     }
 
     public static bool IsActionPressed(PlayerCharacter.ControlScheme scheme, Action action)

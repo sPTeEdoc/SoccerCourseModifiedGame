@@ -69,6 +69,9 @@ public partial class FullFieldActorsContainer : Node2D
         squadAway = SpawnPlayers(gameManager.currentMatch.AwayTeam, NorthGoal);
         SouthGoal.Initialize(gameManager.currentMatch.AwayTeam);
 
+        gameManager.playerSetup[0] = 2;
+        gameManager.playerSetup[1] = -2;
+
         SetupControlSchemes();
     }
 

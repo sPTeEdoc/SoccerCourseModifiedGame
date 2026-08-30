@@ -312,41 +312,51 @@ public partial class PlayerCharacter : CharacterBody2D
     public void SetMovementAnimation()
     {
         float velLength = Velocity.Length();
-        Vector2 visualDirection;
+        Vector2 rawInput = Vector2.Zero;
+        Vector2 movementDir = Vector2.Zero;
 
-        if (velLength > 5f)
+        // 1. HUMAN INPUT
+        if (controlScheme != ControlScheme.CPU)
         {
-            // Moving: Use current velocity direction and save it to our buffer
-            visualDirection = Velocity.Normalized();
-            _bufferedDirection = visualDirection;
+            rawInput = KeyUtils.GetInputVector(controlScheme);
+        }
 
-            // Snap the physical heading to the 8-way grid
-            float angle = Mathf.Round(visualDirection.Angle() / (Mathf.Pi / 4f)) * (Mathf.Pi / 4f);
-            heading = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+        // 2. MOVEMENT DIRECTION (always valid)
+        if (velLength > 0.1f)
+        {
+            movementDir = Velocity.Normalized();
         }
         else
         {
-            // Idling/Slow: Fall back directly to our persistent movement buffer
-            // (For human players, catch a quick tap frame if velocity hasn't registered yet)
-            if (controlScheme != ControlScheme.CPU)
-            {
-                Vector2 rawInput = KeyUtils.GetInputVector(controlScheme);
-                if (rawInput != Vector2.Zero) _bufferedDirection = rawInput.Normalized();
-            }
+            movementDir = _bufferedDirection;
+        }
 
-            visualDirection = _bufferedDirection;
-            if (visualDirection != Vector2.Zero)
+        // 3. HEADING LOGIC
+        if (controlScheme != ControlScheme.CPU)
+        {
+            // Human heading = raw input
+            if (rawInput != Vector2.Zero)
             {
-                float angle = Mathf.Round(visualDirection.Angle() / (Mathf.Pi / 4f)) * (Mathf.Pi / 4f);
+                float angle = Mathf.Round(rawInput.Angle() / (Mathf.Pi / 4f)) * (Mathf.Pi / 4f);
                 heading = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+                _bufferedDirection = heading;
+            }
+        }
+        else
+        {
+            // CPU heading = movement direction
+            if (movementDir != Vector2.Zero)
+            {
+                float angle = Mathf.Round(movementDir.Angle() / (Mathf.Pi / 4f)) * (Mathf.Pi / 4f);
+                heading = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+                _bufferedDirection = heading;
             }
         }
 
-        if (visualDirection == Vector2.Zero)
-            visualDirection = heading;
-
-        // Snap the visual rendering angle for your sprite selection
+        // 4. ANIMATION ALWAYS USES MOVEMENT DIRECTION
+        Vector2 visualDirection = movementDir;
         float snappedAngle = Mathf.Round(visualDirection.Angle() * 180f / MathF.PI / 45f) * 45f;
+
         int angleCheck = (int)snappedAngle;
         if (angleCheck == -180) angleCheck = 180;
 
@@ -379,8 +389,16 @@ public partial class PlayerCharacter : CharacterBody2D
 
     public void SetHeading()
     {
-        if (Velocity.Y > 0) heading = Vector2.Up;
-        else if (Velocity.Y < 0) heading = Vector2.Down;
+        if (controlScheme != ControlScheme.CPU)
+        {
+            Vector2 input = KeyUtils.GetInputVector(controlScheme);
+            if (input != Vector2.Zero)
+                heading = input;
+        }
+        else if (Velocity != Vector2.Zero)
+        {
+            heading = Velocity.Normalized();
+        }
     }
 
     public void FaceTowardsTargetGoal()
