@@ -57,12 +57,12 @@ public partial class BallStateCarried : BallState
 
         // ✔️ FIX: wobble perpendicular to actual heading, not forward offset
         Vector2 perp = new Vector2(-heading.Y, heading.X).Normalized();
-        // wobble = Mathf.Cos(dribbleTime * DribbleFrequency) * DribbleIntensity;
+        wobble = Mathf.Cos(dribbleTime * DribbleFrequency) * DribbleIntensity;
 
         ball.Position =
             carrier.Position
             + forward
-            + perp
+            + perp * wobble
             + new Vector2(0, OffsetFromPlayer.Y);
 
         GD.Print($"heading: {carrier.heading}, dir: {GetDirectionString(carrier.heading)}");
