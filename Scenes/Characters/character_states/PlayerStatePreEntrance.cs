@@ -40,7 +40,7 @@ public partial class PlayerStatePreEntrance : PlayerState
         player.SetHeading();
     }
 
-    public override bool IsReadyForEntrance() => hasArrived;
+    public override bool IsReadyToGoToKickoffSpots() => hasArrived;
 
     private void OnPreEntranceFinished()
     {

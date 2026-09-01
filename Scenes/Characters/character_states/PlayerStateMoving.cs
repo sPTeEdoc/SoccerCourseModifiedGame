@@ -21,12 +21,20 @@ public partial class PlayerStateMoving : PlayerState
 
     private void HandleHumanMovement()
     {
-        Vector2 direction = KeyUtils.GetInputVector(player.controlScheme);
-        player.Velocity = direction * player.speed;
-
-        if (player.Velocity != Vector2.Zero)
+        if (!player.InputLocked)
         {
-            teammateDetectionArea.Rotation = player.Velocity.Angle();
+            Vector2 direction = KeyUtils.GetInputVector(player.controlScheme);
+            player.Velocity = direction * player.speed;
+        }
+        else
+        {
+            player.Velocity = Vector2.Zero;
+        }
+
+        // Keep detection cone aligned with heading direction
+        if (player.heading != Vector2.Zero && teammateDetectionArea != null)
+        {
+            teammateDetectionArea.Rotation = player.heading.Angle();
         }
 
         if (KeyUtils.IsActionJustPressed(player.controlScheme, KeyUtils.Action.PASS))
@@ -75,10 +83,7 @@ public partial class PlayerStateMoving : PlayerState
         }
     }
 
-    public override bool CanCarryBall()
-    {
-        return player.role != PlayerCharacter.Role.GOALIE;
-    }
+    public override bool CanCarryBall() => player.role != PlayerCharacter.Role.GOALIE;
 
     private bool CanTeammatePassBall()
     {
@@ -87,8 +92,5 @@ public partial class PlayerStateMoving : PlayerState
                ball.Carrier.controlScheme == PlayerCharacter.ControlScheme.CPU;
     }
 
-    public override bool CanPass()
-    {
-        return true;
-    }
+    public override bool CanPass() => true;
 }

@@ -44,6 +44,7 @@ public partial class AIBehaviorField : AIBehavior
             }
         }
 
+        totalSteeringForce += GetSeparationSteeringForce() * 1.2f; // Keep a bit of distance
         totalSteeringForce = totalSteeringForce.LimitLength(1.0f);
         player.Velocity = totalSteeringForce * player.speed;
     }
@@ -138,5 +139,31 @@ public partial class AIBehaviorField : AIBehavior
             .Where(p => p != player && p.TeamID == player.TeamID);
 
         return teammates.Any();
+    }
+
+    public Vector2 GetSeparationSteeringForce(float neighborRadius = 25f)
+    {
+        Vector2 separation = Vector2.Zero;
+        int count = 0;
+
+        // Grab nearby players via area detection or scene tree
+        var nearbyPlayers = teammateDetectionArea.GetOverlappingBodies()
+            .OfType<PlayerCharacter>()
+            .Where(p => p != player && p.Position.DistanceTo(player.Position) < neighborRadius);
+
+        foreach (var other in nearbyPlayers)
+        {
+            Vector2 diff = player.Position - other.Position;
+            float distance = diff.Length();
+
+            if (distance > 0)
+            {
+                // Inverse weighting: closer neighbors exert stronger push away
+                separation += diff.Normalized() / distance;
+                count++;
+            }
+        }
+
+        return count > 0 ? separation.Normalized() : Vector2.Zero;
     }
 }

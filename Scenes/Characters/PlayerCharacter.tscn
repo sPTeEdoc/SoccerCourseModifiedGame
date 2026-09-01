@@ -1180,7 +1180,6 @@ process_material = SubResource("ParticleProcessMaterial_7vyk4")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 z_index = 5
 material = SubResource("ShaderMaterial_edpow")
-scale = Vector2(1.5, 1.5)
 sprite_frames = SubResource("SpriteFrames_kdal4")
 animation = &"hurt_west"
 frame_progress = 0.550679

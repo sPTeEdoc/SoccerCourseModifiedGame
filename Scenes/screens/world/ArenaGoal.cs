@@ -16,7 +16,7 @@ public partial class ArenaGoal : Node2D
     [Export] private Area2D backNetAreaLeft;
     [Export] private Area2D backNetAreaRight;
     [Export] private Area2D scoringArea;
-    [Export] private TileMapLayer layer;
+    [Export] public TileMapLayer layer;
     [Export] private Area2D ballAtBackOfNet;
     [Export] private Area2D ballAwayFromBackOfNet;
     [Export] private Area2D crossBarPlus;
@@ -109,7 +109,7 @@ public partial class ArenaGoal : Node2D
         }
     }
 
-    bool goalCounted = false;
+    public bool goalCounted = false;
 
     public Vector2 GetCenterTargetPosition()
     {

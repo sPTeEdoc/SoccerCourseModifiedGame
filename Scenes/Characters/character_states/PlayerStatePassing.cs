@@ -5,15 +5,21 @@ using System.Linq;
 [GlobalClass]
 public partial class PlayerStatePassing : PlayerState
 {
+    private const float PASS_FREEZE_DURATION = 0.12f;
+    private float freezeTimer = 0f;
+
     public SoundPlayer soundPlayer;
+
     public override void _EnterTree()
     {
         soundPlayer = GetNode<SoundPlayer>("/root/SoundPlayer");
-        // animationPlayer.Play("kick");
+
+        freezeTimer = PASS_FREEZE_DURATION;
         player.Velocity = Vector2.Zero;
+        player.InputLocked = true;
+
         soundPlayer.Play(SoundPlayer.Sound.PASS);
 
-        // Snap the visual rendering angle for your sprite selection
         float snappedAngle = Mathf.Round(player.heading.Angle() * 180f / MathF.PI / 45f) * 45f;
         int angleCheck = (int)snappedAngle;
         if (angleCheck == -180) angleCheck = 180;
@@ -32,7 +38,43 @@ public partial class PlayerStatePassing : PlayerState
 
         player.animatedSprite2D.Play(animPrefix + directionStr);
 
-        OnAnimationComplete();
+        // Perform pass directly and do NOT connect AnimationFinished signal to OnAnimationComplete
+        PerformPass();
+    }
+
+    private void PerformPass()
+    {
+        PlayerCharacter passTarget = stateData.PassTarget ?? FindTeammateInView();
+
+        if (passTarget == null)
+        {
+            // Vector2 heading = player.heading.Normalized();
+            // if (heading.LengthSquared() < 0.01f)
+            //     heading = player.FacingDirection; // Use last non-zero direction instead of Vector2.Down
+
+            float passPowerFactor = 0.85f + (player.power / 100f) * 0.35f;
+            float targetDistance = 115f * passPowerFactor;
+
+            Vector2 destination = ball.Position + player.heading.Normalized() * targetDistance;
+            ball.PassTo(destination, receiver: null);
+        }
+        else
+        {
+            Vector2 predictedPos = passTarget.Position + passTarget.Velocity * 0.8f;
+            ball.PassTo(predictedPos, receiver: passTarget);
+        }
+    }
+
+    public override void _Process(double delta)
+    {
+        freezeTimer -= (float)delta;
+        player.Velocity = Vector2.Zero;
+
+        if (freezeTimer <= 0f)
+        {
+            player.InputLocked = false;
+            TransitionState(PlayerCharacter.State.MOVING);
+        }
     }
 
     public override void OnAnimationComplete()
@@ -41,34 +83,55 @@ public partial class PlayerStatePassing : PlayerState
 
         if (passTarget == null)
         {
-            ball.PassTo(ball.Position + player.heading * player.speed, receiver: passTarget);
+            GD.Print($"ball original position: {ball.Position}");
+            Vector2 heading = player.heading;
+            // if (heading.LengthSquared() < 0.01f)
+            //     heading = Vector2.Down;
+
+            heading = heading.Normalized();
+
+            // Open-field pass tuned to match targeted pass pace
+            float passPowerFactor = 0.85f + (player.power / 100f) * 0.35f;
+            float targetDistance = 115f * passPowerFactor;
+
+            Vector2 destination = ball.Position + heading * targetDistance;
+            ball.PassTo(destination, receiver: null);
+            GD.Print($"heading: {heading}, player power: {player.power}, destination: {destination}");
         }
         else
         {
-            Vector2 direction = player.Position.DirectionTo(passTarget.Position);
-
-            if (Math.Sign(player.heading.X) != Math.Sign(direction.X))
-            {
-                player.heading *= -1;
-            }
-
-            ball.PassTo(passTarget.Position + passTarget.Velocity * 0.8f, receiver: passTarget);
+            Vector2 predictedPos = passTarget.Position + passTarget.Velocity * 0.8f;
+            ball.PassTo(predictedPos, receiver: passTarget);
         }
-
-        TransitionState(PlayerCharacter.State.MOVING);
     }
 
     private PlayerCharacter FindTeammateInView()
     {
-        var playersInView = teammateDetectionArea.GetOverlappingBodies()
+        if (player.heading != Vector2.Zero && teammateDetectionArea != null)
+        {
+            teammateDetectionArea.Rotation = player.heading.Angle();
+        }
+
+        Vector2 passDir = player.heading.Normalized();
+        if (passDir == Vector2.Zero) passDir = Vector2.Down;
+
+        var candidates = teammateDetectionArea.GetOverlappingBodies()
             .OfType<PlayerCharacter>()
             .Where(p => p != player && p.TeamID == player.TeamID)
+            .Select(p =>
+            {
+                Vector2 toTeammate = p.Position - player.Position;
+                float dist = toTeammate.Length();
+                Vector2 dir = dist > 0.001f ? toTeammate / dist : Vector2.Zero;
+                float dot = passDir.Dot(dir); // 1.0 = directly ahead, <0 = behind
+                return new { Player = p, Distance = dist, Dot = dot };
+            })
+            // Ignore teammates behind or sharply to the side of the passer
+            .Where(x => x.Dot > 0.2f)
+            // Score candidates favoring forward alignment and downfield distance
+            .OrderByDescending(x => (x.Dot * 120f) + (x.Distance * 0.4f))
             .ToList();
 
-        playersInView.Sort((p1, p2) =>
-            p1.Position.DistanceSquaredTo(player.Position)
-            .CompareTo(p2.Position.DistanceSquaredTo(player.Position)));
-
-        return playersInView.Count > 0 ? playersInView[0] : null;
+        return candidates.Count > 0 ? candidates[0].Player : null;
     }
 }

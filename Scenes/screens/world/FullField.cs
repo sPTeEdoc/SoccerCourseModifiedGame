@@ -17,6 +17,8 @@ public partial class FullField : Node2D
         gameEvents.Connect("GameOver", new Callable(this, nameof(OnGameOver)));
 
         gameManager.StartGame();
+
+        GameManagement.Instance.IsOnPracticeField = false;
     }
 
     private void OnGameOver(string winner)

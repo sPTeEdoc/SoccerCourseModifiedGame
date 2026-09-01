@@ -64,19 +64,17 @@ public partial class BallStateCarried : BallState
             + forward
             + perp * wobble
             + new Vector2(0, OffsetFromPlayer.Y);
-
-        GD.Print($"heading: {carrier.heading}, dir: {GetDirectionString(carrier.heading)}");
     }
 
     private Vector2 GetForwardOffset(string dir)
     {
         float dist = OffsetFromPlayer.X;
-        float diag = dist * 0.7071f;
+        float diag = dist * 0.6071f;
 
         return dir switch
         {
             "north" => new Vector2(0, -dist),
-            "south" => new Vector2(0, dist),
+            "south" => new Vector2(0, dist * 0.6071f),
             "east" => new Vector2(dist, 0),
             "west" => new Vector2(-dist, 0),
 

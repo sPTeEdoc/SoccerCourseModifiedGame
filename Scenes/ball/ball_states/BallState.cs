@@ -93,6 +93,7 @@ public partial class BallState : Node
         var collision = ball.MoveAndCollide(ball.Velocity * delta);
         if (collision != null)
         {
+            GD.Print($"BALL COLLIDED WITH: {((Node)collision.GetCollider()).Name} at Position: {ball.Position}");
             ball.Velocity = ball.Velocity.Bounce(collision.GetNormal()) * Ball.BOUNCINESS;
             soundPlayer.Play(SoundPlayer.Sound.BOUNCE);
             ball.SwitchState(Ball.State.FREEFORM);

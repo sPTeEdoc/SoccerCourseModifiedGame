@@ -5,6 +5,7 @@ public partial class Match : Node
 {
     public int HomeTeam { get; private set; }
     public int AwayTeam { get; private set; }
+    public int TeamKickingOff {get;set;} = 2;
 
     public int GoalsHome { get; private set; } = 0;
     public int GoalsAway { get; private set; } = 0;
@@ -16,6 +17,7 @@ public partial class Match : Node
     {
         HomeTeam = teamHome;
         AwayTeam = teamAway;
+        TeamKickingOff = teamHome;
     }
 
     public bool IsTied()

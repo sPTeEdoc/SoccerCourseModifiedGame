@@ -10,6 +10,7 @@ public partial class GameManagement : Node
     // Drop the 'static' keyword from these so they belong to the instance
     public Dictionary<int, Team> TeamsDictionary { get; set; } = new Dictionary<int, Team>();
     public int PlayerID { get; set; } = 0;
+    public bool IsOnPracticeField {get;set;} = false;
 
     public override void _Ready()
     {

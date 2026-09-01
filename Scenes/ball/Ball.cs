@@ -4,10 +4,10 @@ using System;
 public partial class Ball : AnimatableBody2D
 {
     public const float BOUNCINESS = 0.8f;
-    private const int DISTANCE_HIGH_PASS = 90;
+    private const int DISTANCE_HIGH_PASS = 120;
     private const int DURATION_TUMBLE_LOCK = 200;
     private const int DURATION_PASS_LOCK = 500;
-    private const float KICKOFF_PASS_DISTANCE = 80f;
+    private const float KICKOFF_PASS_DISTANCE = 89f;
     private const float TUMBLE_HEIGHT_VELOCITY = 3f;
 
     public enum State { CARRIED, FREEFORM, SHOT }
@@ -32,7 +32,7 @@ public partial class Ball : AnimatableBody2D
     private BallStateFactory stateFactory = new BallStateFactory();
     public Vector2 Velocity = Vector2.Zero;
     public GameEvents gameEvents;
-    public float CrossbarHeight { get; set; } = 32f; // Adjust to match your art's scale
+    public float CrossbarHeight { get; set; } = 32f;
     public bool IsInNet { get; set; } = false;
 
     public override void _Ready()
@@ -89,9 +89,11 @@ public partial class Ball : AnimatableBody2D
 
     public void PassTo(Vector2 destination, int lockDuration = DURATION_PASS_LOCK, PlayerCharacter receiver = null)
     {
-        Vector2 direction = Position.DirectionTo(destination);
-        float distance = Position.DistanceTo(destination);
-        float intensity = Mathf.Sqrt(2 * distance * FrictionGround);
+        Vector2 direction = (destination - Position).Normalized();
+        float rawDistance = Position.DistanceTo(destination);
+        float effectiveDistance = Mathf.Max(rawDistance, 80f);
+
+        float intensity = Mathf.Sqrt(2 * effectiveDistance * FrictionGround);
 
         if (Carrier != null)
         {
@@ -99,15 +101,26 @@ public partial class Ball : AnimatableBody2D
             intensity *= Mathf.Lerp(0.9f, 1.1f, ratingFactor);
         }
 
-        Velocity = intensity * direction;
+        Velocity = direction * intensity;
 
-        if (distance > DISTANCE_HIGH_PASS)
+        if (rawDistance > DISTANCE_HIGH_PASS && BallState.Gravity > 0)
         {
-            HeightVelocity = BallState.Gravity * distance / (1.85f * intensity);
+            HeightVelocity = BallState.Gravity * rawDistance / (1.85f * intensity);
+        }
+
+        // Capture passer reference before clearing Carrier
+        PlayerCharacter passer = Carrier;
+
+        // Switch state FIRST
+        SwitchState(State.FREEFORM, BallStateData.Build().SetLockDuration(lockDuration));
+
+        // Store passer exception explicitly if state transition cleared ball.Carrier
+        if (CurrentState is BallStateFreeform freeformState && passer != null)
+        {
+            AddCollisionExceptionWith(passer);
         }
 
         Carrier = null;
-        SwitchState(State.FREEFORM, BallStateData.Build().SetLockDuration(lockDuration));
     }
 
     public void Stop()
@@ -115,10 +128,7 @@ public partial class Ball : AnimatableBody2D
         Velocity = Vector2.Zero;
     }
 
-    public bool CanAirInteract()
-    {
-        return CurrentState != null && CurrentState.CanAirInteract();
-    }
+    public bool CanAirInteract() => CurrentState != null && CurrentState.CanAirInteract();
 
     public bool CanAirConnect(float airConnectMinHeight, float airConnectMaxHeight)
     {
@@ -127,9 +137,7 @@ public partial class Ball : AnimatableBody2D
 
     public bool IsHeadedForScoringArea(Area2D scoringArea)
     {
-        if (!scoringRaycast.IsColliding())
-            return false;
-
+        if (!scoringRaycast.IsColliding()) return false;
         return scoringRaycast.GetCollider() == scoringArea;
     }
 
@@ -137,26 +145,16 @@ public partial class Ball : AnimatableBody2D
     {
         var players = playerProximityArea.GetOverlappingBodies();
         int count = 0;
-
         foreach (var body in players)
         {
             if (body is PlayerCharacter p && p.TeamID == teamID)
                 count++;
         }
-
         return count;
-    }
-
-    private void SetBallVisibility(bool visible)
-    {
-        ballSprite.Visible = visible;
-        if (shadowSprite != null)
-            shadowSprite.Visible = visible;
     }
 
     private void SetInteractionsEnabled(bool enabled)
     {
-        // Defer physics changes so Godot doesn't complain about modifying collision state mid-frame
         playerDetectionArea.SetDeferred(Area2D.PropertyName.Monitoring, enabled);
         playerDetectionArea.SetDeferred(Area2D.PropertyName.Monitorable, enabled);
 
@@ -169,23 +167,16 @@ public partial class Ball : AnimatableBody2D
         Position = spawnPosition;
         Velocity = Vector2.Zero;
         Height = 0f;
-
-        // Hide and prevent player interaction while resetting positions
-        // SetBallVisibility(false);
         SetInteractionsEnabled(false);
-
         SwitchState(State.FREEFORM);
     }
 
     private void OnKickoffStarted()
     {
-        // Restore ball visibility and physics interaction
-        // SetBallVisibility(true);
         SetInteractionsEnabled(true);
-
         Velocity = Vector2.Zero;
         HeightVelocity = 0;
-        PassTo(spawnPosition + Vector2.Down * KICKOFF_PASS_DISTANCE, 0);
+        PassTo(spawnPosition + Carrier.heading.Normalized() * KICKOFF_PASS_DISTANCE, 0);
     }
 
     public override void _EnterTree()

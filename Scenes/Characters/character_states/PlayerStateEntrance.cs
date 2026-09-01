@@ -41,5 +41,5 @@ public partial class PlayerStateEntrance : PlayerState
     }
 
     // This makes sure ArenaActorsContainer knows this specific player is done entering
-    public override bool IsReadyForEntrance() => hasArrived;
+    public override bool IsReadyToGoToKickoffSpots() => hasArrived;
 }

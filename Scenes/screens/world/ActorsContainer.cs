@@ -178,7 +178,7 @@ public partial class ActorsContainer : Node2D
         {
             foreach (var player in squad)
             {
-                if (!player.IsReadyForKickoff())
+                if (!player.IsReadyToGoToKickoffSpots())
                     return;
             }
         }

@@ -1,7 +1,6 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using System.Data.Common;
 
 [GlobalClass]
 public partial class PlayerCharacter : CharacterBody2D
@@ -49,6 +48,7 @@ public partial class PlayerCharacter : CharacterBody2D
     [Export] public float power;
     [Export] public float speed;
     [Export] public ArenaGoal targetGoal;
+    [Export] public float pushForce = 50.0f;
 
     // Node References
     public AnimationPlayer animationPlayer;
@@ -90,8 +90,12 @@ public partial class PlayerCharacter : CharacterBody2D
     public AnimatedSprite2D animatedSprite2D;
     public Vector2 _bufferedDirection = Vector2.Down;
     private bool _materialDuplicated { get; set; } = false;
-    public bool IsReadyForKickoff() => currentState != null && currentState.IsReadyForEntrance();
+    public bool IsReadyToGoToKickoffSpots() => currentState != null && currentState.IsReadyToGoToKickoffSpots();
+    public bool IsReadyForKickoff() => currentState != null && currentState.IsReadyForKickoff();
     public bool IsKickingOffPlayer = false;
+    public bool InputLocked { get; set; } = false;
+    public static float PASS_DISTANCE { get; set; } = 140f; // Increased default open-field pass distance
+
     public override void _Ready()
     {
         animatedSprite2D = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
@@ -100,12 +104,10 @@ public partial class PlayerCharacter : CharacterBody2D
         goalieHandsCollider = GetNode<CollisionShape2D>("GoalieHands/GoalieHandsCollider");
         opponentDetectionArea = GetNode<Area2D>("OpponentDetectionArea");
         permanentDamageEmitterArea = GetNode<Area2D>("PermanentDamageEmitterArea");
-        animatedSprite2D = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
         tackleDamageEmitterArea = GetNode<Area2D>("TackleDamageEmitterArea");
         teammateDetectionArea = GetNode<Area2D>("TeammateDetectionArea");
         gameEvents = GetNode<GameEvents>("/root/GameEvents");
         gameManager = GetNode<GameManager>("/root/GameManager");
-        dataLoader = GetNode<DataLoader>("/root/DataLoader");
         dataLoader = GetNode<DataLoader>("/root/DataLoader");
         rootParticles = GetNode<Node2D>("RootParticles");
         runParticles = GetNode<GpuParticles2D>("RootParticles/RunParticles");
@@ -120,8 +122,13 @@ public partial class PlayerCharacter : CharacterBody2D
         tackleDamageEmitterArea.BodyEntered += OnTacklePlayer;
         permanentDamageEmitterArea.BodyEntered += OnTacklePlayer;
 
-        // var initialPosition = TeamID == gameManager.currentMatch.HomeTeam ? kickoffPosition : spawnPosition;
-        CallDeferred(nameof(InitializePreEntrance));
+        if (goalieHandsCollider != null)
+        {
+            goalieHandsCollider.Disabled = (role != Role.GOALIE);
+        }
+
+        if (!GameManagement.Instance.IsOnPracticeField)
+            CallDeferred(nameof(InitializePreEntrance));
     }
 
     public override void _ExitTree()
@@ -139,42 +146,45 @@ public partial class PlayerCharacter : CharacterBody2D
             PlayerStateData.Build().SetPreEntrancePosition(preentracePosition));
     }
 
-    private void InitializeKickOffState()
-    {
-        Vector2 initialPosition =
-            TeamID == gameManager.currentMatch.HomeTeam
-            ? kickoffPosition
-            : spawnPosition;
-
-        SwitchState(State.RESETING,
-            PlayerStateData.Build().SetResetPosition(initialPosition));
-    }
-
-    private void InitializeResetState()
-    {
-        var initialPosition = TeamID == gameManager.currentMatch.HomeTeam ? kickoffPosition : spawnPosition;
-        SwitchState(State.RESETING, PlayerStateData.Build().SetResetPosition(initialPosition));
-    }
-
     public override void _Process(double delta)
     {
-        // FlipSprites();
         SetSpriteVisibility();
         ProcessGravity((float)delta);
+        ResolvePlayerPush();
         MoveAndSlide();
+    }
+
+    public void ResolvePlayerPush()
+    {
+        int collisionCount = GetSlideCollisionCount();
+        for (int i = 0; i < collisionCount; i++)
+        {
+            KinematicCollision2D collision = GetSlideCollision(i);
+            if (collision.GetCollider() is PlayerCharacter otherPlayer)
+            {
+                if (!CanBePushed() || !otherPlayer.CanBePushed()) continue;
+                Vector2 pushDirection = collision.GetNormal();
+                Velocity += pushDirection * pushForce;
+            }
+        }
+    }
+
+    public bool CanBePushed()
+    {
+        if (currentState == null) return false;
+        string stateName = currentState.Name.ToString().ToUpper();
+        return !stateName.Contains("HURT")
+            && !stateName.Contains("TACKLING")
+            && !stateName.Contains("DIVING");
     }
 
     private void SetShaderProperties()
     {
-        // 1. Safely ensure we have the node reference if called before _Ready() finishes
         if (animatedSprite2D == null)
-        {
             animatedSprite2D = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
-        }
 
         if (animatedSprite2D?.Material is ShaderMaterial sharedMat)
         {
-            // 2. Duplicate the material ONCE to prevent memory leaks and shared states
             if (!_materialDuplicated)
             {
                 sharedMat = (ShaderMaterial)sharedMat.Duplicate();
@@ -182,35 +192,19 @@ public partial class PlayerCharacter : CharacterBody2D
                 _materialDuplicated = true;
             }
 
-            // 3. TELL THE SHADER IF THIS IS A GOALKEEPER! (Fixes Goalie Kit)
             sharedMat.SetShaderParameter("is_goalkeeper", role == Role.GOALIE);
-
-            // 4. Set physical features (Added hair_color mapping!)
             sharedMat.SetShaderParameter("skin_color", Color.FromHtml(skinColor));
             sharedMat.SetShaderParameter("hair_color", Color.FromHtml(hairColor));
 
-            // 5. Fetch team kit colors
             var jersey = dataLoader.GetJerseyColor(TeamID);
             var shorts = dataLoader.GetShortsColor(TeamID);
             var socks = dataLoader.GetSocks(TeamID);
-            // var keeper_jersey = dataLoader.GetKeeperJerseyColor(TeamID);
-            // var keeper_shorts = dataLoader.GetKeeperShorts(TeamID);
-            // var keeper_socks = dataLoader.GetKeeperSocks(TeamID);
 
             if (jersey != null && !string.IsNullOrEmpty(jersey))
             {
-                // if (role != Role.GOALIE)
-                // {
                 sharedMat.SetShaderParameter("jersey_color", Color.FromHtml(jersey));
                 sharedMat.SetShaderParameter("shorts", Color.FromHtml(shorts));
                 sharedMat.SetShaderParameter("socks", Color.FromHtml(socks));
-                // }
-                // else
-                // {
-                //     sharedMat.SetShaderParameter("keeper_jersey", Color.FromHtml(keeper_jersey));
-                //     sharedMat.SetShaderParameter("keeper_shorts", Color.FromHtml(keeper_shorts));
-                //     sharedMat.SetShaderParameter("keeper_socks", Color.FromHtml(keeper_socks));
-                // }
             }
             else
             {
@@ -251,7 +245,10 @@ public partial class PlayerCharacter : CharacterBody2D
         role = contextPlayerData.Role;
         skinColor = contextPlayerData.SkinColor;
         fullname = contextPlayerData.FullName;
-        heading = targetGoal.Position.X < Position.X ? Vector2.Down : Vector2.Up;
+
+        // FIX: Compare Y coordinates for vertical field orientation instead of X
+        heading = targetGoal.Position.Y < Position.Y ? Vector2.Up : Vector2.Down;
+
         TeamID = contextTeamID;
         playerID = GameManagement.Instance.PlayerID++;
         preentracePosition = contextPreentrancePosition;
@@ -270,7 +267,6 @@ public partial class PlayerCharacter : CharacterBody2D
     {
         stateData ??= new PlayerStateData();
 
-        // Disconnect before freeing the old state
         if (currentState != null)
         {
             var callback = new Callable(this, nameof(SwitchStateWrapped));
@@ -278,18 +274,13 @@ public partial class PlayerCharacter : CharacterBody2D
             currentState.QueueFree();
         }
 
-        // Create and set up the new state
         currentState = stateFactory.GetFreshState(state, this);
         currentState.Setup(this, stateData, ball,
             teammateDetectionArea, ballDetectionArea, ownGoal, targetGoal,
             tackleDamageEmitterArea, currentAIBehavior);
 
         currentState.Name = $"PlayerStateMachine: {state}";
-
-        // Reconnect the signal with the fresh state
         currentState.Connect("StateTransitionRequested", new Callable(this, nameof(SwitchStateWrapped)));
-
-        // Add the new state to the tree after setup
         GetNode<Node>("PlayerStateMachine").CallDeferred("add_child", currentState);
     }
 
@@ -298,43 +289,22 @@ public partial class PlayerCharacter : CharacterBody2D
         SwitchState((PlayerCharacter.State)nextState, data);
     }
 
-    // public void SetMovementAnimation()
-    // {
-    //     float velLength = Velocity.Length();
-    //     if (velLength < 1)
-    //         animationPlayer.Play($"{AnimPrefix}idle");
-    //     else if (velLength < speed * WalkAnimThreshold)
-    //         animationPlayer.Play($"{AnimPrefix}walk");
-    //     else
-    //         animationPlayer.Play($"{AnimPrefix}run");
-    // }
-
     public void SetMovementAnimation()
     {
         float velLength = Velocity.Length();
         Vector2 rawInput = Vector2.Zero;
         Vector2 movementDir = Vector2.Zero;
 
-        // 1. HUMAN INPUT
         if (controlScheme != ControlScheme.CPU)
-        {
             rawInput = KeyUtils.GetInputVector(controlScheme);
-        }
 
-        // 2. MOVEMENT DIRECTION (always valid)
         if (velLength > 0.1f)
-        {
             movementDir = Velocity.Normalized();
-        }
         else
-        {
             movementDir = _bufferedDirection;
-        }
 
-        // 3. HEADING LOGIC
         if (controlScheme != ControlScheme.CPU)
         {
-            // Human heading = raw input
             if (rawInput != Vector2.Zero)
             {
                 float angle = Mathf.Round(rawInput.Angle() / (Mathf.Pi / 4f)) * (Mathf.Pi / 4f);
@@ -344,7 +314,6 @@ public partial class PlayerCharacter : CharacterBody2D
         }
         else
         {
-            // CPU heading = movement direction
             if (movementDir != Vector2.Zero)
             {
                 float angle = Mathf.Round(movementDir.Angle() / (Mathf.Pi / 4f)) * (Mathf.Pi / 4f);
@@ -353,7 +322,6 @@ public partial class PlayerCharacter : CharacterBody2D
             }
         }
 
-        // 4. ANIMATION ALWAYS USES MOVEMENT DIRECTION
         Vector2 visualDirection = movementDir;
         float snappedAngle = Mathf.Round(visualDirection.Angle() * 180f / MathF.PI / 45f) * 45f;
 
@@ -381,8 +349,7 @@ public partial class PlayerCharacter : CharacterBody2D
         {
             heightVelocity -= Gravity * delta;
             height += heightVelocity;
-            if (height <= 0f)
-                height = 0f;
+            if (height <= 0f) height = 0f;
         }
         animatedSprite2D.Position = Vector2.Up * height;
     }
@@ -399,6 +366,14 @@ public partial class PlayerCharacter : CharacterBody2D
         {
             heading = Velocity.Normalized();
         }
+
+        // FIX: Always sync detection areas with heading direction
+        if (heading != Vector2.Zero)
+        {
+            float rotAngle = heading.Angle();
+            if (teammateDetectionArea != null) teammateDetectionArea.Rotation = rotAngle;
+            if (opponentDetectionArea != null) opponentDetectionArea.Rotation = rotAngle;
+        }
     }
 
     public void FaceTowardsTargetGoal()
@@ -413,14 +388,13 @@ public partial class PlayerCharacter : CharacterBody2D
             heading *= -1;
     }
 
-    public virtual void FlipSprites() // Added 'virtual'
+    public virtual void FlipSprites()
     {
-        bool facingRight = heading == Vector2.Right;
+        // FIX: Flip sprite horizontally when moving left (West)
+        bool facingLeft = heading.X < -0.1f;
+        animatedSprite2D.FlipH = facingLeft;
 
-        animatedSprite2D.FlipH = !facingRight;
-        float scale = facingRight ? 1 : -1;
-
-        opponentDetectionArea.Scale = new Vector2(scale, opponentDetectionArea.Scale.Y);
+        float scale = facingLeft ? -1f : 1f;
         rootParticles.Scale = new Vector2(scale, rootParticles.Scale.Y);
     }
 
@@ -479,6 +453,7 @@ public partial class PlayerCharacter : CharacterBody2D
 
     private void OnTeamScored(int teamScoredOn)
     {
+        gameManager.currentMatch.TeamKickingOff = teamScoredOn;
         if (TeamID == teamScoredOn)
             SwitchState(State.MOURNING);
         else
@@ -499,12 +474,8 @@ public partial class PlayerCharacter : CharacterBody2D
             SwitchState(State.CHEST_CONTROL);
     }
 
-    public Vector2 GetPassTarget()
-    {
-        return passTargetPosition;
-    }
+    public Vector2 GetPassTarget() => passTargetPosition;
 
-    // Virtual method for subclasses to override
     protected virtual void SubclassReady() { }
 
     public virtual void OnTacklePlayer(Node other)

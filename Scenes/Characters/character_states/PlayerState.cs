@@ -20,7 +20,7 @@ public partial class PlayerState : Node
     protected ArenaGoal targetGoal;
     protected Area2D tackleDamageEmitterArea;
     protected Area2D teammateDetectionArea;
-    public virtual bool IsReadyForEntrance() => false;
+    public virtual bool IsReadyToGoToKickoffSpots() => false;
 
     public void Setup(PlayerCharacter contextPlayer, PlayerStateData contextData,
                       Ball contextBall, Area2D contextTeammateDetectionArea, Area2D contextBallDetectionArea,
