@@ -38,8 +38,8 @@ public partial class GameEvents : Node
         EmitSignal("ImpactReceived", impactPosition, isHighImpact);
     }
 
-    public void EmitScoreChanged()
+    public void EmitScoreChanged(int teamScoredOn)
     {
-        EmitSignal("ScoreChanged");
+        EmitSignal("ScoreChanged", teamScoredOn);
     }
 }

@@ -1,0 +1,451 @@
+[gd_scene load_steps=15 format=3 uid="uid://ca75kttltlbq0"]
+
+[ext_resource type="Script" uid="uid://dhm2mh6eafa1n" path="res://Scenes/ui/SensiUi.cs" id="1_lyev7"]
+[ext_resource type="Texture2D" uid="uid://d22013wapcssk" path="res://assets/art/ui/goal.png" id="2_lyev7"]
+[ext_resource type="FontFile" uid="uid://d4fcw1dkpl6aa" path="res://assets/fonts/Inter-VariableFont_opsz,wght.ttf" id="2_ynno0"]
+[ext_resource type="FontFile" uid="uid://c6h466bbag4bm" path="res://assets/fonts/Vipnagorgialla Bd.otf" id="3_af5ua"]
+[ext_resource type="Texture2D" uid="uid://8c1xmc3crbje" path="res://assets/art/ui/times-up.png" id="3_ynno0"]
+
+[sub_resource type="Theme" id="Theme_af5ua"]
+Label/colors/font_color = Color(1, 1, 1, 1)
+Label/font_sizes/font_size = 12
+Label/fonts/font = ExtResource("2_ynno0")
+
+[sub_resource type="Theme" id="Theme_lyev7"]
+
+[sub_resource type="Theme" id="Theme_6t3am"]
+Label/colors/font_color = Color(1, 0, 0, 1)
+Label/font_sizes/font_size = 30
+Label/fonts/font = ExtResource("3_af5ua")
+
+[sub_resource type="Theme" id="Theme_ynno0"]
+Label/colors/font_color = Color(0, 0, 0, 1)
+Label/font_sizes/font_size = 30
+Label/fonts/font = ExtResource("3_af5ua")
+
+[sub_resource type="Animation" id="Animation_g5kmx"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("UIContainer/GoalTexture:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1e-05, 1e-05)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("UIContainer/GoalTexture:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("UIContainer/GoalScorerLabel:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("UIContainer/ScoreInfoLabel:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("UIContainer/Mask:modulate")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("UIContainer/TimesUpTexture:scale")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1e-05, 1e-05)]
+}
+
+[sub_resource type="Animation" id="Animation_pfayw"]
+resource_name = "game_over"
+length = 0.4
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("UIContainer/TimesUpTexture:scale")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1e-05, 1e-05), Vector2(1.1, 1.1), Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("UIContainer/Mask:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 0.396078)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("UIContainer/ScoreInfoLabel:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_aac20"]
+resource_name = "goal_appear"
+length = 0.4
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("UIContainer/GoalTexture:scale")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(1e-05, 1e-05), Vector2(1.1, 1.1), Vector2(1, 1)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("UIContainer/GoalTexture:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("UIContainer/GoalScorerLabel:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("UIContainer/ScoreInfoLabel:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("UIContainer/Mask:modulate")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 0.262745)]
+}
+
+[sub_resource type="Animation" id="Animation_0dwhk"]
+resource_name = "goal_hide"
+length = 0.4
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("UIContainer/Mask:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0.262745), Color(1, 1, 1, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("UIContainer/GoalTexture:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("UIContainer/GoalScorerLabel:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("UIContainer/ScoreInfoLabel:modulate")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.4),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_g5kmx"]
+_data = {
+&"RESET": SubResource("Animation_g5kmx"),
+&"game_over": SubResource("Animation_pfayw"),
+&"goal_appear": SubResource("Animation_aac20"),
+&"goal_hide": SubResource("Animation_0dwhk")
+}
+
+[node name="SensiUi" type="CanvasLayer" node_paths=PackedStringArray("minutesLabel", "ballCarrierLabel", "homeTeamLabel", "homeScoreLabel", "awayTeamLabel", "awayScoreLabel", "scoreContainer")]
+script = ExtResource("1_lyev7")
+minutesLabel = NodePath("UIContainer/VBoxContainer/MarginContainer/VBoxContainer/MintesLabel")
+ballCarrierLabel = NodePath("UIContainer/VBoxContainer/MarginContainer/VBoxContainer/BallCarrierLabel")
+homeTeamLabel = NodePath("UIContainer/VBoxContainer/ScoreContainer/HomeContainer/HomeTeam")
+homeScoreLabel = NodePath("UIContainer/VBoxContainer/ScoreContainer/HomeContainer/HomeScore")
+awayTeamLabel = NodePath("UIContainer/VBoxContainer/ScoreContainer/AwayContainer/AwayTeam")
+awayScoreLabel = NodePath("UIContainer/VBoxContainer/ScoreContainer/AwayContainer/AwayScore")
+scoreContainer = NodePath("UIContainer/VBoxContainer/ScoreContainer")
+
+[node name="UIContainer" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Mask" type="ColorRect" parent="UIContainer"]
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UIContainer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="UIContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UIContainer/VBoxContainer/MarginContainer"]
+layout_mode = 2
+theme = SubResource("Theme_af5ua")
+
+[node name="MintesLabel" type="Label" parent="UIContainer/VBoxContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "0 Minutes"
+
+[node name="BallCarrierLabel" type="Label" parent="UIContainer/VBoxContainer/MarginContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+text = "Nibley 2"
+
+[node name="ScoreContainer" type="HBoxContainer" parent="UIContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 6
+theme = SubResource("Theme_lyev7")
+
+[node name="HomeContainer" type="GridContainer" parent="UIContainer/VBoxContainer/ScoreContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+theme = SubResource("Theme_6t3am")
+columns = 4
+
+[node name="HomeTeam" type="Label" parent="UIContainer/VBoxContainer/ScoreContainer/HomeContainer"]
+layout_mode = 2
+text = "Manchester United"
+vertical_alignment = 1
+
+[node name="Label3" type="Label" parent="UIContainer/VBoxContainer/ScoreContainer/HomeContainer"]
+layout_mode = 2
+text = "  "
+vertical_alignment = 1
+
+[node name="HomeScore" type="Label" parent="UIContainer/VBoxContainer/ScoreContainer/HomeContainer"]
+layout_mode = 2
+text = "3"
+
+[node name="Label4" type="Label" parent="UIContainer/VBoxContainer/ScoreContainer/HomeContainer"]
+layout_mode = 2
+vertical_alignment = 1
+
+[node name="AwayContainer" type="GridContainer" parent="UIContainer/VBoxContainer/ScoreContainer"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme = SubResource("Theme_ynno0")
+columns = 4
+
+[node name="Label4" type="Label" parent="UIContainer/VBoxContainer/ScoreContainer/AwayContainer"]
+layout_mode = 2
+vertical_alignment = 1
+
+[node name="AwayScore" type="Label" parent="UIContainer/VBoxContainer/ScoreContainer/AwayContainer"]
+layout_mode = 2
+text = "3"
+
+[node name="Label3" type="Label" parent="UIContainer/VBoxContainer/ScoreContainer/AwayContainer"]
+layout_mode = 2
+text = "  "
+vertical_alignment = 1
+
+[node name="AwayTeam" type="Label" parent="UIContainer/VBoxContainer/ScoreContainer/AwayContainer"]
+layout_mode = 2
+text = "Liverpool"
+vertical_alignment = 1
+
+[node name="GoalTexture" type="TextureRect" parent="UIContainer"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -66.0
+offset_top = -25.0
+offset_right = 67.0
+offset_bottom = 25.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(1e-05, 1e-05)
+pivot_offset = Vector2(66, 21)
+texture = ExtResource("2_lyev7")
+
+[node name="TimesUpTexture" type="TextureRect" parent="UIContainer"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -68.0
+offset_right = 100.0
+offset_bottom = 42.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(1e-05, 1e-05)
+pivot_offset = Vector2(100, 55)
+texture = ExtResource("3_ynno0")
+
+[node name="GoalScorerLabel" type="Label" parent="UIContainer"]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -50.0
+offset_top = 30.0
+offset_right = 50.0
+offset_bottom = 44.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.933333, 0.807843, 0, 1)
+text = "MBAPPE JUST SCORED!"
+horizontal_alignment = 1
+
+[node name="ScoreInfoLabel" type="Label" parent="UIContainer"]
+unique_name_in_owner = true
+modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -60.0
+offset_top = 45.0
+offset_right = 60.0
+offset_bottom = 59.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.933333, 0.584314, 0, 1)
+text = "FRANCE LEADS 1 - 0"
+horizontal_alignment = 1
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+unique_name_in_owner = true
+libraries = {
+&"": SubResource("AnimationLibrary_g5kmx")
+}

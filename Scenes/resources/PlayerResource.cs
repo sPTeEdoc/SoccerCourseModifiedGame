@@ -14,10 +14,12 @@ public partial class PlayerResource : Resource
     [Export] public float Control { get; set; }
     [Export] public float Speed { get; set; }
     [Export] public float Power { get; set; }
+    [Export] public int TeamID { get; set; }
 
     public PlayerResource() { }
 
-    public PlayerResource(int id, string name, string skin, string hairColor, PlayerCharacter.Role role, int number, float pass, float control, float speed, float power)
+    public PlayerResource(int id, string name, string skin, string hairColor, PlayerCharacter.Role role, int number, float pass, float control, float speed, float power,
+        int teamID)
     {
         PlayerID = id;
         FullName = name;
@@ -29,5 +31,6 @@ public partial class PlayerResource : Resource
         Number = number;
         Pass = pass;
         Control = control;
+        TeamID = teamID;
     }
 }

@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=4 uid="uid://bxmti20vssxjy"]
+[gd_scene load_steps=33 format=4 uid="uid://bxmti20vssxjy"]
 
 [ext_resource type="Script" uid="uid://cy40dqruypuv7" path="res://Scenes/screens/world/FullField.cs" id="1_3a32w"]
 [ext_resource type="Texture2D" uid="uid://bx31y8j1do36b" path="res://assets/tilsets/Goal_1.png" id="1_33rkm"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://i7y5xfbbwnri" path="res://Scenes/screens/world/ArenaCamera.cs" id="4_33rkm"]
 [ext_resource type="Script" uid="uid://cpy1h1xke88pv" path="res://Scenes/screens/world/ArenaGoal.cs" id="5_3a32w"]
 [ext_resource type="Script" uid="uid://pm0ohsk840fl" path="res://Scenes/screens/world/FullFieldActorsContainer.cs" id="5_fabbr"]
+[ext_resource type="PackedScene" uid="uid://ca75kttltlbq0" path="res://Scenes/ui/SensiUI.tscn" id="10_fabbr"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_3a32w"]
 texture = ExtResource("1_33rkm")
@@ -3713,6 +3714,8 @@ collision_mask = 4
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GoalSouth/TopBar"]
 position = Vector2(144, 23)
 shape = SubResource("RectangleShape2D_jhlpd")
+
+[node name="SensiUi" parent="." instance=ExtResource("10_fabbr")]
 
 [node name="GameOverTimer" type="Timer" parent="."]
 unique_name_in_owner = true

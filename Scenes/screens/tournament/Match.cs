@@ -12,6 +12,7 @@ public partial class Match : Node
 
     public string FinalScore { get; private set; } = "";
     public int Winner { get; private set; } = -1;
+    public int Half { get; set; } = 1;
 
     public Match(int teamHome, int teamAway)
     {

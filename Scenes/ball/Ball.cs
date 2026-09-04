@@ -173,6 +173,7 @@ public partial class Ball : AnimatableBody2D
 
     private void OnKickoffStarted()
     {
+        GD.Print("I'm kicking off now!");
         SetInteractionsEnabled(true);
         Velocity = Vector2.Zero;
         HeightVelocity = 0;

@@ -79,7 +79,7 @@ public partial class PracticeFieldActorsContainer : Node2D
         practiceCharacter = playerPrefab.Instantiate<PlayerCharacter>();
         Vector2 kickoffPosition = kickoffs.GetChild<Node2D>(0).GlobalPosition;
         var pr = new PlayerResource(0, "Nibley", "#FDCBB0", "#854C23", PlayerCharacter.Role.MIDFIELD, 1, 
-        50, 50, 50, 50);
+        50, 50, 50, 50, 2);
         practiceCharacter = SpawnPlayer(kickoffPosition, kickoffPosition, NorthGoal, SouthGoal, pr, 2, kickoffPosition,
             kickoffPosition);
         practiceCharacter.Position = kickoffPosition;

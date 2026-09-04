@@ -36,6 +36,7 @@ public partial class FullFieldActorsContainer : Node2D
     public DataLoader dataLoader;
 
     private bool EntrancesMade { get; set; } = false;
+    public SoundPlayer soundPlayer;
 
     public override void _ExitTree()
     {
@@ -49,6 +50,7 @@ public partial class FullFieldActorsContainer : Node2D
 
     public override void _Ready()
     {
+        soundPlayer = GetNode<SoundPlayer>("/root/SoundPlayer");
         kickoffs = GetNode<Node2D>("KickOffs");
         spawns = GetNode<Node2D>("Spawns");
 
@@ -97,7 +99,7 @@ public partial class FullFieldActorsContainer : Node2D
     private List<PlayerCharacter> SpawnPlayers(int teamID, ArenaGoal ownGoal)
     {
         var playerNodes = new List<PlayerCharacter>();
-        var players = dataLoader.GetSquad(teamID);
+        List<PlayerResource> players = dataLoader.GetSquad(teamID);
         var targetGoal = ownGoal == SouthGoal ? NorthGoal : SouthGoal;
 
         float halfwayY = 485f; // midpoint of pitch
@@ -141,6 +143,7 @@ public partial class FullFieldActorsContainer : Node2D
             }
 
             var player = SpawnPlayer(playerPosition, kickoffPosition, ownGoal, targetGoal, playerData, teamID, preentrancePosition, entrancePosition);
+            player.playerID = playerData.PlayerID;
             if (i == 10)
                 player.IsKickingOffPlayer = true;
             playerNodes.Add(player);
@@ -285,6 +288,9 @@ public partial class FullFieldActorsContainer : Node2D
         SouthGoal.goalCounted = false;
         ball.IsInNet = false;
         gameEvents.EmitSignal("KickoffReady");
+        soundPlayer.Play(SoundPlayer.Sound.WHISTLE);
+        await ToSignal(GetTree().CreateTimer(1.0f), SceneTreeTimer.SignalName.Timeout);
+        GD.Print("Kickoff Ready");
     }
 
     private void SetupControlSchemes()

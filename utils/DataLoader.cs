@@ -66,8 +66,10 @@ public partial class DataLoader : Node
                 float pass = (float)player["pass"];
                 float control = (float)player["control"];
 
-                var resource = new PlayerResource(playerID, fullname, skin, hair, role, number, pass, control, speed, power);
+                var resource = new PlayerResource(playerID, fullname, skin, hair, role, number, pass, control, speed, power,
+                    club.TeamID);
                 club.startingRoster.Add(resource);
+                GameManagement.Instance.PlayerDictionary.Add(playerID, resource);
             }
 
             GameManagement.Instance.TeamsDictionary.Add(club.TeamID, club);

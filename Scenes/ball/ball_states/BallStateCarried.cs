@@ -14,7 +14,7 @@ public partial class BallStateCarried : BallState
     public override void _EnterTree()
     {
         gameEvents = GetNode<GameEvents>("/root/GameEvents");
-        gameEvents.EmitSignal("BallPossessed", carrier.fullname);
+        gameEvents.EmitSignal("BallPossessed", carrier.playerID);
     }
 
     public override void _Process(double delta)

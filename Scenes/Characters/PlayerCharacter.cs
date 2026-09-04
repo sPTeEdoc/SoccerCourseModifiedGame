@@ -199,12 +199,24 @@ public partial class PlayerCharacter : CharacterBody2D
             var jersey = dataLoader.GetJerseyColor(TeamID);
             var shorts = dataLoader.GetShortsColor(TeamID);
             var socks = dataLoader.GetSocks(TeamID);
+            var keeper_jersey = dataLoader.GetKeeperJerseyColor(TeamID);
+            var keeper_shorts = dataLoader.GetKeeperShorts(TeamID);
+            var keeper_socks = dataLoader.GetKeeperSocks(TeamID);
 
             if (jersey != null && !string.IsNullOrEmpty(jersey))
             {
-                sharedMat.SetShaderParameter("jersey_color", Color.FromHtml(jersey));
-                sharedMat.SetShaderParameter("shorts", Color.FromHtml(shorts));
-                sharedMat.SetShaderParameter("socks", Color.FromHtml(socks));
+                if (role != Role.GOALIE)
+                {
+                    sharedMat.SetShaderParameter("jersey_color", Color.FromHtml(jersey));
+                    sharedMat.SetShaderParameter("shorts", Color.FromHtml(shorts));
+                    sharedMat.SetShaderParameter("socks", Color.FromHtml(socks));
+                }
+                else
+                {
+                    sharedMat.SetShaderParameter("keeper_jersey", Color.FromHtml(keeper_jersey));
+                    sharedMat.SetShaderParameter("keeper_shorts", Color.FromHtml(keeper_shorts));
+                    sharedMat.SetShaderParameter("keeper_socks", Color.FromHtml(keeper_socks));
+                }
             }
             else
             {
@@ -250,7 +262,7 @@ public partial class PlayerCharacter : CharacterBody2D
         heading = targetGoal.Position.Y < Position.Y ? Vector2.Up : Vector2.Down;
 
         TeamID = contextTeamID;
-        playerID = GameManagement.Instance.PlayerID++;
+        // playerID = GameManagement.Instance.PlayerID++;
         preentracePosition = contextPreentrancePosition;
         entrancePosition = contextEntrancePosition;
     }

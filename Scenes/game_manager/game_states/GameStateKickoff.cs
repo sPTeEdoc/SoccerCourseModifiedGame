@@ -27,6 +27,8 @@ public partial class GameStateKickoff : GameState
 
         if (validControlSchemes.Count == 0)
             validControlSchemes.Add(PlayerCharacter.ControlScheme.P1);
+
+        gameEvents.CallDeferred(nameof(GameEvents.EmitReset));
     }
 
     public override void _Process(double delta)
@@ -36,7 +38,6 @@ public partial class GameStateKickoff : GameState
             if (KeyUtils.IsActionJustPressed(controlScheme, KeyUtils.Action.SHOOT))
             {
                 gameEvents.EmitKickOffStarted();
-                soundPlayer.Play(SoundPlayer.Sound.WHISTLE);
                 TransitionState(GameManager.State.IN_PLAY);
             }
         }
