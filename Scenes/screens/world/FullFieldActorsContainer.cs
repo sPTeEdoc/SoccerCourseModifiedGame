@@ -99,26 +99,50 @@ public partial class FullFieldActorsContainer : Node2D
         isHalfTransitioning = true;
         isCheckingForKickoffReadiness = false;
 
-        // 1. Instantly exit IN_PLAY so GameStateInPlay stops draining timeLeft during the transition
         gameManager.SwitchState(GameManager.State.RESET);
 
-        // 2. Move players off the pitch to preentrance positions
+        // Command players off-field and explicitly tell them NOT to auto-enter
         foreach (var squad in new[] { squadHome, squadAway })
         {
             foreach (var player in squad)
             {
                 player.SwitchState(PlayerCharacter.State.PREENTRANCE,
-                    PlayerStateData.Build().SetPreEntrancePosition(player.preentracePosition));
+                    PlayerStateData.Build()
+                        .SetPreEntrancePosition(player.preentracePosition)
+                        .SetAutoAdvanceToEntrance(false));
             }
         }
 
-        // 3. Trigger UI to display scores and output statistics log
+        // Wait until every player reaches the off-field spot
+        float waitTimer = 0f;
+        float maxWaitTime = 6.0f;
+        while (waitTimer < maxWaitTime)
+        {
+            bool allPlayersOffField = true;
+            foreach (var squad in new[] { squadHome, squadAway })
+            {
+                foreach (var player in squad)
+                {
+                    if (!player.IsReadyToGoToKickoffSpots())
+                    {
+                        allPlayersOffField = false;
+                        break;
+                    }
+                }
+                if (!allPlayersOffField) break;
+            }
+
+            if (allPlayersOffField) break;
+
+            await ToSignal(GetTree().CreateTimer(0.1f), SceneTreeTimer.SignalName.Timeout);
+            waitTimer += 0.1f;
+        }
+
+        // Show halftime stats while players idle off-field
         gameEvents.EmitSignal("HalfOver");
 
-        // 4. Increment half counter (swaps TeamKickingOff in Match.cs)
         gameManager.currentMatch.AdvanceHalf();
 
-        // 5. Check if the match can end or goes into sudden death
         if (gameManager.currentMatch.Half > 2 && !gameManager.currentMatch.IsTied())
         {
             gameEvents.EmitSignal("GameOver", gameManager.currentMatch.Winner.ToString());
@@ -126,18 +150,14 @@ public partial class FullFieldActorsContainer : Node2D
             return;
         }
 
-        // 6. Delay showing scores/statistics
-        await ToSignal(GetTree().CreateTimer(1.5f), SceneTreeTimer.SignalName.Timeout);
+        // Display duration for stats UI
+        await ToSignal(GetTree().CreateTimer(2.0f), SceneTreeTimer.SignalName.Timeout);
 
-        // 7. Swap sides
         SwapSides();
-
         ball.Carrier = null;
-
-        // Reset game timer for the new half (safe now because GameManager is in State.RESET)
         gameManager.timeLeft = gameManager.DURATION_GAME_SEC;
 
-        // 8. Transition players to reset spots
+        // Send players back onto the pitch for the next half
         foreach (var squad in new[] { squadHome, squadAway })
         {
             foreach (var player in squad)

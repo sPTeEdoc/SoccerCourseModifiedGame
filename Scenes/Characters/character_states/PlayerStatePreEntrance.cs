@@ -14,21 +14,25 @@ public partial class PlayerStatePreEntrance : PlayerState
         gameEvents.KickoffStarted += OnPreEntranceFinished;
     }
 
-    public override async void _Process(double delta)
+    public override void _Process(double delta)
     {
         if (!hasArrived)
         {
             Vector2 direction = player.Position.DirectionTo(stateData.PreEntrancePosition);
 
-            if (player.Position.DistanceSquaredTo(stateData.PreEntrancePosition) < 4)
+            if (player.Position.DistanceSquaredTo(stateData.PreEntrancePosition) < 4f)
             {
                 hasArrived = true;
                 player.Velocity = Vector2.Zero;
                 player.FaceTowardsTargetGoal();
 
-                // Immediately transition to ENTRANCE state
-                TransitionState(PlayerCharacter.State.ENTRANCE,
-                    PlayerStateData.Build().SetEntrancePosition(player.entrancePosition));
+                // Game Start: Auto-transition onto the pitch
+                // Halftime: Hold off-field until StartHalfOverSequence explicitly moves them
+                if (stateData.AutoAdvanceToEntrance)
+                {
+                    TransitionState(PlayerCharacter.State.ENTRANCE,
+                        PlayerStateData.Build().SetEntrancePosition(player.entrancePosition));
+                }
 
                 return;
             }

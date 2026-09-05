@@ -10,6 +10,7 @@ public partial class PlayerStateData : GodotObject
     public Vector2 EntrancePosition { get; private set; } = Vector2.Zero;
     public Vector2 ShotDirection { get; private set; } = Vector2.Zero;
     public float ShotPower { get; private set; } = 0f;
+    public bool AutoAdvanceToEntrance { get; private set; } = true;
 
     public static PlayerStateData Build()
     {
@@ -55,6 +56,12 @@ public partial class PlayerStateData : GodotObject
     public PlayerStateData SetEntrancePosition(Vector2 position)
     {
         EntrancePosition = position;
+        return this;
+    }
+
+    public PlayerStateData SetAutoAdvanceToEntrance(bool autoAdvance)
+    {
+        AutoAdvanceToEntrance = autoAdvance;
         return this;
     }
 }
