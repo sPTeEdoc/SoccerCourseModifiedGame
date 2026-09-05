@@ -4,7 +4,7 @@ using System;
 public partial class GameManager : Node
 {
     private const int DURATION_IMPACT_PAUSE = 100;
-    public float DURATION_GAME_SEC = 1 * 30;
+    public float DURATION_GAME_SEC = 1 * 1;
     public float IN_GAME_MINUTES_PER_HALF = 20;
 
     public enum State { IN_PLAY, SCORED, RESET, KICKOFF, OVERTIME, GAMEOVER }
@@ -33,6 +33,12 @@ public partial class GameManager : Node
     }
 
     public void StartGame()
+    {
+        timeLeft = DURATION_GAME_SEC;
+        SwitchState(State.RESET);
+    }
+
+    public void StartHalf()
     {
         timeLeft = DURATION_GAME_SEC;
         SwitchState(State.RESET);

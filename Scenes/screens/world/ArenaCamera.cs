@@ -14,7 +14,7 @@ public partial class ArenaCamera : Camera2D
 
     public override void _Ready()
     {
-        Ball = GetNode<Ball>("../ActorsContainer/Ball");
+        Ball = GetNode<Ball>("../FullFieldActorsContainer/Ball");
         var gameEvents = GetNode<GameEvents>("/root/GameEvents");
         gameEvents.EmitImpact(Ball.Position, false);
     }

@@ -509,4 +509,40 @@ public partial class PlayerCharacter : CharacterBody2D
     {
         _bufferedDirection = direction.Normalized();
     }
+
+    /// <summary>
+    /// Swaps goals and mirrors all tactical anchor positions across the center of the pitch.
+    /// </summary>
+    public void SwapSides(Vector2 pitchCenter)
+    {
+        // 1. Swap Goal References
+        (ownGoal, targetGoal) = (targetGoal, ownGoal);
+
+        // 2. Mirror tactical points 180 degrees around pitch center
+        spawnPosition = 2 * pitchCenter - spawnPosition;
+        kickoffPosition = 2 * pitchCenter - kickoffPosition;
+        preentracePosition = 2 * pitchCenter - preentracePosition;
+        entrancePosition = 2 * pitchCenter - entrancePosition;
+
+        // 3. Update heading and facing direction towards new target goal
+        heading = targetGoal.Position.Y < Position.Y ? Vector2.Up : Vector2.Down;
+    }
+
+    /// <summary>
+    /// Sends player off-field to preentrance position for halftime.
+    /// </summary>
+    public void MoveToPreEntrance()
+    {
+        SwitchState(State.PREENTRANCE,
+            PlayerStateData.Build().SetPreEntrancePosition(preentracePosition));
+    }
+
+    /// <summary>
+    /// Sends player from off-field back to kickoff/reset spot for new half.
+    /// </summary>
+    public void MoveToResetPosition()
+    {
+        SwitchState(State.RESETING,
+            PlayerStateData.Build().SetResetPosition(kickoffPosition));
+    }
 }

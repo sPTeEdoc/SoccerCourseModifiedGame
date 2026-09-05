@@ -2,7 +2,6 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 public partial class FullFieldActorsContainer : Node2D
 {
@@ -21,18 +20,17 @@ public partial class FullFieldActorsContainer : Node2D
     private Node2D entrance;
 
     private bool isCheckingForKickoffReadiness = false;
+    private bool isHalfTransitioning = false;
     private List<PlayerCharacter> squadHome = new();
     private List<PlayerCharacter> squadAway = new();
     private ulong timeSinceLastCacheRefresh = Time.GetTicksMsec();
 
     private ulong lastAutoSwitchTime = 0;
-    private const int AUTO_SWITCH_INTERVAL = 300;  // ms between switch attempts
-    private const float MIN_SWITCH_DELTA = 40f;    // how much closer candidate must be
+    private const int AUTO_SWITCH_INTERVAL = 300;
+    private const float MIN_SWITCH_DELTA = 40f;
 
     public GameManager gameManager;
-
     public GameEvents gameEvents;
-
     public DataLoader dataLoader;
 
     private bool EntrancesMade { get; set; } = false;
@@ -46,7 +44,6 @@ public partial class FullFieldActorsContainer : Node2D
             gameEvents.ImpactReceived -= OnImpactReceived;
         }
     }
-
 
     public override void _Ready()
     {
@@ -96,13 +93,134 @@ public partial class FullFieldActorsContainer : Node2D
             CheckForKickoffReadiness();
     }
 
+    public async void StartHalfOverSequence()
+    {
+        if (isHalfTransitioning) return;
+        isHalfTransitioning = true;
+        isCheckingForKickoffReadiness = false;
+
+        // 1. Instantly exit IN_PLAY so GameStateInPlay stops draining timeLeft during the transition
+        gameManager.SwitchState(GameManager.State.RESET);
+
+        // 2. Move players off the pitch to preentrance positions
+        foreach (var squad in new[] { squadHome, squadAway })
+        {
+            foreach (var player in squad)
+            {
+                player.SwitchState(PlayerCharacter.State.PREENTRANCE,
+                    PlayerStateData.Build().SetPreEntrancePosition(player.preentracePosition));
+            }
+        }
+
+        // 3. Trigger UI to display scores and output statistics log
+        gameEvents.EmitSignal("HalfOver");
+
+        // 4. Increment half counter (swaps TeamKickingOff in Match.cs)
+        gameManager.currentMatch.AdvanceHalf();
+
+        // 5. Check if the match can end or goes into sudden death
+        if (gameManager.currentMatch.Half > 2 && !gameManager.currentMatch.IsTied())
+        {
+            gameEvents.EmitSignal("GameOver", gameManager.currentMatch.Winner.ToString());
+            isHalfTransitioning = false;
+            return;
+        }
+
+        // 6. Delay showing scores/statistics
+        await ToSignal(GetTree().CreateTimer(1.5f), SceneTreeTimer.SignalName.Timeout);
+
+        // 7. Swap sides
+        SwapSides();
+
+        ball.Carrier = null;
+
+        // Reset game timer for the new half (safe now because GameManager is in State.RESET)
+        gameManager.timeLeft = gameManager.DURATION_GAME_SEC;
+
+        // 8. Transition players to reset spots
+        foreach (var squad in new[] { squadHome, squadAway })
+        {
+            foreach (var player in squad)
+            {
+                bool teamIsKickingOff = player.TeamID == gameManager.currentMatch.TeamKickingOff;
+                Vector2 initialPosition = teamIsKickingOff
+                    ? player.kickoffPosition
+                    : player.spawnPosition;
+
+                player.SwitchState(PlayerCharacter.State.RESETING,
+                    PlayerStateData.Build().SetResetPosition(initialPosition));
+            }
+        }
+
+        EntrancesMade = true;
+        isHalfTransitioning = false;
+        isCheckingForKickoffReadiness = true;
+    }
+
+    private void SwapSides()
+    {
+        // Re-assign goals for the teams
+        NorthGoal.Initialize(gameManager.currentMatch.HomeTeam);
+        SouthGoal.Initialize(gameManager.currentMatch.AwayTeam);
+
+        // Update squad goal assignments and mirror positions
+        UpdateSquadSidePositions(squadHome);
+        UpdateSquadSidePositions(squadAway);
+    }
+
+    private void UpdateSquadSidePositions(List<PlayerCharacter> squad)
+    {
+        float halfwayY = 485f;
+
+        for (int i = 0; i < squad.Count; i++)
+        {
+            var player = squad[i];
+
+            // Swap goal references
+            var oldOwn = player.ownGoal;
+            player.ownGoal = player.targetGoal;
+            player.targetGoal = oldOwn;
+
+            // Recalculate target positions based on new goal side
+            Vector2 playerPosition = spawns.GetChild<Node2D>(i).GlobalPosition;
+            Vector2 entrancePosition = entrance.GetChild<Node2D>(i).GlobalPosition;
+            Vector2 preentrancePosition = preentrance.GetChild<Node2D>(0).GlobalPosition;
+
+            Vector2 kickoffPosition;
+            if (i > 8)
+            {
+                kickoffPosition = kickoffs.GetChild<Node2D>(i - 9).GlobalPosition;
+                if (player.ownGoal == NorthGoal)
+                {
+                    kickoffPosition.Y = 2 * halfwayY - kickoffPosition.Y + 10;
+                }
+            }
+            else
+            {
+                kickoffPosition = playerPosition;
+            }
+
+            if (player.ownGoal == NorthGoal)
+            {
+                playerPosition.Y = 2 * halfwayY - playerPosition.Y;
+                entrancePosition.Y = 2 * halfwayY - entrancePosition.Y;
+                preentrancePosition.Y = 2 * halfwayY - preentrancePosition.Y;
+            }
+
+            player.spawnPosition = playerPosition;
+            player.entrancePosition = entrancePosition;
+            player.preentracePosition = preentrancePosition;
+            player.kickoffPosition = kickoffPosition;
+        }
+    }
+
     private List<PlayerCharacter> SpawnPlayers(int teamID, ArenaGoal ownGoal)
     {
         var playerNodes = new List<PlayerCharacter>();
         List<PlayerResource> players = dataLoader.GetSquad(teamID);
         var targetGoal = ownGoal == SouthGoal ? NorthGoal : SouthGoal;
 
-        float halfwayY = 485f; // midpoint of pitch
+        float halfwayY = 485f;
 
         for (int i = 0; i < players.Count; i++)
         {
@@ -113,7 +231,6 @@ public partial class FullFieldActorsContainer : Node2D
             var preentranceNode = preentrance.GetChild<Node2D>(0);
             Vector2 preentrancePosition = preentranceNode.GlobalPosition;
 
-            // If this is the away team, mirror vertically
             if (ownGoal == NorthGoal)
             {
                 playerPosition.Y = 2 * halfwayY - playerPosition.Y;
@@ -126,10 +243,8 @@ public partial class FullFieldActorsContainer : Node2D
             Vector2 kickoffPosition;
             if (i > 8)
             {
-                // Pull from the dedicated kickoff nodes
                 kickoffPosition = kickoffs.GetChild<Node2D>(i - 9).GlobalPosition;
 
-                // Mirror vertically ONLY if this specific team is playing on the south side
                 if (ownGoal == NorthGoal)
                 {
                     kickoffPosition.Y = 2 * halfwayY - kickoffPosition.Y + 10;
@@ -137,8 +252,6 @@ public partial class FullFieldActorsContainer : Node2D
             }
             else
             {
-                // Fall back to the player's standard spawn position 
-                // (This has already been correctly mirrored above if they are TeamGoingSouth)
                 kickoffPosition = playerPosition;
             }
 
@@ -156,14 +269,8 @@ public partial class FullFieldActorsContainer : Node2D
         Vector2 preentrancePosition, Vector2 entrancePosition)
     {
         var player = playerPrefab.Instantiate<PlayerCharacter>();
-
-        // 2. Initialize the common fields exactly like before!
-        // Because both types are PlayerCharacters, this method works seamlessly on either.
         player.Initialize(position, kickoffPos, ball, ownGoal, targetGoal, data, teamID, preentrancePosition, entrancePosition);
-
         player.SwapRequested += OnPlayerSwapRequest;
-
-        // 3. Add to the scene tree and return
         AddChild(player);
         return player;
     }
@@ -186,7 +293,6 @@ public partial class FullFieldActorsContainer : Node2D
         if (ball.Carrier != null && (ball.Carrier.controlScheme == PlayerCharacter.ControlScheme.P1 ||
             ball.Carrier.controlScheme == PlayerCharacter.ControlScheme.P2))
         {
-            // Already controlled by human — no swap needed
             return;
         }
 
@@ -196,7 +302,6 @@ public partial class FullFieldActorsContainer : Node2D
             ball.Carrier.controlScheme != PlayerCharacter.ControlScheme.P2)
         {
             var squad1 = ball.Carrier.TeamID == squadHome[0].TeamID ? squadHome : squadAway;
-            var squad2 = ball.Carrier.TeamID == squadHome[0].TeamID ? squadHome : squadAway;
             var currentHuman1 = squad1.Find(p => p.controlScheme == PlayerCharacter.ControlScheme.P1);
             var currentHuman2 = squad1.Find(p => p.controlScheme == PlayerCharacter.ControlScheme.P2);
 
@@ -208,7 +313,6 @@ public partial class FullFieldActorsContainer : Node2D
             if (currentHuman2 != null) ball.Carrier.SetControlScheme(PlayerCharacter.ControlScheme.P2);
             return;
         }
-
 
         var squad = requester.TeamID == squadHome[0].TeamID ? squadHome : squadAway;
         var cpuPlayers = squad.FindAll(p => p.controlScheme == PlayerCharacter.ControlScheme.CPU && p.role != PlayerCharacter.Role.GOALIE);
@@ -228,26 +332,22 @@ public partial class FullFieldActorsContainer : Node2D
 
     private async void CheckForKickoffReadiness()
     {
-        // Prevent starting multiple timer tasks while one is already waiting
         if (_isTransitioningToReset) return;
 
         if (!EntrancesMade)
         {
-            // 1. Verify if EVERY player on both teams has completed their entrance
             foreach (var squad in new[] { squadHome, squadAway })
             {
                 foreach (var player in squad)
                 {
                     if (!player.IsReadyToGoToKickoffSpots())
-                        return; // Wait until everyone is in position
+                        return;
                 }
             }
 
-            // Everyone arrived at entrance; block re-entry while waiting 1 second
             _isTransitioningToReset = true;
             await ToSignal(GetTree().CreateTimer(1.0f), SceneTreeTimer.SignalName.Timeout);
 
-            // Transition all players to RESETING state ONCE
             foreach (var squad in new[] { squadHome, squadAway })
             {
                 foreach (var player in squad)
@@ -267,30 +367,33 @@ public partial class FullFieldActorsContainer : Node2D
             return;
         }
 
-        // 2. Entrances are done; check frame-by-frame if all players reached their kickoff spot
         foreach (var squad in new[] { squadHome, squadAway })
         {
             foreach (var player in squad)
             {
                 if (!player.IsReadyForKickoff())
-                    return; // Keep waiting in RESETING state
+                    return;
                 if (gameManager.currentMatch.TeamKickingOff == player.TeamID)
                     if (player.IsKickingOffPlayer)
                         ball.Carrier = player;
             }
         }
 
-        // 3. Complete kickoff initialization sequence
         isCheckingForKickoffReadiness = false;
         NorthGoal.layer.ZIndex = 0;
         SouthGoal.layer.ZIndex = 0;
         NorthGoal.goalCounted = false;
         SouthGoal.goalCounted = false;
         ball.IsInNet = false;
+
         gameEvents.EmitSignal("KickoffReady");
         soundPlayer.Play(SoundPlayer.Sound.WHISTLE);
         await ToSignal(GetTree().CreateTimer(1.0f), SceneTreeTimer.SignalName.Timeout);
+
         GD.Print("Kickoff Ready");
+
+        // Activate GameStateKickoff so _Process checks for input again
+        gameManager.SwitchState(GameManager.State.KICKOFF); ;
     }
 
     private void SetupControlSchemes()
@@ -309,7 +412,7 @@ public partial class FullFieldActorsContainer : Node2D
             var playerSquad = squadHome[0].TeamID == p1Team ? squadHome : squadAway;
             playerSquad[10].SetControlScheme(PlayerCharacter.ControlScheme.P1);
         }
-        else // versus
+        else
         {
             var p1Squad = squadHome[0].TeamID == p1Team ? squadHome : squadAway;
             var p2Squad = p1Squad == squadAway ? squadHome : squadAway;
@@ -353,11 +456,10 @@ public partial class FullFieldActorsContainer : Node2D
 
         int playerTeam = gameManager.playerSetup[0];
         if (ball.Carrier.TeamID == playerTeam)
-            return; // Human team is attacking
+            return;
 
         var squad = squadHome[0].TeamID == playerTeam ? squadHome : squadAway;
 
-        // Handle both P1 and P2
         var humans = squad.FindAll(p =>
             p.controlScheme == PlayerCharacter.ControlScheme.P1 ||
             p.controlScheme == PlayerCharacter.ControlScheme.P2);
@@ -369,7 +471,6 @@ public partial class FullFieldActorsContainer : Node2D
         if (cpuDefenders.Count == 0 || humans.Count == 0)
             return;
 
-        // Sort CPU defenders by proximity to ball
         cpuDefenders.Sort((a, b) =>
             a.Position.DistanceSquaredTo(ball.Position)
             .CompareTo(b.Position.DistanceSquaredTo(ball.Position)));
@@ -389,7 +490,6 @@ public partial class FullFieldActorsContainer : Node2D
                 human.SetControlScheme(PlayerCharacter.ControlScheme.CPU);
                 bestCandidate.SetControlScheme(oldScheme);
                 lastAutoSwitchTime = Time.GetTicksMsec();
-                // GD.Print($"[AutoSwitch] {oldScheme} now controls {bestCandidate.Name}");
             }
         }
     }

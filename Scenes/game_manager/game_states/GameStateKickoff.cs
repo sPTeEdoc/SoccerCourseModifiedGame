@@ -14,10 +14,12 @@ public partial class GameStateKickoff : GameState
         soundPlayer = GetNode<SoundPlayer>("/root/SoundPlayer");
         gameEvents = GetNode<GameEvents>("/root/GameEvents");
 
-        int startingTeamID = stateData.TeamScoredOn;
+        validControlSchemes.Clear();
 
-        if (startingTeamID > -1)
-            startingTeamID = manager.currentMatch.HomeTeam;
+        // If a team was scored on, they kick off. Otherwise, use TeamKickingOff (updated by AdvanceHalf)
+        int startingTeamID = stateData.TeamScoredOn > -1
+            ? stateData.TeamScoredOn
+            : manager.currentMatch.TeamKickingOff;
 
         if (startingTeamID == manager.playerSetup[0])
             validControlSchemes.Add(PlayerCharacter.ControlScheme.P1);
@@ -27,8 +29,6 @@ public partial class GameStateKickoff : GameState
 
         if (validControlSchemes.Count == 0)
             validControlSchemes.Add(PlayerCharacter.ControlScheme.P1);
-
-        gameEvents.CallDeferred(nameof(GameEvents.EmitReset));
     }
 
     public override void _Process(double delta)

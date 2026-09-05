@@ -5,7 +5,7 @@ public partial class Match : Node
 {
     public int HomeTeam { get; private set; }
     public int AwayTeam { get; private set; }
-    public int TeamKickingOff {get;set;} = 2;
+    public int TeamKickingOff { get; set; } = 2;
 
     public int GoalsHome { get; private set; } = 0;
     public int GoalsAway { get; private set; } = 0;
@@ -19,6 +19,13 @@ public partial class Match : Node
         HomeTeam = teamHome;
         AwayTeam = teamAway;
         TeamKickingOff = teamHome;
+    }
+
+    public void AdvanceHalf()
+    {
+        Half++;
+        // Alternate kickoff team each half
+        TeamKickingOff = (TeamKickingOff == HomeTeam) ? AwayTeam : HomeTeam;
     }
 
     public bool IsTied()
@@ -43,7 +50,7 @@ public partial class Match : Node
 
     private void UpdateMatchInfo()
     {
-        Winner = (GoalsHome > GoalsAway) ? HomeTeam : AwayTeam;
+        Winner = (GoalsHome > GoalsAway) ? HomeTeam : (GoalsAway > GoalsHome ? AwayTeam : -1);
         FinalScore = $"{Math.Max(GoalsHome, GoalsAway)} - {Math.Min(GoalsHome, GoalsAway)}";
     }
 

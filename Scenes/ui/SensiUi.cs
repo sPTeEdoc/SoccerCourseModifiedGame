@@ -1,6 +1,5 @@
 using Godot;
 using System;
-using System.Collections.Generic;
 
 public partial class SensiUi : CanvasLayer
 {
@@ -49,9 +48,8 @@ public partial class SensiUi : CanvasLayer
 
     private void UpdateClock()
     {
-        float time = (gameManager.DURATION_GAME_SEC - gameManager.timeLeft)
-                * minutesPerSecond + 
-                ((gameManager.currentMatch.Half) - 1 * gameManager.IN_GAME_MINUTES_PER_HALF);
+        float time = (gameManager.DURATION_GAME_SEC - gameManager.timeLeft) * minutesPerSecond 
+                     + ((gameManager.currentMatch.Half - 1) * gameManager.IN_GAME_MINUTES_PER_HALF);
         minutesLabel.Text = $"{Math.Round(time)} Minutes";
     }
 
@@ -59,7 +57,7 @@ public partial class SensiUi : CanvasLayer
     {
         ballCarrierLabel.Visible = true;
         player = GameManagement.Instance.PlayerDictionary[playerID];
-        ballCarrierLabel.Text = $"{player.Number} player.FullName";
+        ballCarrierLabel.Text = $"{player.Number} {player.FullName}";
     }
 
     private void OnBallReleased()
@@ -88,8 +86,6 @@ public partial class SensiUi : CanvasLayer
 
     private void OnGameOver(string winningTeamID)
     {
-        // scoreInfoLabel.Text = ScoreHelper.GetFinalScoreInfo(gameManager.currentMatch);
-        // animationPlayer.Play("game_over");
         ShowScores();
         GD.Print("Show the statistics");
     }
