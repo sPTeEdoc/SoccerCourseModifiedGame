@@ -147,7 +147,7 @@ public partial class FullFieldActorsContainer : Node2D
         // Show halftime stats while players idle off-field
         gameEvents.EmitHalfOver();
 
-        gameManager.timeLeft = gameManager.DURATION_GAME_SEC;
+        gameManager.TimePlayed = 0;
         gameManager.InjuryTime = 0;
         gameManager.currentMatch.AdvanceHalf();
         gameManager.currentMatch.TeamKickingOff = gameManager.currentMatch.HomeTeam;
@@ -169,7 +169,7 @@ public partial class FullFieldActorsContainer : Node2D
 
         SwapSides();
         ball.Carrier = null;
-        gameManager.timeLeft = gameManager.DURATION_GAME_SEC;
+        gameManager.TimePlayed = 0;
         gameManager.InjuryTime = 0;
 
         // Send players back onto the pitch for the next half

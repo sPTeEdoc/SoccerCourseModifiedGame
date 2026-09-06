@@ -69,10 +69,7 @@ public partial class UI : CanvasLayer
 
     private void UpdateClock()
     {
-        if (gameManager.timeLeft < 0)
-            timeLabel.Modulate = Colors.Yellow;
-
-        timeLabel.Text = TimeHelper.GetTimeText(gameManager.timeLeft);
+        timeLabel.Text = TimeHelper.GetTimeText(gameManager.TimePlayed);
     }
 
     private void OnBallPossessed(string playerName)

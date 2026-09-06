@@ -22,10 +22,7 @@ public partial class GameStateInPlay : GameState
     public override void _Process(double delta)
     {
         if (isTransitioningHalf) return;
-        if (manager.timeLeft > 0)
-            manager.timeLeft -= (float)delta;
-        else
-            manager.InjuryTime -= (float)delta;
+        manager.TimePlayed += (float)delta;
         if (manager.currentMatch.TeamWithPossession == manager.currentMatch.HomeTeam)
             manager.currentMatch.HomeTeamPossessionTime += (float)delta;
         else

@@ -4,7 +4,7 @@ using System;
 public partial class GameManager : Node
 {
     private const int DURATION_IMPACT_PAUSE = 100;
-    public float DURATION_GAME_SEC = 1 * 1;
+    public float DURATION_GAME_SEC = 1 * 30;
     public float IN_GAME_MINUTES_PER_HALF = 20;
 
     public enum State { IN_PLAY, SCORED, RESET, KICKOFF, OVERTIME, GAMEOVER }
@@ -13,7 +13,7 @@ public partial class GameManager : Node
     public GameState currentState = null;
     public int[] playerSetup = new int[] { 0, -2 };
     public GameStateFactory stateFactory = new GameStateFactory();
-    public float timeLeft;
+    public float TimePlayed;
     public ulong timeSincePaused = Time.GetTicksMsec();
     public GameEvents gameEvents;
     public float minutesPerSecond
@@ -28,7 +28,7 @@ public partial class GameManager : Node
     {
         get
         {
-            return (DURATION_GAME_SEC - timeLeft) * minutesPerSecond 
+            return TimePlayed * minutesPerSecond 
                      + ((currentMatch.Half - 1) * IN_GAME_MINUTES_PER_HALF);
         }
     }
@@ -55,14 +55,14 @@ public partial class GameManager : Node
 
     public void StartGame()
     {
-        timeLeft = DURATION_GAME_SEC;
+        TimePlayed = 0;
         InjuryTime = 0;
         SwitchState(State.RESET);
     }
 
     public void StartHalf()
     {
-        timeLeft = DURATION_GAME_SEC;
+        TimePlayed = 0;
         InjuryTime = 0;
         SwitchState(State.RESET);
     }
@@ -93,7 +93,7 @@ public partial class GameManager : Node
 
     public bool IsCoop() => playerSetup[0] == playerSetup[1];
     public bool IsSinglePlayer() => playerSetup[1] == -2;
-    public bool IsTimeUp() => timeLeft + InjuryTime <= 0;
+    public bool IsTimeUp() => TimePlayed >= DURATION_GAME_SEC + InjuryTime;
 
     public int GetWinningTeam()
     {
