@@ -33,6 +33,8 @@ public partial class GameManager : Node
         }
     }
 
+    public bool GoalJustScored { get; set; } = false;
+
     public override void _Ready()
     {
         ProcessMode = ProcessModeEnum.Always;

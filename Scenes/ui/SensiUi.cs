@@ -82,8 +82,11 @@ public partial class SensiUi : CanvasLayer
 
     private void OnTeamReset()
     {
-        if (gameManager.currentMatch.HasSomeoneScored())
+        if (gameManager.GoalJustScored)
+        {
             animationPlayer.Play("goal_hide");
+            gameManager.GoalJustScored = false;
+        }
     }
 
     private void OnGameOver(string winningTeamID)

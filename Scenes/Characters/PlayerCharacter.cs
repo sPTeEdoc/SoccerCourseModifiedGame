@@ -466,6 +466,7 @@ public partial class PlayerCharacter : CharacterBody2D
     private void OnTeamScored(int teamScoredOn)
     {
         gameManager.currentMatch.TeamKickingOff = teamScoredOn;
+        gameManager.GoalJustScored = true;
         if (TeamID == teamScoredOn)
             SwitchState(State.MOURNING);
         else

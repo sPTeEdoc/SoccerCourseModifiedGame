@@ -164,6 +164,7 @@ public partial class Ball : AnimatableBody2D
 
     private void OnTeamReset()
     {
+        
         Position = spawnPosition;
         Velocity = Vector2.Zero;
         Height = 0f;
