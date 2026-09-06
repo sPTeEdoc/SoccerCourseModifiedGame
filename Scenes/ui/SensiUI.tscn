@@ -1,10 +1,11 @@
-[gd_scene load_steps=15 format=3 uid="uid://ca75kttltlbq0"]
+[gd_scene load_steps=21 format=3 uid="uid://ca75kttltlbq0"]
 
 [ext_resource type="Script" uid="uid://dhm2mh6eafa1n" path="res://Scenes/ui/SensiUi.cs" id="1_lyev7"]
 [ext_resource type="Texture2D" uid="uid://d22013wapcssk" path="res://assets/art/ui/goal.png" id="2_lyev7"]
 [ext_resource type="FontFile" uid="uid://d4fcw1dkpl6aa" path="res://assets/fonts/Inter-VariableFont_opsz,wght.ttf" id="2_ynno0"]
 [ext_resource type="FontFile" uid="uid://c6h466bbag4bm" path="res://assets/fonts/Vipnagorgialla Bd.otf" id="3_af5ua"]
 [ext_resource type="Texture2D" uid="uid://8c1xmc3crbje" path="res://assets/art/ui/times-up.png" id="3_ynno0"]
+[ext_resource type="FontFile" uid="uid://7pv5ufahhmwv" path="res://assets/fonts/Vipnagorgialla Rg.otf" id="4_af5ua"]
 
 [sub_resource type="Theme" id="Theme_af5ua"]
 Label/colors/font_color = Color(1, 1, 1, 1)
@@ -15,14 +16,36 @@ Label/fonts/font = ExtResource("2_ynno0")
 Label/font_sizes/font_size = 15
 
 [sub_resource type="Theme" id="Theme_6t3am"]
-Label/colors/font_color = Color(1, 0, 0, 1)
-Label/font_sizes/font_size = 18
+Label/colors/font_color = Color(1, 1, 1, 1)
+Label/font_sizes/font_size = 16
 Label/fonts/font = ExtResource("3_af5ua")
 
+[sub_resource type="Theme" id="Theme_pjqbg"]
+Label/font_sizes/font_size = 30
+
+[sub_resource type="Theme" id="Theme_07mkh"]
+Label/colors/font_color = Color(1, 1, 1, 1)
+Label/font_sizes/font_size = 25
+Label/fonts/font = ExtResource("4_af5ua")
+
 [sub_resource type="Theme" id="Theme_ynno0"]
-Label/colors/font_color = Color(0, 0, 0, 1)
-Label/font_sizes/font_size = 18
+Label/colors/font_color = Color(1, 1, 1, 1)
+Label/font_sizes/font_size = 16
 Label/fonts/font = ExtResource("3_af5ua")
+
+[sub_resource type="Theme" id="Theme_0weeh"]
+Label/font_sizes/font_size = 30
+
+[sub_resource type="Theme" id="Theme_n2ihi"]
+Label/colors/font_color = Color(1, 1, 1, 1)
+Label/font_sizes/font_size = 12
+Label/fonts/font = ExtResource("3_af5ua")
+
+[sub_resource type="Theme" id="Theme_h5xk2"]
+Label/colors/font_color = Color(1, 1, 1, 1)
+Label/font_sizes/font_size = 12
+Label/fonts/font = ExtResource("3_af5ua")
+Label/styles/normal = null
 
 [sub_resource type="Animation" id="Animation_g5kmx"]
 length = 0.001
@@ -266,15 +289,17 @@ _data = {
 &"goal_hide": SubResource("Animation_0dwhk")
 }
 
-[node name="SensiUi" type="CanvasLayer" node_paths=PackedStringArray("minutesLabel", "ballCarrierLabel", "homeTeamLabel", "homeScoreLabel", "awayTeamLabel", "awayScoreLabel", "scoreContainer")]
+[node name="SensiUi" type="CanvasLayer" node_paths=PackedStringArray("minutesLabel", "ballCarrierLabel", "homeTeamLabel", "homeScoreLabel", "awayTeamLabel", "awayScoreLabel", "scoreContainer", "HomeGoalSummary", "AwayGoalSummary")]
 script = ExtResource("1_lyev7")
 minutesLabel = NodePath("UIContainer/VBoxContainer/MarginContainer/VBoxContainer/MintesLabel")
 ballCarrierLabel = NodePath("UIContainer/VBoxContainer/MarginContainer/VBoxContainer/BallCarrierLabel")
-homeTeamLabel = NodePath("UIContainer/VBoxContainer/ScoreContainer/HomeContainer/HomeTeam")
-homeScoreLabel = NodePath("UIContainer/VBoxContainer/ScoreContainer/HomeContainer/HomeScore")
-awayTeamLabel = NodePath("UIContainer/VBoxContainer/ScoreContainer/AwayContainer/AwayTeam")
-awayScoreLabel = NodePath("UIContainer/VBoxContainer/ScoreContainer/AwayContainer/AwayScore")
-scoreContainer = NodePath("UIContainer/VBoxContainer/ScoreContainer")
+homeTeamLabel = NodePath("UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer/HomeContainer/HomeTeam")
+homeScoreLabel = NodePath("UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer/HomeContainer/HomeScore")
+awayTeamLabel = NodePath("UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer/AwayContainer/AwayTeam")
+awayScoreLabel = NodePath("UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer/AwayContainer/AwayScore")
+scoreContainer = NodePath("UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer")
+HomeGoalSummary = NodePath("UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer2/HomeContainer/HomeScoresList")
+AwayGoalSummary = NodePath("UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer2/AwayContainer/AwayScoresList")
 
 [node name="UIContainer" type="Control" parent="."]
 layout_mode = 3
@@ -319,58 +344,145 @@ visible = false
 layout_mode = 2
 text = "Nibley 2"
 
-[node name="ScoreContainer" type="HBoxContainer" parent="UIContainer/VBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="UIContainer/VBoxContainer"]
 layout_mode = 2
-size_flags_vertical = 6
+size_flags_vertical = 3
+size_flags_stretch_ratio = 8.0
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="UIContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.0
+
+[node name="ScoreContainer" type="PanelContainer" parent="UIContainer/VBoxContainer/VBoxContainer2"]
+visible = false
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer"]
+layout_mode = 2
+theme_override_constants/margin_top = 25
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="ScoreContainer" type="HBoxContainer" parent="UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
 theme = SubResource("Theme_lyev7")
 
-[node name="HomeContainer" type="GridContainer" parent="UIContainer/VBoxContainer/ScoreContainer"]
+[node name="HomeContainer" type="GridContainer" parent="UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer"]
 layout_mode = 2
 size_flags_horizontal = 10
 theme = SubResource("Theme_6t3am")
 columns = 4
 
-[node name="HomeTeam" type="Label" parent="UIContainer/VBoxContainer/ScoreContainer/HomeContainer"]
+[node name="HomeTeam" type="Label" parent="UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer/HomeContainer"]
 layout_mode = 2
 text = "Manchester"
 
-[node name="Label3" type="Label" parent="UIContainer/VBoxContainer/ScoreContainer/HomeContainer"]
+[node name="Label3" type="Label" parent="UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer/HomeContainer"]
 layout_mode = 2
 text = "  "
 horizontal_alignment = 2
 vertical_alignment = 1
 
-[node name="HomeScore" type="Label" parent="UIContainer/VBoxContainer/ScoreContainer/HomeContainer"]
+[node name="HomeScore" type="Label" parent="UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer/HomeContainer"]
 layout_mode = 2
+theme = SubResource("Theme_pjqbg")
 text = "3"
 horizontal_alignment = 2
 
-[node name="Label4" type="Label" parent="UIContainer/VBoxContainer/ScoreContainer/HomeContainer"]
+[node name="Label4" type="Label" parent="UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer/HomeContainer"]
 layout_mode = 2
 vertical_alignment = 1
 
-[node name="AwayContainer" type="GridContainer" parent="UIContainer/VBoxContainer/ScoreContainer"]
+[node name="Label" type="Label" parent="UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer"]
+layout_mode = 2
+theme = SubResource("Theme_07mkh")
+text = "-"
+
+[node name="AwayContainer" type="GridContainer" parent="UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme = SubResource("Theme_ynno0")
 columns = 4
 
-[node name="Label4" type="Label" parent="UIContainer/VBoxContainer/ScoreContainer/AwayContainer"]
+[node name="Label4" type="Label" parent="UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer/AwayContainer"]
 layout_mode = 2
 vertical_alignment = 1
 
-[node name="AwayScore" type="Label" parent="UIContainer/VBoxContainer/ScoreContainer/AwayContainer"]
+[node name="AwayScore" type="Label" parent="UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer/AwayContainer"]
 layout_mode = 2
+theme = SubResource("Theme_0weeh")
 text = "3"
 
-[node name="Label3" type="Label" parent="UIContainer/VBoxContainer/ScoreContainer/AwayContainer"]
+[node name="Label3" type="Label" parent="UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer/AwayContainer"]
 layout_mode = 2
 text = "  "
 vertical_alignment = 1
 
-[node name="AwayTeam" type="Label" parent="UIContainer/VBoxContainer/ScoreContainer/AwayContainer"]
+[node name="AwayTeam" type="Label" parent="UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer/AwayContainer"]
 layout_mode = 2
 text = "Liverpool"
+vertical_alignment = 1
+
+[node name="ScoreContainer2" type="HBoxContainer" parent="UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme = SubResource("Theme_lyev7")
+
+[node name="HomeContainer" type="GridContainer" parent="UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer2"]
+layout_mode = 2
+size_flags_horizontal = 10
+theme = SubResource("Theme_n2ihi")
+columns = 4
+
+[node name="HomeScoresList" type="Label" parent="UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer2/HomeContainer"]
+layout_mode = 2
+horizontal_alignment = 2
+
+[node name="Label3" type="Label" parent="UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer2/HomeContainer"]
+layout_mode = 2
+text = "  "
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="HomeScore" type="Label" parent="UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer2/HomeContainer"]
+layout_mode = 2
+theme = SubResource("Theme_pjqbg")
+text = "   "
+horizontal_alignment = 2
+
+[node name="Label4" type="Label" parent="UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer2/HomeContainer"]
+layout_mode = 2
+vertical_alignment = 1
+
+[node name="Label" type="Label" parent="UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer2"]
+layout_mode = 2
+theme = SubResource("Theme_07mkh")
+
+[node name="AwayContainer" type="GridContainer" parent="UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme = SubResource("Theme_h5xk2")
+columns = 4
+
+[node name="Label4" type="Label" parent="UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer2/AwayContainer"]
+layout_mode = 2
+vertical_alignment = 1
+
+[node name="AwayScore" type="Label" parent="UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer2/AwayContainer"]
+layout_mode = 2
+theme = SubResource("Theme_0weeh")
+text = "    "
+
+[node name="Label3" type="Label" parent="UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer2/AwayContainer"]
+layout_mode = 2
+text = "  "
+vertical_alignment = 1
+
+[node name="AwayScoresList" type="Label" parent="UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer2/AwayContainer"]
+layout_mode = 2
 vertical_alignment = 1
 
 [node name="GoalTexture" type="TextureRect" parent="UIContainer"]

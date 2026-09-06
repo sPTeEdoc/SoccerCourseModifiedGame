@@ -35,6 +35,8 @@ public partial class FullFieldActorsContainer : Node2D
 
     private bool EntrancesMade { get; set; } = false;
     public SoundPlayer soundPlayer;
+    [Export] private CollisionShape2D collisionShape;
+    [Export] private StaticBody2D wallDetectionArea;
 
     public override void _ExitTree()
     {
@@ -47,6 +49,8 @@ public partial class FullFieldActorsContainer : Node2D
 
     public override void _Ready()
     {
+        SetWallinteractionsEnabled(false);
+
         soundPlayer = GetNode<SoundPlayer>("/root/SoundPlayer");
         kickoffs = GetNode<Node2D>("KickOffs");
         spawns = GetNode<Node2D>("Spawns");
@@ -95,6 +99,8 @@ public partial class FullFieldActorsContainer : Node2D
 
     public async void StartHalfOverSequence()
     {
+        SetWallinteractionsEnabled(false);
+
         if (isHalfTransitioning) return;
         isHalfTransitioning = true;
         isCheckingForKickoffReadiness = false;
@@ -139,9 +145,13 @@ public partial class FullFieldActorsContainer : Node2D
         }
 
         // Show halftime stats while players idle off-field
-        gameEvents.EmitSignal("HalfOver");
+        gameEvents.EmitHalfOver();
 
+        gameManager.timeLeft = gameManager.DURATION_GAME_SEC;
         gameManager.currentMatch.AdvanceHalf();
+        gameManager.currentMatch.TeamKickingOff = gameManager.currentMatch.HomeTeam;
+        if (gameManager.currentMatch.TeamKickingOff == gameManager.currentMatch.HomeTeam)
+            gameManager.currentMatch.TeamKickingOff = gameManager.currentMatch.AwayTeam;
 
         if (gameManager.currentMatch.Half > 2 && !gameManager.currentMatch.IsTied())
         {
@@ -152,6 +162,8 @@ public partial class FullFieldActorsContainer : Node2D
 
         // Display duration for stats UI
         await ToSignal(GetTree().CreateTimer(2.0f), SceneTreeTimer.SignalName.Timeout);
+
+        gameEvents.EmitEntrance();
 
         SwapSides();
         ball.Carrier = null;
@@ -206,6 +218,14 @@ public partial class FullFieldActorsContainer : Node2D
             Vector2 entrancePosition = entrance.GetChild<Node2D>(i).GlobalPosition;
             Vector2 preentrancePosition = preentrance.GetChild<Node2D>(0).GlobalPosition;
 
+            // Mirror positions FIRST if assigned to NorthGoal
+            if (player.ownGoal == NorthGoal)
+            {
+                playerPosition.Y = 2 * halfwayY - playerPosition.Y;
+                entrancePosition.Y = 2 * halfwayY - entrancePosition.Y;
+                preentrancePosition.Y = 2 * halfwayY - preentrancePosition.Y;
+            }
+
             Vector2 kickoffPosition;
             if (i > 8)
             {
@@ -217,14 +237,8 @@ public partial class FullFieldActorsContainer : Node2D
             }
             else
             {
+                // Now playerPosition is already correctly mirrored
                 kickoffPosition = playerPosition;
-            }
-
-            if (player.ownGoal == NorthGoal)
-            {
-                playerPosition.Y = 2 * halfwayY - playerPosition.Y;
-                entrancePosition.Y = 2 * halfwayY - entrancePosition.Y;
-                preentrancePosition.Y = 2 * halfwayY - preentrancePosition.Y;
             }
 
             player.spawnPosition = playerPosition;
@@ -395,7 +409,10 @@ public partial class FullFieldActorsContainer : Node2D
                     return;
                 if (gameManager.currentMatch.TeamKickingOff == player.TeamID)
                     if (player.IsKickingOffPlayer)
+                    {
                         ball.Carrier = player;
+                        ball.Carrier.gameManager.currentMatch.LastBallCarrier = player.playerID;
+                    }
             }
         }
 
@@ -406,13 +423,14 @@ public partial class FullFieldActorsContainer : Node2D
         SouthGoal.goalCounted = false;
         ball.IsInNet = false;
 
-        gameEvents.EmitSignal("KickoffReady");
-        soundPlayer.Play(SoundPlayer.Sound.WHISTLE);
-        await ToSignal(GetTree().CreateTimer(1.0f), SceneTreeTimer.SignalName.Timeout);
-
         GD.Print("Kickoff Ready");
 
+        SetWallinteractionsEnabled(true);
+
+        await ToSignal(GetTree().CreateTimer(1.0f), SceneTreeTimer.SignalName.Timeout);
         // Activate GameStateKickoff so _Process checks for input again
+        soundPlayer.Play(SoundPlayer.Sound.WHISTLE);
+        gameEvents.EmitSignal("KickoffReady");
         gameManager.SwitchState(GameManager.State.KICKOFF); ;
     }
 
@@ -512,5 +530,14 @@ public partial class FullFieldActorsContainer : Node2D
                 lastAutoSwitchTime = Time.GetTicksMsec();
             }
         }
+    }
+
+    private void SetWallinteractionsEnabled(bool enabled)
+    {
+        wallDetectionArea.SetDeferred(Area2D.PropertyName.Monitoring, enabled);
+        wallDetectionArea.SetDeferred(Area2D.PropertyName.Monitorable, enabled);
+
+        if (collisionShape != null)
+            collisionShape.SetDeferred(CollisionShape2D.PropertyName.Disabled, !enabled);
     }
 }

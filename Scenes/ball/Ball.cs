@@ -24,7 +24,7 @@ public partial class Ball : AnimatableBody2D
     private RayCast2D scoringRaycast;
     private GpuParticles2D shotParticles;
 
-    public PlayerCharacter Carrier = null;
+    public PlayerCharacter Carrier {get; set; } = null;
     public BallState CurrentState = null;
     public float Height = 0f;
     public float HeightVelocity = 0f;

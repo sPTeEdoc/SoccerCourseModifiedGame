@@ -12,6 +12,8 @@ public partial class GameEvents : Node
     [Signal] public delegate void ScoreChangedEventHandler();
     [Signal] public delegate void TeamResetEventTriggeredEventHandler();
     [Signal] public delegate void TeamScoredEventHandler(int teamScoredOn);
+    [Signal] public delegate void HalfOverEventHandler();
+    [Signal] public delegate void EntranceEventHandler();
 
     public void EmitGameOver(int winningTeamID)
     {
@@ -41,5 +43,15 @@ public partial class GameEvents : Node
     public void EmitScoreChanged(int teamScoredOn)
     {
         EmitSignal("ScoreChanged", teamScoredOn);
+    }
+
+    public void EmitHalfOver()
+    {
+        EmitSignal("HalfOver");
+    }
+
+    public void EmitEntrance()
+    {
+        EmitSignal("Entrance");
     }
 }

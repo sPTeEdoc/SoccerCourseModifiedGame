@@ -4,7 +4,7 @@ using System;
 public partial class GameManager : Node
 {
     private const int DURATION_IMPACT_PAUSE = 100;
-    public float DURATION_GAME_SEC = 1 * 1;
+    public float DURATION_GAME_SEC = 1 * 30;
     public float IN_GAME_MINUTES_PER_HALF = 20;
 
     public enum State { IN_PLAY, SCORED, RESET, KICKOFF, OVERTIME, GAMEOVER }
@@ -16,6 +16,22 @@ public partial class GameManager : Node
     public float timeLeft;
     public ulong timeSincePaused = Time.GetTicksMsec();
     public GameEvents gameEvents;
+    public float minutesPerSecond
+    {
+        get 
+        {
+            return IN_GAME_MINUTES_PER_HALF / DURATION_GAME_SEC;
+        }
+    }
+
+    public float TimeElapsed
+    {
+        get
+        {
+            return (DURATION_GAME_SEC - timeLeft) * minutesPerSecond 
+                     + ((currentMatch.Half - 1) * IN_GAME_MINUTES_PER_HALF);
+        }
+    }
 
     public override void _Ready()
     {
@@ -79,7 +95,7 @@ public partial class GameManager : Node
 
     public void IncreaseScore(int intScoredOn)
     {
-        currentMatch.IncreaseScore(intScoredOn);
+        currentMatch.IncreaseScore(intScoredOn, TimeElapsed);
         gameEvents.EmitScoreChanged(intScoredOn);
     }
 

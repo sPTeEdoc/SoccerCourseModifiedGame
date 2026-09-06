@@ -42,6 +42,7 @@ public partial class BallStateFreeform : BallState
                 return;
 
             ball.Carrier = p;
+            ball.Carrier.gameManager.currentMatch.LastBallCarrier = p.playerID;
             p.ControlBall();
             TransitionState(Ball.State.CARRIED);
         }

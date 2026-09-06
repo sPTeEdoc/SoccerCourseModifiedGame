@@ -24,6 +24,10 @@ public partial class GameStateInPlay : GameState
         if (isTransitioningHalf) return;
 
         manager.timeLeft -= (float)delta;
+        if (manager.currentMatch.TeamWithPossession == manager.currentMatch.HomeTeam)
+            manager.currentMatch.HomeTeamPossessionTime += (float)delta;
+        else
+            manager.currentMatch.AwayTeamPossessionTime += (float)delta;
 
         if (manager.IsTimeUp())
         {
@@ -38,7 +42,7 @@ public partial class GameStateInPlay : GameState
             else
             {
                 // Fallback direct signal emission
-                gameEvents.EmitSignal("HalfOver");
+                gameEvents.EmitHalfOver();
             }
         }
     }
@@ -48,7 +52,7 @@ public partial class GameStateInPlay : GameState
         // Golden Goal check: If a goal is scored in overtime (Half > 2), end match immediately
         if (manager.currentMatch.Half > 2)
         {
-            manager.currentMatch.IncreaseScore(teamScoredOn);
+            manager.currentMatch.IncreaseScore(teamScoredOn, manager.TimeElapsed);
             TransitionState(GameManager.State.GAMEOVER);
             return;
         }
