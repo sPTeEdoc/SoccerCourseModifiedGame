@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://ca75kttltlbq0"]
+[gd_scene load_steps=23 format=3 uid="uid://ca75kttltlbq0"]
 
 [ext_resource type="Script" uid="uid://dhm2mh6eafa1n" path="res://Scenes/ui/SensiUi.cs" id="1_lyev7"]
 [ext_resource type="Texture2D" uid="uid://d22013wapcssk" path="res://assets/art/ui/goal.png" id="2_lyev7"]
@@ -11,6 +11,20 @@
 Label/colors/font_color = Color(1, 1, 1, 1)
 Label/font_sizes/font_size = 12
 Label/fonts/font = ExtResource("2_ynno0")
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_af5ua"]
+bg_color = Color(1, 0, 0, 1)
+expand_margin_left = 2.0
+expand_margin_top = 2.0
+expand_margin_right = 2.0
+expand_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6t3am"]
+bg_color = Color(0, 0, 0, 1)
+expand_margin_left = 2.0
+expand_margin_top = 2.0
+expand_margin_right = 2.0
+expand_margin_bottom = 2.0
 
 [sub_resource type="Theme" id="Theme_lyev7"]
 Label/font_sizes/font_size = 15
@@ -289,7 +303,7 @@ _data = {
 &"goal_hide": SubResource("Animation_0dwhk")
 }
 
-[node name="SensiUi" type="CanvasLayer" node_paths=PackedStringArray("minutesLabel", "ballCarrierLabel", "homeTeamLabel", "homeScoreLabel", "awayTeamLabel", "awayScoreLabel", "scoreContainer", "HomeGoalSummary", "AwayGoalSummary")]
+[node name="SensiUi" type="CanvasLayer" node_paths=PackedStringArray("minutesLabel", "ballCarrierLabel", "homeTeamLabel", "homeScoreLabel", "awayTeamLabel", "awayScoreLabel", "scoreContainer", "HomeGoalSummary", "AwayGoalSummary", "HalfTime", "HalfOrFullTime")]
 script = ExtResource("1_lyev7")
 minutesLabel = NodePath("UIContainer/VBoxContainer/MarginContainer/VBoxContainer/MintesLabel")
 ballCarrierLabel = NodePath("UIContainer/VBoxContainer/MarginContainer/VBoxContainer/BallCarrierLabel")
@@ -300,6 +314,8 @@ awayScoreLabel = NodePath("UIContainer/VBoxContainer/VBoxContainer2/ScoreContain
 scoreContainer = NodePath("UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer")
 HomeGoalSummary = NodePath("UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer2/HomeContainer/HomeScoresList")
 AwayGoalSummary = NodePath("UIContainer/VBoxContainer/VBoxContainer2/ScoreContainer/MarginContainer/VBoxContainer/ScoreContainer2/AwayContainer/AwayScoresList")
+HalfTime = NodePath("UIContainer/VBoxContainer/HalfTimeContainer")
+HalfOrFullTime = NodePath("UIContainer/VBoxContainer/HalfTimeContainer/PanelContainer/HalfOrFull")
 
 [node name="UIContainer" type="Control" parent="."]
 layout_mode = 3
@@ -344,10 +360,38 @@ visible = false
 layout_mode = 2
 text = "Nibley 2"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="UIContainer/VBoxContainer"]
+[node name="VBoxContainer3" type="VBoxContainer" parent="UIContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
-size_flags_stretch_ratio = 8.0
+size_flags_stretch_ratio = 20.0
+
+[node name="HalfTimeContainer" type="VBoxContainer" parent="UIContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+size_flags_stretch_ratio = 8.93
+
+[node name="PanelContainer" type="HBoxContainer" parent="UIContainer/VBoxContainer/HalfTimeContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 4.0
+
+[node name="HalfOrFull" type="Label" parent="UIContainer/VBoxContainer/HalfTimeContainer/PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_af5ua")
+text = "HALF"
+horizontal_alignment = 2
+
+[node name="Label2" type="Label" parent="UIContainer/VBoxContainer/HalfTimeContainer/PanelContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0, 0, 1)
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_6t3am")
+text = "TIME"
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="UIContainer/VBoxContainer"]
 layout_mode = 2

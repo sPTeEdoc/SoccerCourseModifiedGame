@@ -18,6 +18,8 @@ public partial class SensiUi : CanvasLayer
     [Export] private PanelContainer scoreContainer;
     [Export] private Label HomeGoalSummary;
     [Export] private Label AwayGoalSummary;
+    [Export] private VBoxContainer HalfTime;
+    [Export] private Label HalfOrFullTime;
     private GameManager gameManager;
     private PlayerResource player;
 
@@ -91,6 +93,8 @@ public partial class SensiUi : CanvasLayer
 
     private void OnGameOver(string winningTeamID)
     {
+        HalfTime.Visible = true;
+        HalfOrFullTime.Text = "FULL";
         ShowScores();
         GD.Print("Show the statistics");
     }
@@ -142,16 +146,20 @@ public partial class SensiUi : CanvasLayer
     private void OnKickoffStarted()
     {
         scoreContainer.Visible = false;
+        HalfTime.Visible = false;
     }
 
     private void OnEntrance()
     {
         scoreContainer.Visible = false;
+        HalfTime.Visible = false;
     }
 
     private void OnHalfOver()
     {
-        GD.Print("Show the statistics");
+        HalfTime.Visible = true;
         ShowScores();
+        if (!gameManager.currentMatch.IsGameOver)
+            GD.Print("Show the statistics");
     }
 }

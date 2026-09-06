@@ -28,6 +28,7 @@ public partial class Match : Node
 
     public List<GoalSummary> awayPlayerGoalTrackerTraditional = new List<GoalSummary>();
     public List<GoalSummary> homePlayerGoalTrackerTraditional = new List<GoalSummary>();
+    public bool IsGameOver { get; set; } = false;
 
 
     public Match(int teamHome, int teamAway)

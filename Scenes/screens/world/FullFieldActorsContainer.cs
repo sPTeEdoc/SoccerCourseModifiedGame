@@ -155,6 +155,7 @@ public partial class FullFieldActorsContainer : Node2D
 
         if (gameManager.currentMatch.Half > 2 && !gameManager.currentMatch.IsTied())
         {
+            gameManager.currentMatch.IsGameOver = true;
             gameEvents.EmitSignal("GameOver", gameManager.currentMatch.Winner.ToString());
             isHalfTransitioning = false;
             return;
