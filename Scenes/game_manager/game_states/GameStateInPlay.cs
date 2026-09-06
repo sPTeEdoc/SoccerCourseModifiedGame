@@ -30,11 +30,19 @@ public partial class GameStateInPlay : GameState
 
         if (manager.IsTimeUp() && !manager.PlayTilWinnerIsScored)
         {
-            if (manager.OT_IS_ENDLESS_GOLDEN_GOAL_AFTER_SECOND_HALF_CONCLUDES && manager.currentMatch.Half >= 2 && manager.currentMatch.IsTied())
+            if (manager.currentMatch.Half >= 2 && manager.currentMatch.IsTied())
             {
-                manager.PlayTilWinnerIsScored = true;
-                TransitionState(GameManager.State.OVERTIME);
-                return;
+                if (manager.OT_IS_ENDLESS_GOLDEN_GOAL_AFTER_SECOND_HALF_CONCLUDES)
+                {
+                    manager.PlayTilWinnerIsScored = true;
+                    TransitionState(GameManager.State.OVERTIME);
+                    return;
+                }
+                else
+                {
+                    GD.Print("It's a draw!");
+                    TransitionState(GameManager.State.GAMEOVER);
+                }
             }
 
             isTransitioningHalf = true;
