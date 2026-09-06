@@ -148,6 +148,7 @@ public partial class FullFieldActorsContainer : Node2D
         gameEvents.EmitHalfOver();
 
         gameManager.timeLeft = gameManager.DURATION_GAME_SEC;
+        gameManager.InjuryTime = 0;
         gameManager.currentMatch.AdvanceHalf();
         gameManager.currentMatch.TeamKickingOff = gameManager.currentMatch.HomeTeam;
         if (gameManager.currentMatch.TeamKickingOff == gameManager.currentMatch.HomeTeam)
@@ -169,6 +170,7 @@ public partial class FullFieldActorsContainer : Node2D
         SwapSides();
         ball.Carrier = null;
         gameManager.timeLeft = gameManager.DURATION_GAME_SEC;
+        gameManager.InjuryTime = 0;
 
         // Send players back onto the pitch for the next half
         foreach (var squad in new[] { squadHome, squadAway })

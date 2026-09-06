@@ -55,6 +55,10 @@ public partial class SensiUi : CanvasLayer
     {
         float time = gameManager.TimeElapsed;
         minutesLabel.Text = $"{Math.Round(time)} Minutes";
+        if (gameManager.PlayTilWinnerIsScored)
+        {
+            minutesLabel.Text = "Untimed Golden Goal";
+        }
     }
 
     private void OnBallPossessed(int playerID)

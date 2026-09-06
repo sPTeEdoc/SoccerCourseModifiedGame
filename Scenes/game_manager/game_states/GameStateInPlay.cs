@@ -22,15 +22,24 @@ public partial class GameStateInPlay : GameState
     public override void _Process(double delta)
     {
         if (isTransitioningHalf) return;
-
-        manager.timeLeft -= (float)delta;
+        if (manager.timeLeft > 0)
+            manager.timeLeft -= (float)delta;
+        else
+            manager.InjuryTime -= (float)delta;
         if (manager.currentMatch.TeamWithPossession == manager.currentMatch.HomeTeam)
             manager.currentMatch.HomeTeamPossessionTime += (float)delta;
         else
             manager.currentMatch.AwayTeamPossessionTime += (float)delta;
 
-        if (manager.IsTimeUp())
+        if (manager.IsTimeUp() && !manager.PlayTilWinnerIsScored)
         {
+            if (manager.OT_IS_ENDLESS_GOLDEN_GOAL_AFTER_SECOND_HALF_CONCLUDES && manager.currentMatch.Half >= 2 && manager.currentMatch.IsTied())
+            {
+                manager.PlayTilWinnerIsScored = true;
+                TransitionState(GameManager.State.OVERTIME);
+                return;
+            }
+
             isTransitioningHalf = true;
             var container = GetTree().CurrentScene.GetNodeOrNull<FullFieldActorsContainer>("FullFieldActorsContainer")
                             ?? GetParent() as FullFieldActorsContainer;

@@ -4,7 +4,7 @@ using System;
 public partial class GameManager : Node
 {
     private const int DURATION_IMPACT_PAUSE = 100;
-    public float DURATION_GAME_SEC = 1 * 30;
+    public float DURATION_GAME_SEC = 1 * 1;
     public float IN_GAME_MINUTES_PER_HALF = 20;
 
     public enum State { IN_PLAY, SCORED, RESET, KICKOFF, OVERTIME, GAMEOVER }
@@ -34,6 +34,9 @@ public partial class GameManager : Node
     }
 
     public bool GoalJustScored { get; set; } = false;
+    public bool PlayTilWinnerIsScored { get; set; } = false;
+    public bool OT_IS_ENDLESS_GOLDEN_GOAL_AFTER_SECOND_HALF_CONCLUDES = true;
+    public float InjuryTime { get; set; } = 0;
 
     public override void _Ready()
     {
@@ -53,12 +56,14 @@ public partial class GameManager : Node
     public void StartGame()
     {
         timeLeft = DURATION_GAME_SEC;
+        InjuryTime = 0;
         SwitchState(State.RESET);
     }
 
     public void StartHalf()
     {
         timeLeft = DURATION_GAME_SEC;
+        InjuryTime = 0;
         SwitchState(State.RESET);
     }
 
@@ -88,7 +93,7 @@ public partial class GameManager : Node
 
     public bool IsCoop() => playerSetup[0] == playerSetup[1];
     public bool IsSinglePlayer() => playerSetup[1] == -2;
-    public bool IsTimeUp() => timeLeft <= 0;
+    public bool IsTimeUp() => timeLeft + InjuryTime <= 0;
 
     public int GetWinningTeam()
     {
