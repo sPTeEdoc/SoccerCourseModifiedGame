@@ -46,7 +46,7 @@ public partial class AIBehaviorField : AIBehavior
 
         totalSteeringForce += GetSeparationSteeringForce() * 1.2f; // Keep a bit of distance
         totalSteeringForce = totalSteeringForce.LimitLength(1.0f);
-        player.Velocity = totalSteeringForce * player.speed;
+        player.Velocity = totalSteeringForce * player.GameAttributes.Speed;
     }
 
     public override void PerformAIDecisions()
@@ -75,7 +75,7 @@ public partial class AIBehaviorField : AIBehavior
                 Vector2 shotDirection = player.Position.DirectionTo(player.targetGoal.GetRandomTargetPosition());
 
                 var data = PlayerStateData.Build()
-                    .SetShotPower(player.power)
+                    .SetShotPower(player.GameAttributes.Shooting)
                     .SetShotDirection(shotDirection);
 
                 player.SwitchState(PlayerCharacter.State.SHOOTING, data);

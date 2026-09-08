@@ -46,7 +46,7 @@ public partial class PlayerStatePreppingShot : PlayerState
             float durationPress = Mathf.Clamp((int)Time.GetTicksMsec() - timeStartShot, 0f, DURATION_MAX_BONUS);
             float easeTime = durationPress / DURATION_MAX_BONUS;
             float bonus = Ease(easeTime, EASE_REWARD_FACTOR);
-            float shotPower = player.power * (1 + bonus);
+            float shotPower = player.GameAttributes.Shooting * (1 + bonus);
 
             shotDirection = shotDirection.Normalized();
 

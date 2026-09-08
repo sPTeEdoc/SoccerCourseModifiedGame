@@ -12,6 +12,7 @@ public partial class PlayerStatePreEntrance : PlayerState
     {
         gameEvents = GetNode<GameEvents>("/root/GameEvents");
         gameEvents.KickoffStarted += OnPreEntranceFinished;
+        player.GameAttributes.Speed = 90; // just for entrance purposes
     }
 
     public override void _Process(double delta)
@@ -37,7 +38,7 @@ public partial class PlayerStatePreEntrance : PlayerState
                 return;
             }
 
-            player.Velocity = direction * player.speed;
+            player.Velocity = direction * player.GameAttributes.Speed;
         }
 
         player.SetMovementAnimation();

@@ -65,7 +65,7 @@ public partial class SensiUi : CanvasLayer
     {
         ballCarrierLabel.Visible = true;
         player = GameManagement.Instance.PlayerDictionary[playerID];
-        ballCarrierLabel.Text = $"{player.Number} {player.FullName}";
+        ballCarrierLabel.Text = $"{player.Number} {player.PlayerName}";
     }
 
     private void OnBallReleased()
@@ -77,7 +77,7 @@ public partial class SensiUi : CanvasLayer
     {
         if (!gameManager.IsTimeUp())
         {
-            string goalString = $"{player.FullName} SCORED!";
+            string goalString = $"{player.PlayerName} SCORED!";
             if (player.TeamID == teamScoredOn)
                 goalString = goalString + " (og)";
             goalScorerLabel.Text = goalString;
@@ -129,7 +129,7 @@ public partial class SensiUi : CanvasLayer
         for (int i = 0; i < goalTracker.Count; i++)
         {
             var trackingItem = goalTracker[i];
-            string playerName = playerDict[trackingItem.PlayerID].FullName;
+            string playerName = playerDict[trackingItem.PlayerID].PlayerName;
 
             // Check if this summary represents an own goal
             string ogTag = trackingItem.IsOwnGoal ? " (OG)" : "";

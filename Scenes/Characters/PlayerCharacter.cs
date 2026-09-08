@@ -45,8 +45,6 @@ public partial class PlayerCharacter : CharacterBody2D
     [Export] public Ball ball;
     [Export] public ControlScheme controlScheme;
     [Export] public ArenaGoal ownGoal;
-    [Export] public float power;
-    [Export] public float speed;
     [Export] public ArenaGoal targetGoal;
     [Export] public float pushForce = 50.0f;
 
@@ -77,9 +75,7 @@ public partial class PlayerCharacter : CharacterBody2D
     public Vector2 spawnPosition = Vector2.Zero;
     public float weightOnDutySteering = 0f;
 
-    public int playerID = 0;
-    public int TeamID = -1;
-    public string fullname = "";
+    public int PlayerID = 0;
     public Role role = Role.MIDFIELD;
     public string skinColor = "#9c7250";
     public string hairColor = "#231709";
@@ -95,7 +91,28 @@ public partial class PlayerCharacter : CharacterBody2D
     public bool IsKickingOffPlayer = false;
     public bool InputLocked { get; set; } = false;
     public static float PASS_DISTANCE { get; set; } = 140f; // Increased default open-field pass distance
-
+    public PlayerAttributes TrueAttributes { get; set; } = new PlayerAttributes();
+    public PlayerAttributes GameAttributes { get; set; } = new PlayerAttributes();
+    public int TeamID { get; set; }
+    public string PlayerName
+    {
+        get
+        {
+            if (!string.IsNullOrEmpty(AltName))
+            {
+                return AltName;
+            }
+            else if (!string.IsNullOrEmpty(LastName))
+            {
+                return LastName;
+            }
+            return FirstName;
+        }
+    }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    public string AltName { get; set; }
+    public bool IsCaptain { get; set; }
     public override void _Ready()
     {
         animatedSprite2D = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
@@ -231,14 +248,47 @@ public partial class PlayerCharacter : CharacterBody2D
         Position = contextPosition;
         kickoffPosition = contextKickoffPosition;
         ball = contextBall;
-        speed = contextPlayerData.Speed;
-        power = contextPlayerData.Power;
         role = contextPlayerData.Role;
         skinColor = contextPlayerData.SkinColor;
-        fullname = contextPlayerData.FullName;
         heading = homeTeam ? Vector2.Down : Vector2.Up;
         TeamID = contextTeamID;
-        playerID = GameManagement.Instance.PlayerID++;
+        PlayerID = GameManagement.Instance.PlayerID++;
+        FirstName = contextPlayerData.FirstName;
+        LastName = contextPlayerData.LastName;
+        AltName = contextPlayerData.AltName;
+        IsCaptain = contextPlayerData.IsCaptain;
+
+        this.TrueAttributes.Offense = contextPlayerData.TrueAttributes.Offense;
+        this.TrueAttributes.Defense = contextPlayerData.TrueAttributes.Defense;
+        this.TrueAttributes.Awareness = contextPlayerData.TrueAttributes.Awareness;
+        this.TrueAttributes.Shooting = contextPlayerData.TrueAttributes.Shooting;
+        this.TrueAttributes.Passing = contextPlayerData.TrueAttributes.Passing;
+        this.TrueAttributes.Speed = contextPlayerData.TrueAttributes.Speed;
+        this.TrueAttributes.Dribble = contextPlayerData.TrueAttributes.Dribble;
+        this.TrueAttributes.Strength = contextPlayerData.TrueAttributes.Strength;
+        this.TrueAttributes.Toughness = contextPlayerData.TrueAttributes.Toughness;
+        this.TrueAttributes.Athleticism = contextPlayerData.TrueAttributes.Athleticism;
+        this.TrueAttributes.Popularity = contextPlayerData.TrueAttributes.Popularity;
+        this.TrueAttributes.Header = contextPlayerData.TrueAttributes.Header;
+        this.TrueAttributes.Save = contextPlayerData.TrueAttributes.Save;
+        this.TrueAttributes.Reflexes = contextPlayerData.TrueAttributes.Reflexes;
+        this.TrueAttributes.Special = contextPlayerData.TrueAttributes.Special;
+
+        this.GameAttributes.Offense = contextPlayerData.TrueAttributes.Offense;
+        this.GameAttributes.Defense = contextPlayerData.TrueAttributes.Defense;
+        this.GameAttributes.Awareness = contextPlayerData.TrueAttributes.Awareness;
+        this.GameAttributes.Shooting = contextPlayerData.TrueAttributes.Shooting;
+        this.GameAttributes.Passing = contextPlayerData.TrueAttributes.Passing;
+        this.GameAttributes.Speed = contextPlayerData.TrueAttributes.Speed;
+        this.GameAttributes.Dribble = contextPlayerData.TrueAttributes.Dribble;
+        this.GameAttributes.Strength = contextPlayerData.TrueAttributes.Strength;
+        this.GameAttributes.Toughness = contextPlayerData.TrueAttributes.Toughness;
+        this.GameAttributes.Athleticism = contextPlayerData.TrueAttributes.Athleticism;
+        this.GameAttributes.Popularity = contextPlayerData.TrueAttributes.Popularity;
+        this.GameAttributes.Header = contextPlayerData.TrueAttributes.Header;
+        this.GameAttributes.Save = contextPlayerData.TrueAttributes.Save;
+        this.GameAttributes.Reflexes = contextPlayerData.TrueAttributes.Reflexes;
+        this.GameAttributes.Special = contextPlayerData.TrueAttributes.Special;
     }
 
     public void Initialize(Vector2 contextPosition, Vector2 contextKickoffPosition, Ball contextBall,
@@ -252,11 +302,8 @@ public partial class PlayerCharacter : CharacterBody2D
         ball = contextBall;
         ownGoal = contextOwnGoal;
         targetGoal = contextTargetGoal;
-        speed = contextPlayerData.Speed;
-        power = contextPlayerData.Power;
         role = contextPlayerData.Role;
         skinColor = contextPlayerData.SkinColor;
-        fullname = contextPlayerData.FullName;
 
         // FIX: Compare Y coordinates for vertical field orientation instead of X
         heading = targetGoal.Position.Y < Position.Y ? Vector2.Up : Vector2.Down;
@@ -265,6 +312,43 @@ public partial class PlayerCharacter : CharacterBody2D
         // playerID = GameManagement.Instance.PlayerID++;
         preentracePosition = contextPreentrancePosition;
         entrancePosition = contextEntrancePosition;
+
+        FirstName = contextPlayerData.FirstName;
+        LastName = contextPlayerData.LastName;
+        AltName = contextPlayerData.AltName;
+        IsCaptain = contextPlayerData.IsCaptain;
+
+        this.TrueAttributes.Offense = contextPlayerData.TrueAttributes.Offense;
+        this.TrueAttributes.Defense = contextPlayerData.TrueAttributes.Defense;
+        this.TrueAttributes.Awareness = contextPlayerData.TrueAttributes.Awareness;
+        this.TrueAttributes.Shooting = contextPlayerData.TrueAttributes.Shooting;
+        this.TrueAttributes.Passing = contextPlayerData.TrueAttributes.Passing;
+        this.TrueAttributes.Speed = contextPlayerData.TrueAttributes.Speed;
+        this.TrueAttributes.Dribble = contextPlayerData.TrueAttributes.Dribble;
+        this.TrueAttributes.Strength = contextPlayerData.TrueAttributes.Strength;
+        this.TrueAttributes.Toughness = contextPlayerData.TrueAttributes.Toughness;
+        this.TrueAttributes.Athleticism = contextPlayerData.TrueAttributes.Athleticism;
+        this.TrueAttributes.Popularity = contextPlayerData.TrueAttributes.Popularity;
+        this.TrueAttributes.Header = contextPlayerData.TrueAttributes.Header;
+        this.TrueAttributes.Save = contextPlayerData.TrueAttributes.Save;
+        this.TrueAttributes.Reflexes = contextPlayerData.TrueAttributes.Reflexes;
+        this.TrueAttributes.Special = contextPlayerData.TrueAttributes.Special;
+
+        this.GameAttributes.Offense = contextPlayerData.TrueAttributes.Offense;
+        this.GameAttributes.Defense = contextPlayerData.TrueAttributes.Defense;
+        this.GameAttributes.Awareness = contextPlayerData.TrueAttributes.Awareness;
+        this.GameAttributes.Shooting = contextPlayerData.TrueAttributes.Shooting;
+        this.GameAttributes.Passing = contextPlayerData.TrueAttributes.Passing;
+        this.GameAttributes.Speed = contextPlayerData.TrueAttributes.Speed;
+        this.GameAttributes.Dribble = contextPlayerData.TrueAttributes.Dribble;
+        this.GameAttributes.Strength = contextPlayerData.TrueAttributes.Strength;
+        this.GameAttributes.Toughness = contextPlayerData.TrueAttributes.Toughness;
+        this.GameAttributes.Athleticism = contextPlayerData.TrueAttributes.Athleticism;
+        this.GameAttributes.Popularity = contextPlayerData.TrueAttributes.Popularity;
+        this.GameAttributes.Header = contextPlayerData.TrueAttributes.Header;
+        this.GameAttributes.Save = contextPlayerData.TrueAttributes.Save;
+        this.GameAttributes.Reflexes = contextPlayerData.TrueAttributes.Reflexes;
+        this.GameAttributes.Special = contextPlayerData.TrueAttributes.Special;
     }
 
     private void SetupAIBehavior()
@@ -419,7 +503,7 @@ public partial class PlayerCharacter : CharacterBody2D
     private void SetSpriteVisibility()
     {
         controlSprite.Visible = HasBall() || controlScheme != ControlScheme.CPU;
-        runParticles.Emitting = Velocity.Length() == speed;
+        runParticles.Emitting = Velocity.Length() == GameAttributes.Speed;
     }
 
     public void GetHurt(Vector2 hurtOrigin)
@@ -498,7 +582,7 @@ public partial class PlayerCharacter : CharacterBody2D
             if (other is PlayerCharacter player &&
                 player != this &&
                 player.TeamID != TeamID &&
-                ball.Carrier.playerID == player.playerID)
+                ball.Carrier.PlayerID == player.PlayerID)
             {
                 Vector2 direction = Position.DirectionTo(player.Position);
                 player.GetHurt(direction);

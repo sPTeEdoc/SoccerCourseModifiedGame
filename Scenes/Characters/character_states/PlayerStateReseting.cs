@@ -12,6 +12,7 @@ public partial class PlayerStateReseting : PlayerState
     {
         gameEvents = GetNode<GameEvents>("/root/GameEvents");
         gameEvents.KickoffStarted += OnKickoffStarted;
+        player.GameAttributes.Speed = 90; // just for getting to their spots at a reasonable speed
     }
 
     public override void _Process(double delta)
@@ -21,6 +22,7 @@ public partial class PlayerStateReseting : PlayerState
             Vector2 direction = player.Position.DirectionTo(stateData.ResetPosition);
             if (player.Position.DistanceSquaredTo(stateData.ResetPosition) < 2)
             {
+                player.GameAttributes.Speed = player.TrueAttributes.Speed;
                 hasArrived = true;
                 player.Velocity = Vector2.Zero;
                 player.FaceTowardsTargetGoal();
@@ -37,7 +39,7 @@ public partial class PlayerStateReseting : PlayerState
             }
             else
             {
-                player.Velocity = direction * player.speed;
+                player.Velocity = direction * player.GameAttributes.Speed;
             }
 
             player.SetMovementAnimation();

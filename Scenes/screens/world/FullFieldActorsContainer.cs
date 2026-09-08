@@ -293,7 +293,7 @@ public partial class FullFieldActorsContainer : Node2D
             }
 
             var player = SpawnPlayer(playerPosition, kickoffPosition, ownGoal, targetGoal, playerData, teamID, preentrancePosition, entrancePosition);
-            player.playerID = playerData.PlayerID;
+            player.PlayerID = playerData.PlayerID;
             if (i == 10)
                 player.IsKickingOffPlayer = true;
             playerNodes.Add(player);
@@ -414,7 +414,7 @@ public partial class FullFieldActorsContainer : Node2D
                     if (player.IsKickingOffPlayer)
                     {
                         ball.Carrier = player;
-                        ball.Carrier.gameManager.currentMatch.LastBallCarrier = player.playerID;
+                        ball.Carrier.gameManager.currentMatch.LastBallCarrier = player.PlayerID;
                     }
             }
         }

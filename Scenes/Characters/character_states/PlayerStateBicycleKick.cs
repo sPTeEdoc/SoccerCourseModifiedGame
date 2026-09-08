@@ -31,7 +31,7 @@ public partial class PlayerStateBicycleKick : PlayerState
             Vector2 direction = ball.Position.DirectionTo(destination);
 
             ((SoundPlayer)soundPlayer).Play(SoundPlayer.Sound.POWERSHOT);
-            contactBall.Shoot(direction * player.power * BonusPower);
+            contactBall.Shoot(direction * player.GameAttributes.Shooting * BonusPower);
         }
     }
 

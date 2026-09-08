@@ -52,7 +52,7 @@ public partial class PlayerStatePassing : PlayerState
             // if (heading.LengthSquared() < 0.01f)
             //     heading = player.FacingDirection; // Use last non-zero direction instead of Vector2.Down
 
-            float passPowerFactor = 0.85f + (player.power / 100f) * 0.35f;
+            float passPowerFactor = 0.85f + (player.GameAttributes.Passing / 100f) * 0.35f;
             float targetDistance = 115f * passPowerFactor;
 
             Vector2 destination = ball.Position + player.heading.Normalized() * targetDistance;
@@ -91,12 +91,12 @@ public partial class PlayerStatePassing : PlayerState
             heading = heading.Normalized();
 
             // Open-field pass tuned to match targeted pass pace
-            float passPowerFactor = 0.85f + (player.power / 100f) * 0.35f;
+            float passPowerFactor = 0.85f + (player.GameAttributes.Passing / 100f) * 0.35f;
             float targetDistance = 115f * passPowerFactor;
 
             Vector2 destination = ball.Position + heading * targetDistance;
             ball.PassTo(destination, receiver: null);
-            GD.Print($"heading: {heading}, player power: {player.power}, destination: {destination}");
+            GD.Print($"heading: {heading}, player power: {player.GameAttributes.Passing}, destination: {destination}");
         }
         else
         {

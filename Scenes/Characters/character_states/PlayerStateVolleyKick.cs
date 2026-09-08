@@ -33,7 +33,7 @@ public partial class PlayerStateVolleyKick : PlayerState
             Vector2 direction = ball.Position.DirectionTo(destination);
 
             soundPlayer.Play(SoundPlayer.Sound.POWERSHOT);
-            contactBall.Shoot(direction * player.power * BONUS_POWER);
+            contactBall.Shoot(direction * player.GameAttributes.Shooting * BONUS_POWER);
         }
     }
 

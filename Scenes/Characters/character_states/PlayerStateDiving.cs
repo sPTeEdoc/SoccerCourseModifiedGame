@@ -21,7 +21,7 @@ public partial class PlayerStateDiving : PlayerState
             // animationPlayer.Play("dive_up");
         }
 
-        player.Velocity = direction * player.speed;
+        player.Velocity = direction * player.GameAttributes.Speed;
         timeStartDive = (int)Time.GetTicksMsec();
     }
 

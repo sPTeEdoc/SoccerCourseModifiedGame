@@ -56,18 +56,33 @@ public partial class DataLoader : Node
                 var player = playerVariant.AsGodotDictionary();
                 int playerID = (int)player["id"];
                 int number = (int)player["number"];
-                string fullname = player["name"].AsString();
+                string firstName = player["firstName"].AsString();
+                string lastName = player["lastName"].AsString();
+                string altName = player["altName"].AsString();
                 string skin = player["skin"].AsString();
                 string hair = player["hair"].AsString();
                 skinColorCombo.Add(playerID, skin);
                 var role = (PlayerCharacter.Role)(int)player["role"];
-                float speed = (float)player["speed"];
-                float power = (float)player["power"];
-                float pass = (float)player["pass"];
-                float control = (float)player["control"];
+                int offense = (int)player["offense"];
+                int defense = (int)player["defense"];
+                int awareness = (int)player["awareness"];
+                int shooting = (int)player["shooting"];
+                int passing = (int)player["passing"];
+                int speed = (int)player["speed"];
+                int dribble = (int)player["dribble"];
+                int strength = (int)player["strength"];
+                int toughness = (int)player["toughness"];
+                int athleticism = (int)player["athleticism"];
+                int popularity = (int)player["popularity"];
+                int header = (int)player["header"];
+                int save = (int)player["save"];
+                int reflexes = (int)player["reflexes"];
+                int special = (int)player["special"];
+                bool isCaptain = ParseBool(player, "isCaptain");
 
-                var resource = new PlayerResource(playerID, fullname, skin, hair, role, number, pass, control, speed, power,
-                    club.TeamID);
+                var resource = new PlayerResource(playerID, firstName, lastName, altName, skin, hair, role, number, tID, offense,
+                    defense, awareness, shooting, passing, speed, dribble, strength, toughness, athleticism, popularity,
+                    header, save, reflexes, special, isCaptain);
                 club.startingRoster.Add(resource);
                 GameManagement.Instance.PlayerDictionary.Add(playerID, resource);
             }
@@ -76,6 +91,20 @@ public partial class DataLoader : Node
         }
 
         file.Close();
+    }
+
+    private bool ParseBool(Godot.Collections.Dictionary var, string s)
+    {
+        bool boolVal = false;
+        if (var.ContainsKey(s))
+        {
+            string val = var[s].AsString();
+            if (val == "1")
+                boolVal = true;
+            else if (val == "true")
+                boolVal = true;
+        }
+        return boolVal;
     }
 
     public List<PlayerResource> GetSquad(int teamID)

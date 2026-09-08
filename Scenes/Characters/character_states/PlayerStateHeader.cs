@@ -37,7 +37,7 @@ public partial class PlayerStateHeader : PlayerState
             soundPlayer.Play(SoundPlayer.Sound.POWERSHOT);
             Vector2 destination = player.targetGoal.GetRandomTargetPosition();
             Vector2 direction = contactBall.Position.DirectionTo(destination);
-            contactBall.Shoot(direction * player.power * BONUS_POWER);
+            contactBall.Shoot(direction * player.GameAttributes.Shooting * BONUS_POWER);
         }
     }
 

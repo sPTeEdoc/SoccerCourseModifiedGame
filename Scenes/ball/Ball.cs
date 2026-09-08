@@ -97,7 +97,7 @@ public partial class Ball : AnimatableBody2D
 
         if (Carrier != null)
         {
-            float ratingFactor = Mathf.InverseLerp(50f, 99f, Carrier.power);
+            float ratingFactor = Mathf.InverseLerp(50f, 99f, Carrier.GameAttributes.Passing);
             intensity *= Mathf.Lerp(0.9f, 1.1f, ratingFactor);
         }
 
