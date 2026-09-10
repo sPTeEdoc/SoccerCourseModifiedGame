@@ -10,7 +10,7 @@ public partial class AIBehaviorGoalie : AIBehavior
     {
         Vector2 totalSteeringForce = GetGoalieSteeringForce();
         totalSteeringForce = totalSteeringForce.LimitLength(1.0f);
-        player.Velocity = totalSteeringForce * player.GameAttributes.Speed;
+        player.Velocity = totalSteeringForce * player.EffectiveSpeed;
     }
 
     public override void PerformAIDecisions()

@@ -27,7 +27,7 @@ public partial class PlayerStateEntrance : PlayerState
             }
             else
             {
-                player.Velocity = direction * player.GameAttributes.Speed;
+                player.Velocity = direction * player.EffectiveSpeed;
                 player.SetMovementAnimation();
             }
         }

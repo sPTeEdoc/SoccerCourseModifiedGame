@@ -3,7 +3,7 @@ using System;
 public partial class BallStateCarried : BallState
 {
     private const float DribbleFrequency = 10.0f;
-    private const float DribbleIntensity = 3.0f;
+    private const float DribbleIntensity = 2.2f;
 
     // X = forward distance in front of feet, Y = static height offset
     private static readonly Vector2 OffsetFromPlayer = new Vector2(10, 4);

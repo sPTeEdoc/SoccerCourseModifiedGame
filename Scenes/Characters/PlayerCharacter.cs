@@ -113,6 +113,36 @@ public partial class PlayerCharacter : CharacterBody2D
     public string LastName { get; set; }
     public string AltName { get; set; }
     public bool IsCaptain { get; set; }
+    /// <summary>
+    /// Gets the player's effective movement speed, accounting for ball possession.
+    /// </summary>
+    public float EffectiveSpeed
+    {
+        get
+        {
+            if (!HasBall())
+                return GameAttributes.Speed;
+
+            // âœ… Base dribble penalty: 15-25% reduction based on Dribble attribute
+            // High Dribble (90) = 15% penalty
+            // Low Dribble (50) = 25% penalty
+            float dribblePenaltyPercent = 0.25f - (GameAttributes.Dribble / 100f * 0.10f);
+
+            // âœ… Role-based modifier
+            float roleModifier = role switch
+            {
+                Role.OFFENSE => 0.95f,    // Forwards best at dribbling (5% bonus)
+                Role.MIDFIELD => 1.0f,    // Midfielders neutral
+                Role.DEFENSE => 1.08f,    // Defenders worst (8% worse penalty)
+                Role.GOALIE => 1.15f,     // Goalies terrible (15% worse penalty)
+                _ => 1.0f
+            };
+
+            float finalPenalty = dribblePenaltyPercent * roleModifier;
+            return GameAttributes.Speed * (1f - finalPenalty);
+        }
+    }
+
     public override void _Ready()
     {
         animatedSprite2D = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
@@ -503,7 +533,9 @@ public partial class PlayerCharacter : CharacterBody2D
     private void SetSpriteVisibility()
     {
         controlSprite.Visible = HasBall() || controlScheme != ControlScheme.CPU;
-        runParticles.Emitting = Velocity.Length() == GameAttributes.Speed;
+
+        // âœ… NEW - Account for dribble speed reduction
+        runParticles.Emitting = Velocity.Length() >= EffectiveSpeed * 0.95f;
     }
 
     public void GetHurt(Vector2 hurtOrigin)

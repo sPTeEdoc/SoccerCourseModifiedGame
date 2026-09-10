@@ -24,7 +24,7 @@ public partial class PlayerStateMoving : PlayerState
         if (!player.InputLocked)
         {
             Vector2 direction = KeyUtils.GetInputVector(player.controlScheme);
-            player.Velocity = direction * player.GameAttributes.Speed;
+            player.Velocity = direction * player.EffectiveSpeed;  // âœ…
         }
         else
         {
