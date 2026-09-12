@@ -272,13 +272,66 @@ public partial class AIBehaviorField : AIBehavior
 
         if (IsBallPossessedByOpponent())
         {
+            // â­ PRIORITY 0: Block shots (OVERRIDE EVERYTHING)
+            Vector2 shotBlockForce = GetShotBlockingForce();
+            if (shotBlockForce.LengthSquared() > 0.1f)
+            {
+                totalSteeringForce += shotBlockForce * 3.0f; // MAXIMUM urgency
+                // Don't return - let other forces contribute slightly for smoothness
+            }
+
             float distanceToBall = player.Position.DistanceTo(ball.Position);
 
-            // Ã¢ Allow tighter defensive shape near danger
-            if (distanceToBall < 180f)
+            // â PRIORITY 1: Recovery run if beaten
+            Vector2 recoveryForce = GetRecoveryRunForce();
+            if (recoveryForce.LengthSquared() > 0.1f)
             {
-                separationMultiplier = 0.5f;  // Ã¢ Was always 1.2f
+                totalSteeringForce += recoveryForce * 1.8f; // OVERRIDE everything
             }
+            else
+            {
+                // â PRIORITY 2: Jockey if in middle distance
+                Vector2 jockeyForce = GetJockeyingForce();
+                if (jockeyForce.LengthSquared() > 0.01f)
+                {
+                    totalSteeringForce += jockeyForce * 0.9f;
+                }
+
+                // â PRIORITY 3: Press if close enough
+                if (player.GameAttributes.Awareness >= 60 && distanceToBall < PRESSING_RANGE)
+                {
+                    Vector2 pressingForce = GetPressingSteeringForce();
+                    if (pressingForce.LengthSquared() > 0.1f)
+                    {
+                        totalSteeringForce += pressingForce * 1.0f;
+                    }
+                }
+
+                // â PRIORITY 4: Mark nearby opponents
+                if (player.GameAttributes.Defense >= 50)
+                {
+                    totalSteeringForce += GetMarkingSteeringForce() * 0.8f;
+                }
+
+                // â PRIORITY 5: Drop back to position if not engaged
+                if (totalSteeringForce.LengthSquared() < 0.5f)
+                {
+                    var roleModifiers = GetRoleModifiers();
+                    totalSteeringForce += GetSpawnSteeringForce() * roleModifiers.DefensiveDropMultiplier;
+                }
+            }
+        }
+        else if (ball.Carrier == null)
+        {
+            // â PRIORITY 1: Intercept passes
+            totalSteeringForce += GetPassInterceptionForce() * 1.6f;
+
+            // â PRIORITY 2: Block shots
+            totalSteeringForce += GetShotBlockingForce() * 2.0f;
+
+            // â PRIORITY 3: Chase loose ball
+            totalSteeringForce += GetBallProximitySteeringForce();
+            totalSteeringForce += GetDensityAroundBallSteeringForce();
         }
 
         totalSteeringForce += GetSeparationSteeringForce() * separationMultiplier;
@@ -780,16 +833,20 @@ public partial class AIBehaviorField : AIBehavior
 
             // 3. PASSING
             float passProbability = PASS_PROBABILITY *
-                awarenessModifier *
-                urgencyModifier *
-                roleModifiers.PassingCaution;
+    awarenessModifier *
+    urgencyModifier *
+    roleModifiers.PassingCaution;
+
+            // â REDUCED BASE - AI passes less often (more dribbling)
+            passProbability *= 0.6f; // Was 1.0
 
             // Higher urgency under pressure
             if (HasOpponentsNearby())
             {
-                passProbability *= 2f;
+                passProbability *= 3f; // Was 2f - pass more when pressured
             }
 
+            // â DON'T PASS if no good forward options
             if (GD.Randf() < passProbability && HasTeammateInView())
             {
                 PlayerCharacter passTarget;
@@ -798,6 +855,16 @@ public partial class AIBehaviorField : AIBehavior
                 if (awareness >= 70)
                 {
                     passTarget = FindBestPassTarget();
+
+                    // â VALIDATE - only pass if score is positive
+                    if (passTarget != null)
+                    {
+                        float passScore = CalculatePassScore(passTarget);
+                        if (passScore < 100f) // Threshold for "good pass"
+                        {
+                            passTarget = null; // Cancel pass - not worth it
+                        }
+                    }
                 }
                 else
                 {
@@ -873,65 +940,73 @@ public partial class AIBehaviorField : AIBehavior
         // === FACTOR 1: Proximity to Goal (Closer = Better) ===
         float distToGoal = teammate.Position.DistanceTo(player.targetGoal.Position);
         float maxDist = 1000f;
-        score += (maxDist - distToGoal) * 0.5f; // 0-500 points
+        score += (maxDist - distToGoal) * 0.6f; // Increased weight
 
         // === FACTOR 2: Open Space (No Defenders Nearby) ===
-        var defendersNearTeammate = opponentDetectionArea.GetOverlappingBodies()
+        var defendersNearTeammate = player.opponentDetectionArea.GetOverlappingBodies()
             .OfType<PlayerCharacter>()
             .Where(p => p.TeamID != player.TeamID &&
                         p.Position.DistanceTo(teammate.Position) < 50f);
 
         if (!defendersNearTeammate.Any())
         {
-            score += 400f; // Big bonus for being unmarked
+            score += 500f; // Big bonus for being unmarked
         }
         else
         {
-            score -= defendersNearTeammate.Count() * 100f; // Penalty for each nearby defender
+            score -= defendersNearTeammate.Count() * 150f; // Penalty for each nearby defender
         }
 
         // === FACTOR 3: Movement Toward Goal ===
-        if (teammate.Velocity.Length() > 1f) // Teammate is moving
+        if (teammate.Velocity.Length() > 1f)
         {
             Vector2 toGoal = teammate.Position.DirectionTo(player.targetGoal.Position);
             float movementDot = teammate.Velocity.Normalized().Dot(toGoal);
 
             if (movementDot > 0.5f) // Running toward goal
             {
-                score += movementDot * 300f; // 0-300 bonus
+                score += movementDot * 400f; // Increased bonus
             }
         }
 
-        // === FACTOR 4: Passing Distance (Too Far = Risky) ===
+        // === FACTOR 4: Passing Distance (Prefer Medium Range) ===
         float passDistance = player.Position.DistanceTo(teammate.Position);
 
-        if (passDistance > 250f)
+        if (passDistance > 280f) // Was 250f
         {
-            score -= 300f; // Long pass penalty
+            score -= 400f; // Long pass penalty
         }
-        else if (passDistance < 50f)
+        else if (passDistance < 40f) // Was 50f
         {
-            score -= 100f; // Too close = wasted pass
+            score -= 150f; // Too close = wasted pass
+        }
+        else if (passDistance >= 80f && passDistance <= 150f)
+        {
+            score += 200f; // â SWEET SPOT - ideal pass range
         }
 
         // === FACTOR 5: Clear Passing Lane ===
         if (!IsPassingLaneClear(player.Position, teammate.Position))
         {
-            score -= 500f; // Huge penalty if pass likely intercepted
+            score -= 600f; // Huge penalty if pass likely intercepted
         }
 
-        // === FACTOR 6: Forward Pass Bonus ===
+        // === FACTOR 6: FORWARD PASS MASSIVE BONUS ===
         Vector2 toGoal2 = player.Position.DirectionTo(player.targetGoal.Position);
         Vector2 toTeammate = player.Position.DirectionTo(teammate.Position);
         float forwardDot = toTeammate.Dot(toGoal2);
 
-        if (forwardDot > 0.7f) // Pass toward goal
+        if (forwardDot > 0.8f) // Pass toward goal
         {
-            score += 200f;
+            score += 350f; // â INCREASED - strongly prefer forward
         }
-        else if (forwardDot < -0.3f) // Backward pass
+        else if (forwardDot > 0.4f) // Diagonal forward
         {
-            score -= 150f; // Slight penalty
+            score += 150f; // Still good
+        }
+        else if (forwardDot < -0.2f) // Backward pass
+        {
+            score -= 300f; // â HARSH PENALTY - avoid unless necessary
         }
 
         return score;
@@ -1261,5 +1336,139 @@ public partial class AIBehaviorField : AIBehavior
 
         float weight = Mathf.Clamp(currentDistance / 50f, 0.3f, 0.8f);
         return direction * weight * 0.7f;
+    }
+
+    /// <summary>
+    /// Moves player to intercept incoming passes.
+    /// </summary>
+    private Vector2 GetPassInterceptionForce()
+    {
+        // Only for loose balls (passes in flight)
+        if (ball.Carrier != null)
+            return Vector2.Zero;
+
+        // Ignore opponent passes
+        if (IsBallPossessedByOpponent())
+            return Vector2.Zero;
+
+        Vector2 ballVelocity = ball.Velocity;
+        if (ballVelocity.LengthSquared() < 4f) // Ball moving too slow
+            return Vector2.Zero;
+
+        // â Predict landing position
+        Vector2 landingSpot = ball.Position;
+
+        if (ball.Height > 1f)
+        {
+            // Ball is airborne - calculate landing point
+            float timeToGround = ball.HeightVelocity / BallState.Gravity;
+            if (timeToGround < 0) timeToGround = 0.1f; // Failsafe
+
+            landingSpot = ball.Position + ballVelocity * timeToGround;
+        }
+        else
+        {
+            // Ground pass - predict 0.5 seconds ahead
+            landingSpot = ball.Position + ballVelocity * 0.5f;
+        }
+
+        float distanceToLanding = player.Position.DistanceTo(landingSpot);
+
+        // Only intercept if within reasonable range
+        if (distanceToLanding > 180f)
+            return Vector2.Zero;
+
+        // â Move to intercept with urgency
+        Vector2 direction = player.Position.DirectionTo(landingSpot);
+        float urgency = 1f - (distanceToLanding / 180f);
+        urgency = Mathf.Pow(urgency, 1.5f); // Exponential curve
+
+        float awarenessModifier = player.GameAttributes.Awareness / 100f;
+
+        return direction * urgency * awarenessModifier * 1.4f;
+    }
+
+    /// <summary>
+    /// Defends against shots on goal.
+    /// </summary>
+    private Vector2 GetShotBlockingForce()
+    {
+        if (ball.CurrentState is not BallStateShot)
+            return Vector2.Zero;
+
+        // Only defend own goal
+        if (!ball.IsHeadedForScoringArea(player.ownGoal.GetScoringArea()))
+            return Vector2.Zero;
+
+        float distanceToBall = player.Position.DistanceTo(ball.Position);
+
+        // â INCREASED RANGE - defenders react earlier
+        if (distanceToBall > 140f) // Was 100f
+            return Vector2.Zero;
+
+        // â Calculate interception point based on ball velocity
+        Vector2 ballPath = ball.Velocity.Normalized();
+        Vector2 toBall = ball.Position - player.Position;
+        float projection = toBall.Dot(ballPath);
+
+        if (projection < 0) // Ball moving away
+            return Vector2.Zero;
+
+        // â Intercept the PATH, not the ball's current position
+        Vector2 interceptPoint = ball.Position + ballPath * Mathf.Min(projection, distanceToBall);
+        float distanceToIntercept = player.Position.DistanceTo(interceptPoint);
+
+        // â Only attempt if reachable
+        if (distanceToIntercept > 60f)
+            return Vector2.Zero;
+
+        Vector2 direction = player.Position.DirectionTo(interceptPoint);
+
+        // â DESPERATE urgency - this is a shot on goal!
+        float urgency = 1f - (distanceToIntercept / 60f);
+        urgency = Mathf.Pow(urgency, 1.5f); // Aggressive curve
+
+        float defenseModifier = player.GameAttributes.Defense / 100f;
+        float awarenessModifier = player.GameAttributes.Awareness / 100f;
+
+        // â HIGHEST PRIORITY - override everything else
+        return direction * urgency * defenseModifier * awarenessModifier * 2.5f; // Was 2.0f
+    }
+
+    /// <summary>
+    /// Recovery run when beaten by attacker.
+    /// </summary>
+    private Vector2 GetRecoveryRunForce()
+    {
+        if (!IsBallPossessedByOpponent() || ball.Carrier == null)
+            return Vector2.Zero;
+
+        // Check if carrier is between player and own goal
+        Vector2 toCarrier = player.Position.DirectionTo(ball.Carrier.Position);
+        Vector2 toGoal = player.Position.DirectionTo(player.ownGoal.Position);
+
+        bool beaten = toCarrier.Dot(toGoal) > 0.6f; // Carrier ahead of defender
+
+        if (!beaten)
+            return Vector2.Zero;
+
+        // Check if carrier is attacking (moving toward goal)
+        Vector2 carrierDirection = ball.Carrier.Velocity.Normalized();
+        Vector2 attackDirection = ball.Carrier.Position.DirectionTo(player.ownGoal.Position);
+        bool carrierAttacking = carrierDirection.Dot(attackDirection) > 0.5f;
+
+        if (!carrierAttacking)
+            return Vector2.Zero;
+
+        // â SPRINT BACK toward defensive position
+        Vector2 defensivePosition = player.ownGoal.Position +
+            (player.spawnPosition - player.ownGoal.Position).Normalized() * 80f;
+
+        Vector2 direction = player.Position.DirectionTo(defensivePosition);
+        float distance = player.Position.DistanceTo(defensivePosition);
+
+        float urgency = Mathf.Clamp(distance / 150f, 0.5f, 1.0f);
+
+        return direction * urgency * 1.5f; // Override all other behaviors
     }
 }

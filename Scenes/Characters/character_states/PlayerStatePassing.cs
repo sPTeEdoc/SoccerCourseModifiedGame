@@ -48,19 +48,22 @@ public partial class PlayerStatePassing : PlayerState
 
         if (passTarget == null)
         {
-            // Vector2 heading = player.heading.Normalized();
-            // if (heading.LengthSquared() < 0.01f)
-            //     heading = player.FacingDirection; // Use last non-zero direction instead of Vector2.Down
-
-            float passPowerFactor = 0.85f + (player.GameAttributes.Passing / 100f) * 0.35f;
-            float targetDistance = 115f * passPowerFactor;
+            // â Open-field pass with improved targeting
+            float passPowerFactor = 0.85f + (player.GameAttributes.Passing / 100f) * 0.3f;
+            float targetDistance = 130f * passPowerFactor; // Increased from 115
 
             Vector2 destination = ball.Position + player.heading.Normalized() * targetDistance;
             ball.PassTo(destination, receiver: null);
         }
         else
         {
-            Vector2 predictedPos = passTarget.Position + passTarget.Velocity * 0.8f;
+            // â Targeted pass with lead prediction
+            float passDistance = player.Position.DistanceTo(passTarget.Position);
+            float estimatedTravelTime = passDistance / 200f; // Rough estimate
+
+            Vector2 predictedPos = passTarget.Position +
+                passTarget.Velocity * estimatedTravelTime * 0.9f;
+
             ball.PassTo(predictedPos, receiver: passTarget);
         }
     }
@@ -117,21 +120,65 @@ public partial class PlayerStatePassing : PlayerState
 
         var candidates = teammateDetectionArea.GetOverlappingBodies()
             .OfType<PlayerCharacter>()
-            .Where(p => p != player && p.TeamID == player.TeamID)
+            .Where(p => p != player &&
+                        p.TeamID == player.TeamID &&
+                        p.role != PlayerCharacter.Role.GOALIE) // â Don't pass to keeper
             .Select(p =>
             {
                 Vector2 toTeammate = p.Position - player.Position;
                 float dist = toTeammate.Length();
                 Vector2 dir = dist > 0.001f ? toTeammate / dist : Vector2.Zero;
-                float dot = passDir.Dot(dir); // 1.0 = directly ahead, <0 = behind
-                return new { Player = p, Distance = dist, Dot = dot };
+                float dot = passDir.Dot(dir);
+
+                // â Check if passing lane is clear
+                bool laneBlocked = IsPassingLaneBlocked(player.Position, p.Position);
+                float blockPenalty = laneBlocked ? -500f : 0f;
+
+                return new
+                {
+                    Player = p,
+                    Distance = dist,
+                    Dot = dot,
+                    Score = (dot * 100f) + (dist * 0.3f) + blockPenalty
+                };
             })
-            // Ignore teammates behind or sharply to the side of the passer
-            .Where(x => x.Dot > 0.2f)
-            // Score candidates favoring forward alignment and downfield distance
-            .OrderByDescending(x => (x.Dot * 120f) + (x.Distance * 0.4f))
+            .Where(x => x.Dot > 0.3f) // Must be somewhat forward
+            .OrderByDescending(x => x.Score)
             .ToList();
 
         return candidates.Count > 0 ? candidates[0].Player : null;
+    }
+
+    /// <summary>
+    /// Checks if opponents block the passing lane.
+    /// </summary>
+    private bool IsPassingLaneBlocked(Vector2 start, Vector2 end)
+    {
+        var opponents = player.opponentDetectionArea.GetOverlappingBodies()
+            .OfType<PlayerCharacter>()
+            .Where(p => p.TeamID != player.TeamID);
+
+        Vector2 passDirection = (end - start).Normalized();
+        float passLength = start.DistanceTo(end);
+
+        foreach (var opponent in opponents)
+        {
+            Vector2 toOpponent = opponent.Position - start;
+            float projection = toOpponent.Dot(passDirection);
+
+            // Only check opponents in the path
+            if (projection > 0 && projection < passLength)
+            {
+                Vector2 closestPoint = start + passDirection * projection;
+                float distanceToLane = closestPoint.DistanceTo(opponent.Position);
+
+                if (distanceToLane < 35f) // Within interception range
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

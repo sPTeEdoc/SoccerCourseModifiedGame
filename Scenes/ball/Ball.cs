@@ -3,17 +3,18 @@ using System;
 
 public partial class Ball : AnimatableBody2D
 {
-    public const float BOUNCINESS = 0.8f;
-    private const int DISTANCE_HIGH_PASS = 120;
+    public const float BOUNCINESS = 0.65f; // â Reduced from 0.8 (less pinball-like)
+    private const int DISTANCE_HIGH_PASS = 140; // â Increased from 120
     private const int DURATION_TUMBLE_LOCK = 200;
-    private const int DURATION_PASS_LOCK = 500;
+    private const int DURATION_PASS_LOCK = 400; // â Reduced from 500
     private const float KICKOFF_PASS_DISTANCE = 89f;
     private const float TUMBLE_HEIGHT_VELOCITY = 3f;
 
-    public enum State { CARRIED, FREEFORM, SHOT }
+    // â CRITICAL: Adjust these to match what you declared in the inspector
+    [Export] public float FrictionAir { get; set; } = 25f;  // Was 35
+    [Export] public float FrictionGround { get; set; } = 420f; // Was 350
 
-    [Export] public float FrictionAir { get; set; }
-    [Export] public float FrictionGround { get; set; }
+    public enum State { CARRIED, FREEFORM, SHOT }
 
     private AnimationPlayer animationPlayer;
     private Sprite2D ballSprite;
@@ -24,7 +25,7 @@ public partial class Ball : AnimatableBody2D
     private RayCast2D scoringRaycast;
     private GpuParticles2D shotParticles;
 
-    public PlayerCharacter Carrier {get; set; } = null;
+    public PlayerCharacter Carrier { get; set; } = null;
     public BallState CurrentState = null;
     public float Height = 0f;
     public float HeightVelocity = 0f;
@@ -91,36 +92,60 @@ public partial class Ball : AnimatableBody2D
     {
         Vector2 direction = (destination - Position).Normalized();
         float rawDistance = Position.DistanceTo(destination);
-        float effectiveDistance = Mathf.Max(rawDistance, 80f);
+        float effectiveDistance = Mathf.Max(rawDistance, 60f); // Minimum pass distance
 
-        float intensity = Mathf.Sqrt(2 * effectiveDistance * FrictionGround);
+        // â SENSIBLE SOCCER PHYSICS: Use CONSTANT velocity, not deceleration model
+        // Passes should be FAST and direct, not physics-simulated rolling
+        float basePassSpeed = 280f; // Was solving for deceleration - now fixed speed
 
+        // â Distance scaling - longer passes slightly faster (not exponential)
+        float distanceMultiplier = 1f + Mathf.Clamp((effectiveDistance - 100f) / 300f, 0f, 0.35f);
+        float passSpeed = basePassSpeed * distanceMultiplier;
+
+        // â Passing skill affects ACCURACY, not speed
         if (Carrier != null)
         {
-            float ratingFactor = Mathf.InverseLerp(50f, 99f, Carrier.GameAttributes.Passing);
-            intensity *= Mathf.Lerp(0.9f, 1.1f, ratingFactor);
+            float passingSkill = Carrier.GameAttributes.Passing;
+            float skillFactor = Mathf.InverseLerp(50f, 99f, passingSkill);
+
+            // â Accuracy deviation (not power bonus)
+            float maxDeviation = Mathf.Lerp(8f, 1.5f, skillFactor); // 8Â° to 1.5Â° error
+            float angleError = (GD.Randf() * 2f - 1f) * maxDeviation;
+            direction = direction.Rotated(Mathf.DegToRad(angleError));
         }
 
-        Velocity = direction * intensity;
+        Velocity = direction * passSpeed;
 
-        if (rawDistance > DISTANCE_HIGH_PASS && BallState.Gravity > 0)
+        // â GROUND PASSES BY DEFAULT - only lob if distance > 180px
+        bool shouldLob = rawDistance > 180f;
+
+        if (shouldLob)
         {
-            HeightVelocity = BallState.Gravity * rawDistance / (1.85f * intensity);
+            // â LOW, FAST lob (not slow floaty arc)
+            HeightVelocity = 4.5f; // Was 6-8, now much flatter
+            Height = 2f; // Start slightly elevated
+        }
+        else
+        {
+            // Ground pass - zero height
+            HeightVelocity = 0f;
+            Height = 0f;
         }
 
-        // Capture passer reference before clearing Carrier
+        // Store passer reference BEFORE clearing Carrier
         PlayerCharacter passer = Carrier;
+        Carrier = null;
 
-        // Switch state FIRST
-        SwitchState(State.FREEFORM, BallStateData.Build().SetLockDuration(lockDuration));
+        // Transition to freeform state
+        SwitchState(State.FREEFORM, BallStateData.Build()
+            .SetLockDuration(lockDuration)
+            .SetPassReceiver(receiver));
 
-        // Store passer exception explicitly if state transition cleared ball.Carrier
-        if (CurrentState is BallStateFreeform freeformState && passer != null)
+        // Prevent immediate re-capture by passer
+        if (CurrentState is BallStateFreeform && passer != null)
         {
             AddCollisionExceptionWith(passer);
         }
-
-        Carrier = null;
     }
 
     public void Stop()
@@ -164,7 +189,7 @@ public partial class Ball : AnimatableBody2D
 
     private void OnTeamReset()
     {
-        
+
         Position = spawnPosition;
         Velocity = Vector2.Zero;
         Height = 0f;

@@ -4,16 +4,20 @@ using System;
 public partial class BallStateFreeform : BallState
 {
     private const float MaxCaptureHeight = 25f;
+    private const float MagnetRadius = 30f; // â NEW - pull ball toward receiver
     private ulong timeSinceFreeform;
     private PlayerCharacter previousCarrier;
+    private PlayerCharacter intendedReceiver; // â NEW
 
     public override void _EnterTree()
     {
         playerDetectionArea.BodyEntered += OnPlayerEnter;
         timeSinceFreeform = Time.GetTicksMsec();
 
-        // Store and temporarily ignore the player who just passed/kicked the ball
+        // Store passer and intended receiver
         previousCarrier = ball.Carrier;
+        intendedReceiver = stateData.PassReceiver; // â NEW
+
         if (previousCarrier != null)
         {
             ball.AddCollisionExceptionWith(previousCarrier);
@@ -25,7 +29,6 @@ public partial class BallStateFreeform : BallState
         if (playerDetectionArea != null)
             playerDetectionArea.BodyEntered -= OnPlayerEnter;
 
-        // Clean up collision exception when leaving freeform
         if (previousCarrier != null)
         {
             ball.RemoveCollisionExceptionWith(previousCarrier);
@@ -37,8 +40,9 @@ public partial class BallStateFreeform : BallState
     {
         if (body is PlayerCharacter p && p.CanCarryBall() && ball.Height < MaxCaptureHeight)
         {
-            // Don't allow the passer to re-claim their own pass during the lock window
-            if (p == previousCarrier && (Time.GetTicksMsec() - timeSinceFreeform) < (ulong)stateData.LockDuration)
+            // â Don't allow passer to immediately reclaim during lock window
+            if (p == previousCarrier &&
+                (Time.GetTicksMsec() - timeSinceFreeform) < (ulong)stateData.LockDuration)
                 return;
 
             ball.Carrier = p;
@@ -52,13 +56,35 @@ public partial class BallStateFreeform : BallState
     {
         float floatDelta = (float)delta;
 
+        // Enable collision detection after lock period expires
         playerDetectionArea.Monitoring =
             (Time.GetTicksMsec() - timeSinceFreeform) > (ulong)stateData.LockDuration;
 
         SetBallAnimationFromVelocity();
 
-        float friction = ball.Height > 0 ? ball.FrictionAir : ball.FrictionGround;
+        // â IMPROVED FRICTION: Match new pass physics
+        float friction = ball.Height > 1f ? 35f : 450f; // Slightly higher ground friction
         ball.Velocity = ball.Velocity.MoveToward(Vector2.Zero, friction * floatDelta);
+
+        // â STRONGER MAGNETIC PULL toward intended receiver
+        if (intendedReceiver != null && ball.Height <= MaxCaptureHeight)
+        {
+            float distanceToReceiver = ball.Position.DistanceTo(intendedReceiver.Position);
+
+            // â DOUBLED MAGNET RANGE
+            float magnetRadius = 65f; // Was 30f
+
+            if (distanceToReceiver < magnetRadius)
+            {
+                // â MUCH STRONGER PULL (nearly guaranteed connection if close)
+                Vector2 toReceiver = ball.Position.DirectionTo(intendedReceiver.Position);
+                float pullStrength = (magnetRadius - distanceToReceiver) / magnetRadius;
+                pullStrength = Mathf.Pow(pullStrength, 0.8f); // Gentler curve for smoothness
+
+                // â TRIPLED PULL FORCE
+                ball.Velocity += toReceiver * pullStrength * 360f * floatDelta; // Was 120f
+            }
+        }
 
         ProcessGravity(floatDelta, Ball.BOUNCINESS);
         MoveAndBounce(floatDelta);

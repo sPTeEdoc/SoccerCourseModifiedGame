@@ -56,10 +56,12 @@ public partial class PlayerStateMoving : PlayerState
         {
             if (player.HasBall())
             {
-                TransitionState(PlayerCharacter.State.PREPPING_SHOT);
+                // â INSTANT SHOT - no prep state needed
+                TransitionState(PlayerCharacter.State.SHOOTING);
             }
             else if (ball.CanAirInteract())
             {
+                // Air interactions unchanged
                 if (player.Velocity == Vector2.Zero)
                 {
                     if (player.IsFacingTargetGoal())
