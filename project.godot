@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Behold the Kickmen Semi Clone"
-run/main_scene="uid://bxmti20vssxjy"
+run/main_scene="uid://wa40o4shmn0y"
 config/features=PackedStringArray("4.4", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 

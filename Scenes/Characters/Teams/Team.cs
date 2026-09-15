@@ -108,6 +108,47 @@ public partial class Team
         }
     }
 
+    public void ConfigureRandomLineup(ref PlayerResource[] lineup)
+    {
+        lineup[0] = this.completeRoster
+            .FindAll(x => x.Position == PlayerCharacter.OnFieldPositions.GOALIE
+            || x.Position == PlayerCharacter.OnFieldPositions.ANY)
+            .OrderByDescending(x => PlayerOverallCalculator.CalculateOverall(PlayerCharacter.OnFieldPositions.GOALIE, x)).FirstOrDefault();
+
+        List<PlayerResource> defenderLists = new List<PlayerResource>();
+        List<PlayerResource> midfielderLists = new List<PlayerResource>();
+        List<PlayerResource> forwardsLists = new List<PlayerResource>();
+
+        defenderLists = this.completeRoster
+                .Where(x => x.Position == PlayerCharacter.OnFieldPositions.DEFENSE).ToList();
+        midfielderLists = this.completeRoster
+                        .Where(x => x.Position == PlayerCharacter.OnFieldPositions.MIDFIELD).ToList();
+        forwardsLists = this.completeRoster
+                        .Where(x => x.Position == PlayerCharacter.OnFieldPositions.FORWARD).ToList();
+
+        GameManagement.Instance.Shuffle(defenderLists);
+        GameManagement.Instance.Shuffle(midfielderLists);
+        GameManagement.Instance.Shuffle(forwardsLists);
+
+        int index = 1;
+
+        for (int i = 0; i < NumberOfDefenders(); i++)
+        {
+            lineup[index] = defenderLists[i];
+            index++;
+        }
+        for (int i = 0; i < NumberOfMidfielders(); i++)
+        {
+            lineup[index] = midfielderLists[i];
+            index++;
+        }
+        for (int i = 0; i < NumberOfForwards(); i++)
+        {
+            lineup[index] = forwardsLists[i];
+            index++;
+        }
+    }
+
     public int NumberOfDefenders()
     {
         switch (Formation)

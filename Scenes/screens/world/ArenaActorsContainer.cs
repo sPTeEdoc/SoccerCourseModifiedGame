@@ -18,6 +18,10 @@ public partial class ArenaActorsContainer : Node2D
     private Node2D spawns;
     private Node2D preentrance;
     private Node2D entrance;
+    private Node2D goalkeeper;
+    private List<Node2D> defenders = new List<Node2D>();
+    private List<Node2D> midfielders = new List<Node2D>();
+    private List<Node2D> forwards = new List<Node2D>();
 
     private bool isCheckingForKickoffReadiness = false;
     private bool isHalfTransitioning = false;
@@ -37,6 +41,10 @@ public partial class ArenaActorsContainer : Node2D
     public SoundPlayer soundPlayer;
     [Export] private CollisionShape2D collisionShape;
     [Export] private StaticBody2D wallDetectionArea;
+    int defenderAssigned = 0;
+    int midfieldersAssigned = 0;
+    int forwardsAssigned = 0;
+    int numberPerSide = 7;
 
     public override void _ExitTree()
     {
@@ -54,6 +62,13 @@ public partial class ArenaActorsContainer : Node2D
         soundPlayer = GetNode<SoundPlayer>("/root/SoundPlayer");
         kickoffs = GetNode<Node2D>("KickOffs");
         spawns = GetNode<Node2D>("Spawns");
+        goalkeeper = spawns.GetChild<Node2D>(0);
+        for (int i = 1; i < 6; i++)
+            defenders.Add(spawns.GetChild<Node2D>(i));
+        for (int i = 6; i < 11; i++)
+            midfielders.Add(spawns.GetChild<Node2D>(i));
+        for (int i = 11; i < 16; i++)
+            forwards.Add(spawns.GetChild<Node2D>(i));
 
         gameEvents = GetNode<GameEvents>("/root/GameEvents");
         gameManager = GetNode<GameManager>("/root/GameManager");
@@ -65,6 +80,11 @@ public partial class ArenaActorsContainer : Node2D
 
         gameManager.currentMatch = new Match(GameManagement.Instance.TeamsDictionary[2].TeamID,
             GameManagement.Instance.TeamsDictionary[3].TeamID);
+
+        GameManagement.Instance.TeamsDictionary[2].Formation = GameManagement.Instance.TeamsDictionary[2].SevenASide;
+        GameManagement.Instance.TeamsDictionary[3].Formation = GameManagement.Instance.TeamsDictionary[3].SevenASide;
+        GameManagement.Instance.TeamsDictionary[2].ConfigureRandomLineup(ref GameManagement.Instance.TeamsDictionary[2].startingSeven);
+        GameManagement.Instance.TeamsDictionary[3].ConfigureRandomLineup(ref GameManagement.Instance.TeamsDictionary[3].startingSeven);
 
         preentrance = GetNode<Node2D>("Preentrance");
         entrance = GetNode<Node2D>("Entrance");
@@ -218,6 +238,34 @@ public partial class ArenaActorsContainer : Node2D
 
             // Recalculate target positions based on new goal side
             Vector2 playerPosition = spawns.GetChild<Node2D>(i).GlobalPosition;
+            if (player.role == PlayerCharacter.OnFieldPositions.GOALIE)
+                playerPosition = goalkeeper.GlobalPosition;
+            else
+            {
+                Team team = GameManagement.Instance.TeamsDictionary[player.TeamID];
+                if (player.role == PlayerCharacter.OnFieldPositions.DEFENSE)
+                {
+                    if (team.NumberOfDefenders() % 2 == 0 && defenderAssigned == 0)
+                        defenderAssigned++;
+                    playerPosition = defenders[defenderAssigned].GlobalPosition;
+                    defenderAssigned++;
+                }
+
+                else if (player.role == PlayerCharacter.OnFieldPositions.MIDFIELD)
+                {
+                    if (team.NumberOfMidfielders() % 2 == 0 && midfieldersAssigned == 0)
+                        midfieldersAssigned++;
+                    playerPosition = midfielders[midfieldersAssigned].GlobalPosition;
+                    midfieldersAssigned++;
+                }
+                else
+                {
+                    if (team.NumberOfForwards() % 2 == 0 && forwardsAssigned == 0)
+                        forwardsAssigned++;
+                    playerPosition = forwards[forwardsAssigned].GlobalPosition;
+                    forwardsAssigned++;
+                }
+            }
             Vector2 entrancePosition = entrance.GetChild<Node2D>(i).GlobalPosition;
             Vector2 preentrancePosition = preentrance.GetChild<Node2D>(0).GlobalPosition;
 
@@ -254,15 +302,55 @@ public partial class ArenaActorsContainer : Node2D
     private List<PlayerCharacter> SpawnPlayers(int teamID, ArenaGoal ownGoal)
     {
         var playerNodes = new List<PlayerCharacter>();
-        PlayerResource[] players = dataLoader.GetStartingEleven(teamID);
+        PlayerResource[] players = dataLoader.GetStartingSeven(teamID);
         var targetGoal = ownGoal == SouthGoal ? NorthGoal : SouthGoal;
 
         float halfwayY = 485f;
+        defenderAssigned = 0;
+        midfieldersAssigned = 0;
+        forwardsAssigned = 0;
 
         for (int i = 0; i < players.Length; i++)
         {
             var spawnNode = spawns.GetChild<Node2D>(i);
             Vector2 playerPosition = spawnNode.GlobalPosition;
+            var playerData = players[i] as PlayerResource;
+            if (playerData.Position == PlayerCharacter.OnFieldPositions.GOALIE)
+                playerPosition = goalkeeper.GlobalPosition;
+            else
+            {
+                Team team = GameManagement.Instance.TeamsDictionary[playerData.TeamID];
+                if (playerData.Position == PlayerCharacter.OnFieldPositions.DEFENSE)
+                {
+                    if (team.NumberOfDefenders() % 2 == 0 && defenderAssigned == 0)
+                        defenderAssigned++;
+                    playerPosition = defenders[defenderAssigned].GlobalPosition;
+                    defenderAssigned++;
+                }
+
+                else if (playerData.Position == PlayerCharacter.OnFieldPositions.MIDFIELD)
+                {
+                    if (team.NumberOfMidfielders() % 2 == 0 && midfieldersAssigned == 0)
+                        midfieldersAssigned++;
+                    playerPosition = midfielders[midfieldersAssigned].GlobalPosition;
+                    midfieldersAssigned++;
+                }
+                else
+                {
+                    if (team.NumberOfForwards() % 2 == 0 && forwardsAssigned == 0)
+                        forwardsAssigned++;
+                    if (team.Formation == Enums.Formations.FourThreeThree)
+                    {
+                        playerPosition = forwards[forwardsAssigned + 1].GlobalPosition;
+                        // forwardsAssigned++;
+                    }
+                    else
+                    {
+                        playerPosition = forwards[forwardsAssigned].GlobalPosition;
+                    }
+                    forwardsAssigned++;
+                }
+            }
             var entranceNode = entrance.GetChild<Node2D>(i);
             Vector2 entrancePosition = entranceNode.GlobalPosition;
             var preentranceNode = preentrance.GetChild<Node2D>(0);
@@ -275,12 +363,10 @@ public partial class ArenaActorsContainer : Node2D
                 preentrancePosition.Y = 2 * halfwayY - preentrancePosition.Y;
             }
 
-            var playerData = players[i] as PlayerResource;
-
             Vector2 kickoffPosition;
-            if (i > 8)
+            if (i > (numberPerSide - 3))
             {
-                kickoffPosition = kickoffs.GetChild<Node2D>(i - 9).GlobalPosition;
+                kickoffPosition = kickoffs.GetChild<Node2D>(i - (numberPerSide - 2)).GlobalPosition;
 
                 if (ownGoal == NorthGoal)
                 {
@@ -294,7 +380,7 @@ public partial class ArenaActorsContainer : Node2D
 
             var player = SpawnPlayer(playerPosition, kickoffPosition, ownGoal, targetGoal, playerData, teamID, preentrancePosition, entrancePosition);
             player.PlayerID = playerData.PlayerID;
-            if (i == 10)
+            if (i == (numberPerSide - 1))
                 player.IsKickingOffPlayer = true;
             playerNodes.Add(player);
         }
@@ -415,7 +501,6 @@ public partial class ArenaActorsContainer : Node2D
                     ball.Carrier = player;
                     ball.Carrier.gameManager.currentMatch.LastBallCarrier = player.PlayerID;
                 }
-
             }
         }
 
@@ -445,13 +530,13 @@ public partial class ArenaActorsContainer : Node2D
         if (gameManager.IsCoop())
         {
             var playerSquad = squadHome[0].TeamID == p1Team ? squadHome : squadAway;
-            playerSquad[10].SetControlScheme(PlayerCharacter.ControlScheme.P1);
-            playerSquad[9].SetControlScheme(PlayerCharacter.ControlScheme.P2);
+            playerSquad[numberPerSide - 1].SetControlScheme(PlayerCharacter.ControlScheme.P1);
+            playerSquad[numberPerSide - 2].SetControlScheme(PlayerCharacter.ControlScheme.P2);
         }
         else if (gameManager.IsSinglePlayer())
         {
             var playerSquad = squadHome[0].TeamID == p1Team ? squadHome : squadAway;
-            playerSquad[10].SetControlScheme(PlayerCharacter.ControlScheme.P1);
+            playerSquad[numberPerSide - 1].SetControlScheme(PlayerCharacter.ControlScheme.P1);
         }
         else
         {

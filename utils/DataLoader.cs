@@ -51,7 +51,7 @@ public partial class DataLoader : Node
                 keeper_jersey, keeper_shorts, keeper_socks);
 
             string ElevenASide = team["elevenASideFormation"].AsString();
-            string sevenASideFormation = team["elevenASideFormation"].AsString();
+            string sevenASideFormation = team["sevenASideFormation"].AsString();
             club.SevenASide = (Enums.Formations)Int32.Parse(sevenASideFormation);
             club.ElevenASide = (Enums.Formations)Int32.Parse(ElevenASide);
 

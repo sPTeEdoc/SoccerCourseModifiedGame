@@ -3341,10 +3341,10 @@ position = Vector2(359, 129)
 position = Vector2(144, 105)
 
 [node name="OffensePosition2" type="Node2D" parent="FullFieldActorsContainer/Spawns"]
-position = Vector2(102, 94)
+position = Vector2(98, 94)
 
 [node name="OffensePosition3" type="Node2D" parent="FullFieldActorsContainer/Spawns"]
-position = Vector2(180, 94)
+position = Vector2(183, 94)
 
 [node name="OffensePosition4" type="Node2D" parent="FullFieldActorsContainer/Spawns"]
 position = Vector2(-53, 86)
@@ -3410,8 +3410,9 @@ position = Vector2(272, 352)
 position = Vector2(8, 8)
 tile_set = SubResource("TileSet_uxumm")
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="Camera2D" type="Camera2D" parent="." node_paths=PackedStringArray("Ball")]
 script = ExtResource("4_33rkm")
+Ball = NodePath("../FullFieldActorsContainer/Ball")
 
 [node name="GoalNorth" type="Node2D" parent="." node_paths=PackedStringArray("LeftPost", "RightPost", "backNetAreaUpper", "backNetAreaLeft", "backNetAreaRight", "scoringArea", "layer", "ballAtBackOfNet", "ballAwayFromBackOfNet", "crossBarPlus")]
 position = Vector2(231, 71)

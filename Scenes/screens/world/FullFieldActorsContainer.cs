@@ -530,13 +530,13 @@ public partial class FullFieldActorsContainer : Node2D
         if (gameManager.IsCoop())
         {
             var playerSquad = squadHome[0].TeamID == p1Team ? squadHome : squadAway;
-            playerSquad[10].SetControlScheme(PlayerCharacter.ControlScheme.P1);
-            playerSquad[9].SetControlScheme(PlayerCharacter.ControlScheme.P2);
+            playerSquad[numberPerSide - 1].SetControlScheme(PlayerCharacter.ControlScheme.P1);
+            playerSquad[numberPerSide - 2].SetControlScheme(PlayerCharacter.ControlScheme.P2);
         }
         else if (gameManager.IsSinglePlayer())
         {
             var playerSquad = squadHome[0].TeamID == p1Team ? squadHome : squadAway;
-            playerSquad[10].SetControlScheme(PlayerCharacter.ControlScheme.P1);
+            playerSquad[numberPerSide - 1].SetControlScheme(PlayerCharacter.ControlScheme.P1);
         }
         else
         {
