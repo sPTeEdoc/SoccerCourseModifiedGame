@@ -17,6 +17,8 @@ public partial class Arena : Screen
         gameEvents.Connect("GameOver", new Callable(this, nameof(OnGameOver)));
 
         gameManager.StartGame();
+
+        GameManagement.Instance.IsOnPracticeField = false;
     }
 
     private void OnGameOver(string winner)

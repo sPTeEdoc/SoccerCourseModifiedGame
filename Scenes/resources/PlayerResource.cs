@@ -7,7 +7,7 @@ public partial class PlayerResource : Resource
     [Export] public int PlayerID { get; set; }
     [Export] public string SkinColor { get; set; }
     [Export] public string HairColor { get; set; }
-    [Export] public PlayerCharacter.Role Role { get; set; }
+    [Export] public PlayerCharacter.OnFieldPositions Position { get; set; }
     [Export] public int Number { get; set; }
     [Export] public int TeamID { get; set; }
     [Export] public bool IsCaptain { get; set; }
@@ -34,7 +34,7 @@ public partial class PlayerResource : Resource
 
     public PlayerResource() { }
 
-    public PlayerResource(int id,  string firstName, string lastName, string altName, string skin, string hairColor, PlayerCharacter.Role role, int number, 
+    public PlayerResource(int id,  string firstName, string lastName, string altName, string skin, string hairColor, PlayerCharacter.OnFieldPositions role, int number, 
         int teamID, int offense,
         int defense, int awareness, int shooting, int passing, int speed, int dribble, int strength,
         int toughness, int athleticism, int popularity, int header, int save, int reflexes,
@@ -46,7 +46,7 @@ public partial class PlayerResource : Resource
         AltName = altName;
         SkinColor = skin;
         HairColor = hairColor;
-        Role = role;
+        Position = role;
         Number = number;
         TeamID = teamID;
         IsCaptain = isCaptain;

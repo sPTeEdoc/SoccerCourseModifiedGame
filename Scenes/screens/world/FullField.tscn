@@ -11,7 +11,7 @@
 [ext_resource type="Script" uid="uid://pm0ohsk840fl" path="res://Scenes/screens/world/FullFieldActorsContainer.cs" id="5_fabbr"]
 [ext_resource type="PackedScene" uid="uid://ca75kttltlbq0" path="res://Scenes/ui/SensiUI.tscn" id="10_fabbr"]
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_3a32w"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fabbr"]
 texture = ExtResource("1_33rkm")
 0:0/0 = 0
 1:0/0 = 0
@@ -29,7 +29,7 @@ texture = ExtResource("1_33rkm")
 3:2/0 = 0
 4:2/0 = 0
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fabbr"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_vo6gb"]
 texture = ExtResource("2_3a32w")
 0:0/0 = 0
 1:0/0 = 0
@@ -48,10 +48,10 @@ texture = ExtResource("2_3a32w")
 4:2/0 = 0
 
 [sub_resource type="TileSet" id="TileSet_jlbvx"]
-sources/0 = SubResource("TileSetAtlasSource_3a32w")
-sources/1 = SubResource("TileSetAtlasSource_fabbr")
+sources/0 = SubResource("TileSetAtlasSource_fabbr")
+sources/1 = SubResource("TileSetAtlasSource_vo6gb")
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_vo6gb"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_55va1"]
 texture = ExtResource("1_jlbvx")
 0:0/0 = 0
 1:0/0 = 0
@@ -2935,9 +2935,9 @@ texture = ExtResource("1_jlbvx")
 47:59/0 = 0
 
 [sub_resource type="TileSet" id="TileSet_vo6gb"]
-sources/1 = SubResource("TileSetAtlasSource_vo6gb")
+sources/1 = SubResource("TileSetAtlasSource_55va1")
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_55va1"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_tj7c4"]
 texture = ExtResource("1_gqbm7")
 0:0/0 = 0
 1:0/0 = 0
@@ -3229,7 +3229,7 @@ texture = ExtResource("1_gqbm7")
 23:11/0 = 0
 
 [sub_resource type="TileSet" id="TileSet_uxumm"]
-sources/0 = SubResource("TileSetAtlasSource_55va1")
+sources/0 = SubResource("TileSetAtlasSource_tj7c4")
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_l22ec"]
 size = Vector2(6, 68)
@@ -3307,42 +3307,57 @@ position = Vector2(234, 433)
 [node name="GoaliePosition" type="Node2D" parent="FullFieldActorsContainer/Spawns"]
 position = Vector2(143.5, 369)
 
-[node name="DefensePosition" type="Node2D" parent="FullFieldActorsContainer/Spawns"]
-position = Vector2(50, 286)
+[node name="DefensePosition1" type="Node2D" parent="FullFieldActorsContainer/Spawns"]
+position = Vector2(142, 286)
 
 [node name="DefensePosition2" type="Node2D" parent="FullFieldActorsContainer/Spawns"]
-position = Vector2(235, 286)
+position = Vector2(50, 286)
 
 [node name="DefensePosition3" type="Node2D" parent="FullFieldActorsContainer/Spawns"]
-position = Vector2(-55, 244)
+position = Vector2(235, 286)
 
 [node name="DefensePosition4" type="Node2D" parent="FullFieldActorsContainer/Spawns"]
+position = Vector2(-55, 244)
+
+[node name="DefensePosition5" type="Node2D" parent="FullFieldActorsContainer/Spawns"]
 position = Vector2(374, 244)
 
-[node name="MidfieldPosition" type="Node2D" parent="FullFieldActorsContainer/Spawns"]
-position = Vector2(37, 181)
+[node name="MidfieldPosition1" type="Node2D" parent="FullFieldActorsContainer/Spawns"]
+position = Vector2(144, 181)
 
 [node name="MidfieldPosition2" type="Node2D" parent="FullFieldActorsContainer/Spawns"]
-position = Vector2(248, 181)
+position = Vector2(37, 181)
 
 [node name="MidfieldPosition3" type="Node2D" parent="FullFieldActorsContainer/Spawns"]
-position = Vector2(-53, 133)
+position = Vector2(248, 181)
 
 [node name="MidfieldPosition4" type="Node2D" parent="FullFieldActorsContainer/Spawns"]
+position = Vector2(-53, 129)
+
+[node name="MidfieldPosition5" type="Node2D" parent="FullFieldActorsContainer/Spawns"]
 position = Vector2(359, 129)
 
-[node name="OffensePosition" type="Node2D" parent="FullFieldActorsContainer/Spawns"]
-position = Vector2(72, 91)
+[node name="OffensePosition1" type="Node2D" parent="FullFieldActorsContainer/Spawns"]
+position = Vector2(144, 99)
 
 [node name="OffensePosition2" type="Node2D" parent="FullFieldActorsContainer/Spawns"]
-position = Vector2(216, 91)
+position = Vector2(102, 84)
+
+[node name="OffensePosition3" type="Node2D" parent="FullFieldActorsContainer/Spawns"]
+position = Vector2(180, 91)
+
+[node name="OffensePosition4" type="Node2D" parent="FullFieldActorsContainer/Spawns"]
+position = Vector2(-53, 86)
+
+[node name="OffensePosition5" type="Node2D" parent="FullFieldActorsContainer/Spawns"]
+position = Vector2(359, 86)
 
 [node name="KickOffs" type="Node2D" parent="FullFieldActorsContainer"]
 unique_name_in_owner = true
 position = Vector2(233, 258)
 
 [node name="KickOffPosition2" type="Node2D" parent="FullFieldActorsContainer/KickOffs"]
-position = Vector2(144, 325)
+position = Vector2(144, 305)
 
 [node name="KickOffPosition" type="Node2D" parent="FullFieldActorsContainer/KickOffs"]
 position = Vector2(144, 223)
@@ -3763,3 +3778,6 @@ position = Vector2(314, 0)
 [node name="collision" type="CollisionShape2D" parent="RightWall"]
 position = Vector2(366.5, 480)
 shape = SubResource("RectangleShape2D_7uljg")
+
+[node name="Node2D" type="Node2D" parent="."]
+position = Vector2(104, 480)

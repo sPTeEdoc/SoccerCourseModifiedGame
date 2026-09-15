@@ -208,7 +208,7 @@ public partial class AIBehaviorField : AIBehavior
                 totalSteeringForce += GetAssistFormationSteeringForce() * roleModifiers.OffensivePushMultiplier;
                 totalSteeringForce += GetIntelligentRunSteeringForce() * 0.6f;
 
-                if (player.role == PlayerCharacter.Role.DEFENSE && ShouldAttemptOverlap())
+                if (player.role == PlayerCharacter.OnFieldPositions.DEFENSE && ShouldAttemptOverlap())
                 {
                     Vector2 overlapDestination = ball.Carrier.Position + ball.Carrier.heading * 120f;
                     Vector2 overlapDirection = player.Position.DirectionTo(overlapDestination);
@@ -478,7 +478,7 @@ public partial class AIBehaviorField : AIBehavior
         var roleModifiers = GetRoleModifiers();
 
         // Ã¢ Role-based aggression
-        float roleMultiplier = player.role == PlayerCharacter.Role.DEFENSE ? 1.3f : 0.9f;
+        float roleMultiplier = player.role == PlayerCharacter.OnFieldPositions.DEFENSE ? 1.3f : 0.9f;
 
         return direction * urgency * pressIntensity * roleModifiers.TacklingAggression * roleMultiplier;
     }
@@ -486,7 +486,7 @@ public partial class AIBehaviorField : AIBehavior
     public bool ShouldAttemptOverlap()
     {
         // Only defenders
-        if (player.role != PlayerCharacter.Role.DEFENSE)
+        if (player.role != PlayerCharacter.OnFieldPositions.DEFENSE)
             return false;
 
         // Need high awareness and offense
@@ -907,7 +907,7 @@ public partial class AIBehaviorField : AIBehavior
             .OfType<PlayerCharacter>()
             .Where(p => p != player &&
                         p.TeamID == player.TeamID &&
-                        p.role != PlayerCharacter.Role.GOALIE); // Don't pass to keeper
+                        p.role != PlayerCharacter.OnFieldPositions.GOALIE); // Don't pass to keeper
 
         if (!teammates.Any())
             return null;
@@ -1054,7 +1054,7 @@ public partial class AIBehaviorField : AIBehavior
             .OfType<PlayerCharacter>()
             .Where(p => p != player &&
                         p.TeamID == player.TeamID &&
-                        p.role != PlayerCharacter.Role.GOALIE);
+                        p.role != PlayerCharacter.OnFieldPositions.GOALIE);
 
         if (!teammates.Any())
             return null;
@@ -1140,7 +1140,7 @@ public partial class AIBehaviorField : AIBehavior
     {
         switch (player.role)
         {
-            case PlayerCharacter.Role.DEFENSE:
+            case PlayerCharacter.OnFieldPositions.DEFENSE:
                 return new RoleBehaviorModifiers
                 {
                     OffensivePushMultiplier = 0.6f,  // Defenders push forward less
@@ -1151,7 +1151,7 @@ public partial class AIBehaviorField : AIBehavior
                     MaxPushUpLine = DEFENDER_PUSH_UP_LINE
                 };
 
-            case PlayerCharacter.Role.MIDFIELD:
+            case PlayerCharacter.OnFieldPositions.MIDFIELD:
                 return new RoleBehaviorModifiers
                 {
                     OffensivePushMultiplier = 1.0f,  // Balanced
@@ -1162,7 +1162,7 @@ public partial class AIBehaviorField : AIBehavior
                     MaxPushUpLine = MIDFIELDER_PUSH_UP_LINE
                 };
 
-            case PlayerCharacter.Role.OFFENSE:
+            case PlayerCharacter.OnFieldPositions.FORWARD:
                 return new RoleBehaviorModifiers
                 {
                     OffensivePushMultiplier = 1.5f,  // Push forward aggressively

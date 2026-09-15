@@ -122,7 +122,7 @@ public partial class PlayerStatePassing : PlayerState
             .OfType<PlayerCharacter>()
             .Where(p => p != player &&
                         p.TeamID == player.TeamID &&
-                        p.role != PlayerCharacter.Role.GOALIE) // â Don't pass to keeper
+                        p.role != PlayerCharacter.OnFieldPositions.GOALIE) // â Don't pass to keeper
             .Select(p =>
             {
                 Vector2 toTeammate = p.Position - player.Position;

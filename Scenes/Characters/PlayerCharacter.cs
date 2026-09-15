@@ -23,7 +23,7 @@ public partial class PlayerCharacter : CharacterBody2D
 
     // Enums
     public enum ControlScheme { CPU, P1, P2 }
-    public enum Role { GOALIE, DEFENSE, MIDFIELD, OFFENSE }
+    public enum OnFieldPositions { GOALIE, DEFENSE, MIDFIELD, FORWARD, ANY }
     public enum SkinColor { LIGHT, MEDIUM, DARK }
     public enum State
     {
@@ -76,7 +76,7 @@ public partial class PlayerCharacter : CharacterBody2D
     public float weightOnDutySteering = 0f;
 
     public int PlayerID = 0;
-    public Role role = Role.MIDFIELD;
+    public OnFieldPositions role = OnFieldPositions.MIDFIELD;
     public string skinColor = "#9c7250";
     public string hairColor = "#231709";
 
@@ -131,10 +131,10 @@ public partial class PlayerCharacter : CharacterBody2D
             // âœ… Role-based modifier
             float roleModifier = role switch
             {
-                Role.OFFENSE => 0.95f,    // Forwards best at dribbling (5% bonus)
-                Role.MIDFIELD => 1.0f,    // Midfielders neutral
-                Role.DEFENSE => 1.08f,    // Defenders worst (8% worse penalty)
-                Role.GOALIE => 1.15f,     // Goalies terrible (15% worse penalty)
+                OnFieldPositions.FORWARD => 0.95f,    // Forwards best at dribbling (5% bonus)
+                OnFieldPositions.MIDFIELD => 1.0f,    // Midfielders neutral
+                OnFieldPositions.DEFENSE => 1.08f,    // Defenders worst (8% worse penalty)
+                OnFieldPositions.GOALIE => 1.15f,     // Goalies terrible (15% worse penalty)
                 _ => 1.0f
             };
 
@@ -171,7 +171,7 @@ public partial class PlayerCharacter : CharacterBody2D
 
         if (goalieHandsCollider != null)
         {
-            goalieHandsCollider.Disabled = (role != Role.GOALIE);
+            goalieHandsCollider.Disabled = (role != OnFieldPositions.GOALIE);
         }
 
         if (!GameManagement.Instance.IsOnPracticeField)
@@ -239,7 +239,7 @@ public partial class PlayerCharacter : CharacterBody2D
                 _materialDuplicated = true;
             }
 
-            sharedMat.SetShaderParameter("is_goalkeeper", role == Role.GOALIE);
+            sharedMat.SetShaderParameter("is_goalkeeper", role == OnFieldPositions.GOALIE);
             sharedMat.SetShaderParameter("skin_color", Color.FromHtml(skinColor));
             sharedMat.SetShaderParameter("hair_color", Color.FromHtml(hairColor));
 
@@ -252,7 +252,7 @@ public partial class PlayerCharacter : CharacterBody2D
 
             if (jersey != null && !string.IsNullOrEmpty(jersey))
             {
-                if (role != Role.GOALIE)
+                if (role != OnFieldPositions.GOALIE)
                 {
                     sharedMat.SetShaderParameter("jersey_color", Color.FromHtml(jersey));
                     sharedMat.SetShaderParameter("shorts", Color.FromHtml(shorts));
@@ -275,10 +275,10 @@ public partial class PlayerCharacter : CharacterBody2D
     public void Initialize(Vector2 contextPosition, Vector2 contextKickoffPosition, Ball contextBall,
         PlayerResource contextPlayerData, int contextTeamID, bool homeTeam)
     {
-        Position = contextPosition;
+        base.Position = contextPosition;
         kickoffPosition = contextKickoffPosition;
         ball = contextBall;
-        role = contextPlayerData.Role;
+        role = contextPlayerData.Position;
         skinColor = contextPlayerData.SkinColor;
         heading = homeTeam ? Vector2.Down : Vector2.Up;
         TeamID = contextTeamID;
@@ -325,18 +325,18 @@ public partial class PlayerCharacter : CharacterBody2D
         ArenaGoal contextOwnGoal, ArenaGoal contextTargetGoal, PlayerResource contextPlayerData, int contextTeamID,
         Vector2 contextPreentrancePosition, Vector2 contextEntrancePosition)
     {
-        Position = contextPreentrancePosition;
+        base.Position = contextPreentrancePosition;
         kickoffPosition = contextKickoffPosition;
         spawnPosition = contextPosition;
 
         ball = contextBall;
         ownGoal = contextOwnGoal;
         targetGoal = contextTargetGoal;
-        role = contextPlayerData.Role;
+        role = contextPlayerData.Position;
         skinColor = contextPlayerData.SkinColor;
 
         // FIX: Compare Y coordinates for vertical field orientation instead of X
-        heading = targetGoal.Position.Y < Position.Y ? Vector2.Up : Vector2.Down;
+        heading = targetGoal.Position.Y < base.Position.Y ? Vector2.Up : Vector2.Down;
 
         TeamID = contextTeamID;
         // playerID = GameManagement.Instance.PlayerID++;
@@ -560,13 +560,13 @@ public partial class PlayerCharacter : CharacterBody2D
 
     public bool IsFacingTargetGoal()
     {
-        Vector2 directionToGoal = Position.DirectionTo(targetGoal.Position);
+        Vector2 directionToGoal = base.Position.DirectionTo(targetGoal.Position);
         return heading.Dot(directionToGoal) > 0;
     }
 
     public bool IsFacingBall(Ball ball, float angleThresholdDegrees = 45f)
     {
-        Vector2 toBall = (ball.Position - Position).Normalized();
+        Vector2 toBall = (ball.Position - base.Position).Normalized();
         float dot = heading.Dot(toBall);
         float angle = Mathf.RadToDeg(Mathf.Acos(dot));
         return angle <= angleThresholdDegrees;
@@ -642,7 +642,7 @@ public partial class PlayerCharacter : CharacterBody2D
         entrancePosition = 2 * pitchCenter - entrancePosition;
 
         // 3. Update heading and facing direction towards new target goal
-        heading = targetGoal.Position.Y < Position.Y ? Vector2.Up : Vector2.Down;
+        heading = targetGoal.Position.Y < base.Position.Y ? Vector2.Up : Vector2.Down;
     }
 
     /// <summary>

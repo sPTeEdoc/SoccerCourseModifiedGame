@@ -10,6 +10,8 @@
         "keeper_socks": "#9AFF34",
         "captain_arm_band": "#000000",
         "logo": "Nibley.png",
+        "elevenASideFormation": "1442",
+        "sevenASideFormation": "222",
         "players": [
             {
                 "id": 7,
@@ -193,6 +195,8 @@
         "keeper_socks": "#0A2B85",
         "captain_arm_band": "C8102E",
         "logo": "Carruthers.png",
+        "elevenASideFormation": "1442",
+        "sevenASideFormation": "222",
         "players": [
             {
                 "id": 8,
@@ -374,6 +378,8 @@
         "keeper_shorts": "",
         "keeper_socks": "",
         "logo": "",
+        "elevenASideFormation": "1442",
+        "sevenASideFormation": "222",
         "players": [
             {
                 "id": 1001,
@@ -498,6 +504,8 @@
         "keeper_shorts": "#DA020E",
         "keeper_socks": "#9AFF34",
         "captain_arm_band": "#000000",
+        "elevenASideFormation": "442",
+        "sevenASideFormation": "222",
         "players": [
             {
                 "id": 14,
@@ -816,6 +824,8 @@
         "keeper_shorts": "#FFFFFF",
         "keeper_socks": "#670E36",
         "captain_arm_band": "#95BFE5",
+        "elevenASideFormation": "1433",
+        "sevenASideFormation": "222",
         "players": [
             {
                 "id": 25,

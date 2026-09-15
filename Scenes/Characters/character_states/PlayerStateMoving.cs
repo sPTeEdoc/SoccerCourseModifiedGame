@@ -85,7 +85,7 @@ public partial class PlayerStateMoving : PlayerState
         }
     }
 
-    public override bool CanCarryBall() => player.role != PlayerCharacter.Role.GOALIE;
+    public override bool CanCarryBall() => player.role != PlayerCharacter.OnFieldPositions.GOALIE;
 
     private bool CanTeammatePassBall()
     {

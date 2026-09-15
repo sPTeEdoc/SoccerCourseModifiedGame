@@ -5,15 +5,15 @@ using System.Collections.Generic;
 [GlobalClass]
 public partial class AIBehaviorFactory : GodotObject
 {
-    private readonly Dictionary<PlayerCharacter.Role, Type> roles = new()
+    private readonly Dictionary<PlayerCharacter.OnFieldPositions, Type> roles = new()
     {
-        { PlayerCharacter.Role.DEFENSE, typeof(AIBehaviorField) },
-        { PlayerCharacter.Role.GOALIE, typeof(AIBehaviorGoalie) },
-        { PlayerCharacter.Role.MIDFIELD, typeof(AIBehaviorField) },
-        { PlayerCharacter.Role.OFFENSE, typeof(AIBehaviorField) }
+        { PlayerCharacter.OnFieldPositions.DEFENSE, typeof(AIBehaviorField) },
+        { PlayerCharacter.OnFieldPositions.GOALIE, typeof(AIBehaviorGoalie) },
+        { PlayerCharacter.OnFieldPositions.MIDFIELD, typeof(AIBehaviorField) },
+        { PlayerCharacter.OnFieldPositions.FORWARD, typeof(AIBehaviorField) }
     };
 
-    public AIBehavior GetAIBehavior(PlayerCharacter.Role role)
+    public AIBehavior GetAIBehavior(PlayerCharacter.OnFieldPositions role)
     {
         if (!roles.ContainsKey(role))
             throw new InvalidOperationException($"Role '{role}' doesn't exist!");

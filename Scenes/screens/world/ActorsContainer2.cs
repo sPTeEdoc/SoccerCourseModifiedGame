@@ -108,7 +108,7 @@ public partial class ActorsContainer2 : Node2D
     {
         foreach (var squad in new[] { squadAway, squadHome })
         {
-            var cpuPlayers = squad.FindAll(p => p.controlScheme == PlayerCharacter.ControlScheme.CPU && p.role != PlayerCharacter.Role.GOALIE);
+            var cpuPlayers = squad.FindAll(p => p.controlScheme == PlayerCharacter.ControlScheme.CPU && p.role != PlayerCharacter.OnFieldPositions.GOALIE);
             cpuPlayers.Sort((p1, p2) =>
                 p1.spawnPosition.DistanceSquaredTo(Ball.Position).CompareTo(p2.spawnPosition.DistanceSquaredTo(Ball.Position)));
 
@@ -147,7 +147,7 @@ public partial class ActorsContainer2 : Node2D
 
 
         var squad = requester.TeamID == squadHome[0].TeamID ? squadHome : squadAway;
-        var cpuPlayers = squad.FindAll(p => p.controlScheme == PlayerCharacter.ControlScheme.CPU && p.role != PlayerCharacter.Role.GOALIE);
+        var cpuPlayers = squad.FindAll(p => p.controlScheme == PlayerCharacter.ControlScheme.CPU && p.role != PlayerCharacter.OnFieldPositions.GOALIE);
         cpuPlayers.Sort((p1, p2) =>
             p1.Position.DistanceSquaredTo(Ball.Position).CompareTo(p2.Position.DistanceSquaredTo(Ball.Position)));
 
@@ -247,7 +247,7 @@ public partial class ActorsContainer2 : Node2D
 
         var cpuDefenders = squad.FindAll(p =>
             p.controlScheme == PlayerCharacter.ControlScheme.CPU &&
-            p.role != PlayerCharacter.Role.GOALIE);
+            p.role != PlayerCharacter.OnFieldPositions.GOALIE);
 
         if (cpuDefenders.Count == 0 || humans.Count == 0)
             return;

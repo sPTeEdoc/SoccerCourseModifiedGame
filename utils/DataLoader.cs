@@ -50,6 +50,11 @@ public partial class DataLoader : Node
             Team club = new Team(tID, teamName, jersey_color, shorts, socks,
                 keeper_jersey, keeper_shorts, keeper_socks);
 
+            string ElevenASide = team["elevenASideFormation"].AsString();
+            string sevenASideFormation = team["elevenASideFormation"].AsString();
+            club.SevenASide = (Enums.Formations)Int32.Parse(sevenASideFormation);
+            club.ElevenASide = (Enums.Formations)Int32.Parse(ElevenASide);
+
             var players = team["players"].AsGodotArray();
             foreach (Godot.Variant playerVariant in players)
             {
@@ -62,7 +67,7 @@ public partial class DataLoader : Node
                 string skin = player["skin"].AsString();
                 string hair = player["hair"].AsString();
                 skinColorCombo.Add(playerID, skin);
-                var role = (PlayerCharacter.Role)(int)player["role"];
+                var role = (PlayerCharacter.OnFieldPositions)(int)player["role"];
                 int offense = (int)player["offense"];
                 int defense = (int)player["defense"];
                 int awareness = (int)player["awareness"];
@@ -83,7 +88,7 @@ public partial class DataLoader : Node
                 var resource = new PlayerResource(playerID, firstName, lastName, altName, skin, hair, role, number, tID, offense,
                     defense, awareness, shooting, passing, speed, dribble, strength, toughness, athleticism, popularity,
                     header, save, reflexes, special, isCaptain);
-                club.startingRoster.Add(resource);
+                club.completeRoster.Add(resource);
                 GameManagement.Instance.PlayerDictionary.Add(playerID, resource);
             }
 
@@ -109,7 +114,7 @@ public partial class DataLoader : Node
 
     public List<PlayerResource> GetSquad(int teamID)
     {
-        return GameManagement.Instance.TeamsDictionary[teamID].startingRoster;
+        return GameManagement.Instance.TeamsDictionary[teamID].completeRoster;
     }
 
     public List<int> GetTeams()
