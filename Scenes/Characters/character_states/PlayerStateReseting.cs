@@ -28,12 +28,12 @@ public partial class PlayerStateReseting : PlayerState
                 player.FaceTowardsTargetGoal();
                 if (player.targetGoal.IsNorth)
                 {
-                    if (player.IsKickingOffPlayer) player.SetBufferedDirection(Vector2.Down);
+                    if (player.TeamIsKickingOff) player.SetBufferedDirection(Vector2.Down);
                     else player.SetBufferedDirection(Vector2.Up);
                 }
                 else
                 {
-                    if (player.IsKickingOffPlayer) player.SetBufferedDirection(Vector2.Up);
+                    if (player.TeamIsKickingOff) player.SetBufferedDirection(Vector2.Up);
                     else player.SetBufferedDirection(Vector2.Down);
                 }
             }

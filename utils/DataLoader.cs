@@ -112,9 +112,14 @@ public partial class DataLoader : Node
         return boolVal;
     }
 
-    public List<PlayerResource> GetSquad(int teamID)
+    public PlayerResource[] GetStartingEleven(int teamID)
     {
-        return GameManagement.Instance.TeamsDictionary[teamID].completeRoster;
+        return GameManagement.Instance.TeamsDictionary[teamID].startingEleven;
+    }
+
+    public PlayerResource[] GetStartingSeven(int teamID)
+    {
+        return GameManagement.Instance.TeamsDictionary[teamID].startingSeven;
     }
 
     public List<int> GetTeams()

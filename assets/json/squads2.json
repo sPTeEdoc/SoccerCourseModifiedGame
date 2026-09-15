@@ -504,7 +504,7 @@
         "keeper_shorts": "#DA020E",
         "keeper_socks": "#9AFF34",
         "captain_arm_band": "#000000",
-        "elevenASideFormation": "442",
+        "elevenASideFormation": "1442",
         "sevenASideFormation": "222",
         "players": [
             {
@@ -1059,7 +1059,7 @@
                 "hair": "#854C23",
                 "skin": "#FDCBB0",
                 "number": "11",
-                "role": 2,
+                "role": 3,
                 "pass": 87,
                 "offense": 87,
                 "defense": 87,

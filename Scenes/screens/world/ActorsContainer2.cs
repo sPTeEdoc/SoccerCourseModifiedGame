@@ -79,9 +79,9 @@ public partial class ActorsContainer2 : Node2D
     private List<PlayerCharacter> SpawnPlayers(int teamID, bool homeTeam)
     {
         var playerNodes = new List<PlayerCharacter>();
-        var players = dataLoader.GetSquad(teamID);
+        var players = dataLoader.GetStartingEleven(teamID);
 
-        for (int i = 0; i < players.Count; i++)
+        for (int i = 0; i < players.Length; i++)
         {
             Vector2 playerPosition = spawns.GetChild<Node2D>(i).GlobalPosition;
             var playerData = players[i] as PlayerResource;

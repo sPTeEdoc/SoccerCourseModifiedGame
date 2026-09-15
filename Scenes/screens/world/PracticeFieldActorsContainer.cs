@@ -108,12 +108,12 @@ public partial class PracticeFieldActorsContainer : Node2D
     private List<PlayerCharacter> SpawnPlayers(int teamID, ArenaGoal ownGoal)
     {
         var playerNodes = new List<PlayerCharacter>();
-        var players = dataLoader.GetSquad(teamID);
+        var players = dataLoader.GetStartingEleven(teamID);
         var targetGoal = ownGoal == SouthGoal ? NorthGoal : SouthGoal;
 
         float halfwayY = 485f; // midpoint of pitch
 
-        for (int i = 0; i < players.Count; i++)
+        for (int i = 0; i < players.Length; i++)
         {
             var spawnNode = spawns.GetChild<Node2D>(i);
             Vector2 playerPosition = spawnNode.GlobalPosition;

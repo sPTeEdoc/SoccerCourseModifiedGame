@@ -44,6 +44,7 @@ public partial class FullFieldActorsContainer : Node2D
     int defenderAssigned = 0;
     int midfieldersAssigned = 0;
     int forwardsAssigned = 0;
+    int numberPerSide = 11;
 
     public override void _ExitTree()
     {
@@ -82,6 +83,8 @@ public partial class FullFieldActorsContainer : Node2D
 
         GameManagement.Instance.TeamsDictionary[2].Formation = GameManagement.Instance.TeamsDictionary[2].ElevenASide;
         GameManagement.Instance.TeamsDictionary[3].Formation = GameManagement.Instance.TeamsDictionary[3].ElevenASide;
+        GameManagement.Instance.TeamsDictionary[2].ConfigureLineup(ref GameManagement.Instance.TeamsDictionary[2].startingEleven);
+        GameManagement.Instance.TeamsDictionary[3].ConfigureLineup(ref GameManagement.Instance.TeamsDictionary[3].startingEleven);
 
         preentrance = GetNode<Node2D>("Preentrance");
         entrance = GetNode<Node2D>("Entrance");
@@ -299,7 +302,7 @@ public partial class FullFieldActorsContainer : Node2D
     private List<PlayerCharacter> SpawnPlayers(int teamID, ArenaGoal ownGoal)
     {
         var playerNodes = new List<PlayerCharacter>();
-        List<PlayerResource> players = dataLoader.GetSquad(teamID);
+        PlayerResource[] players = dataLoader.GetStartingEleven(teamID);
         var targetGoal = ownGoal == SouthGoal ? NorthGoal : SouthGoal;
 
         float halfwayY = 485f;
@@ -307,7 +310,7 @@ public partial class FullFieldActorsContainer : Node2D
         midfieldersAssigned = 0;
         forwardsAssigned = 0;
 
-        for (int i = 0; i < players.Count; i++)
+        for (int i = 0; i < players.Length; i++)
         {
             var spawnNode = spawns.GetChild<Node2D>(i);
             Vector2 playerPosition = spawnNode.GlobalPosition;
@@ -336,7 +339,15 @@ public partial class FullFieldActorsContainer : Node2D
                 {
                     if (team.NumberOfForwards() % 2 == 0 && forwardsAssigned == 0)
                         forwardsAssigned++;
-                    playerPosition = forwards[forwardsAssigned].GlobalPosition;
+                    if (team.Formation == Enums.Formations.FourThreeThree)
+                    {
+                        playerPosition = forwards[forwardsAssigned + 1].GlobalPosition;
+                        // forwardsAssigned++;
+                    }
+                    else
+                    {
+                        playerPosition = forwards[forwardsAssigned].GlobalPosition;
+                    }
                     forwardsAssigned++;
                 }
             }
@@ -353,9 +364,9 @@ public partial class FullFieldActorsContainer : Node2D
             }
 
             Vector2 kickoffPosition;
-            if (i > 8)
+            if (i > (numberPerSide - 3))
             {
-                kickoffPosition = kickoffs.GetChild<Node2D>(i - 9).GlobalPosition;
+                kickoffPosition = kickoffs.GetChild<Node2D>(i - (numberPerSide - 2)).GlobalPosition;
 
                 if (ownGoal == NorthGoal)
                 {
@@ -369,7 +380,7 @@ public partial class FullFieldActorsContainer : Node2D
 
             var player = SpawnPlayer(playerPosition, kickoffPosition, ownGoal, targetGoal, playerData, teamID, preentrancePosition, entrancePosition);
             player.PlayerID = playerData.PlayerID;
-            if (i == 10)
+            if (i == (numberPerSide - 1))
                 player.IsKickingOffPlayer = true;
             playerNodes.Add(player);
         }
@@ -485,12 +496,11 @@ public partial class FullFieldActorsContainer : Node2D
             {
                 if (!player.IsReadyForKickoff())
                     return;
-                if (gameManager.currentMatch.TeamKickingOff == player.TeamID)
-                    if (player.IsKickingOffPlayer)
-                    {
-                        ball.Carrier = player;
-                        ball.Carrier.gameManager.currentMatch.LastBallCarrier = player.PlayerID;
-                    }
+                if (player.TeamIsKickingOff)
+                {
+                    ball.Carrier = player;
+                    ball.Carrier.gameManager.currentMatch.LastBallCarrier = player.PlayerID;
+                }
             }
         }
 

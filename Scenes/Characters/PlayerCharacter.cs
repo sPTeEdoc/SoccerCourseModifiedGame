@@ -89,6 +89,7 @@ public partial class PlayerCharacter : CharacterBody2D
     public bool IsReadyToGoToKickoffSpots() => currentState != null && currentState.IsReadyToGoToKickoffSpots();
     public bool IsReadyForKickoff() => currentState != null && currentState.IsReadyForKickoff();
     public bool IsKickingOffPlayer = false;
+    public bool TeamIsKickingOff => IsKickingOffPlayer && gameManager.currentMatch.TeamKickingOff == TeamID;
     public bool InputLocked { get; set; } = false;
     public static float PASS_DISTANCE { get; set; } = 140f; // Increased default open-field pass distance
     public PlayerAttributes TrueAttributes { get; set; } = new PlayerAttributes();

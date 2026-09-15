@@ -254,12 +254,12 @@ public partial class ArenaActorsContainer : Node2D
     private List<PlayerCharacter> SpawnPlayers(int teamID, ArenaGoal ownGoal)
     {
         var playerNodes = new List<PlayerCharacter>();
-        List<PlayerResource> players = dataLoader.GetSquad(teamID);
+        PlayerResource[] players = dataLoader.GetStartingEleven(teamID);
         var targetGoal = ownGoal == SouthGoal ? NorthGoal : SouthGoal;
 
         float halfwayY = 485f;
 
-        for (int i = 0; i < players.Count; i++)
+        for (int i = 0; i < players.Length; i++)
         {
             var spawnNode = spawns.GetChild<Node2D>(i);
             Vector2 playerPosition = spawnNode.GlobalPosition;
@@ -410,12 +410,12 @@ public partial class ArenaActorsContainer : Node2D
             {
                 if (!player.IsReadyForKickoff())
                     return;
-                if (gameManager.currentMatch.TeamKickingOff == player.TeamID)
-                    if (player.IsKickingOffPlayer)
-                    {
-                        ball.Carrier = player;
-                        ball.Carrier.gameManager.currentMatch.LastBallCarrier = player.PlayerID;
-                    }
+                if (player.TeamIsKickingOff)
+                {
+                    ball.Carrier = player;
+                    ball.Carrier.gameManager.currentMatch.LastBallCarrier = player.PlayerID;
+                }
+
             }
         }
 

@@ -14,7 +14,8 @@ public partial class Team
     public string keeper_shorts = "#0A0A0A";
     public string keeper_socks = "#9AFF34";
     public List<PlayerResource> completeRoster = new List<PlayerResource>();
-    public List<PlayerResource> fieldedPosition = new List<PlayerResource>();
+    public PlayerResource[] startingEleven = new PlayerResource[11];
+    public PlayerResource[] startingSeven = new PlayerResource[7];
     public Vector2 Direction = Vector2.Up;
     public bool TeamIsKickingOff = false;
     public Enums.Formations ElevenASide = Enums.Formations.FourFourTwo;
@@ -34,71 +35,76 @@ public partial class Team
         this.keeper_socks = keeper_socks;
     }
 
-    public void RedefinePositions()
+    public void RedefinePositions(PlayerResource[] lineup)
     {
         int numberAlreadyAssigned = 1;
-        fieldedPosition[0].Position = PlayerCharacter.OnFieldPositions.GOALIE;
+        lineup[0].Position = PlayerCharacter.OnFieldPositions.GOALIE;
         int numberAssignedPrev = numberAlreadyAssigned;
-        for (int i = NumberOfDefenders() + numberAlreadyAssigned; i > numberAssignedPrev; i--)
+        for (int i = NumberOfDefenders() + numberAlreadyAssigned; i >= numberAssignedPrev; i--)
         {
-            fieldedPosition[i - 1].Position = PlayerCharacter.OnFieldPositions.DEFENSE;
-            numberAlreadyAssigned++;
-        }
-        for (int i = NumberOfMidfielders() + numberAlreadyAssigned; i > numberAssignedPrev; i--)
-        {
-            fieldedPosition[i - 1].Position = PlayerCharacter.OnFieldPositions.MIDFIELD;
+            lineup[i - 1].Position = PlayerCharacter.OnFieldPositions.DEFENSE;
             numberAlreadyAssigned++;
         }
         numberAssignedPrev = numberAlreadyAssigned;
-        for (int i = NumberOfForwards() + numberAlreadyAssigned; i > numberAssignedPrev; i--)
+        for (int i = NumberOfMidfielders() + numberAlreadyAssigned; i >= numberAssignedPrev; i--)
         {
-            fieldedPosition[i - 1].Position = PlayerCharacter.OnFieldPositions.FORWARD;
+            lineup[i].Position = PlayerCharacter.OnFieldPositions.MIDFIELD;
+            numberAlreadyAssigned++;
+        }
+        numberAssignedPrev = numberAlreadyAssigned;
+        for (int i = NumberOfForwards() + numberAlreadyAssigned; i >= numberAssignedPrev; i--)
+        {
+            lineup[i].Position = PlayerCharacter.OnFieldPositions.FORWARD;
         }
     }
 
-    public void ConfigureRoster(int maxStartingLineupSize)
+    public void ConfigureLineup(ref PlayerResource[] lineup)
     {
-        for (int i = 0; i < maxStartingLineupSize; i++)
+        for (int i = 0; i < lineup.Length; i++)
         {
-            fieldedPosition[i].Position = PlayerCharacter.OnFieldPositions.ANY;
+            if (lineup[i] is not null) lineup[i].Position = PlayerCharacter.OnFieldPositions.ANY;
         }
 
-        fieldedPosition[0] = this.completeRoster
+        lineup[0] = this.completeRoster
             .FindAll(x => x.Position == PlayerCharacter.OnFieldPositions.GOALIE
             || x.Position == PlayerCharacter.OnFieldPositions.ANY)
             .OrderByDescending(x => PlayerOverallCalculator.CalculateOverall(PlayerCharacter.OnFieldPositions.GOALIE, x)).FirstOrDefault();
         var selectedPlayers = new HashSet<PlayerResource>();
-        fieldedPosition[0].Position = PlayerCharacter.OnFieldPositions.GOALIE;
+        selectedPlayers.Add(lineup[0]);
+        lineup[0].Position = PlayerCharacter.OnFieldPositions.GOALIE;
 
         int numberAlreadyAssigned = 1;
         int numberAssignedPrev = numberAlreadyAssigned;
         for (int i = NumberOfDefenders() + numberAlreadyAssigned; i > numberAssignedPrev; i--)
         {
-            fieldedPosition[i] = this.completeRoster
-                .Where(x => !selectedPlayers.Contains(x) && (x.Position == PlayerCharacter.OnFieldPositions.DEFENSE || x.Position == PlayerCharacter.OnFieldPositions.ANY))
+            lineup[i - 1] = this.completeRoster
+                .Where(x => (x.IsCaptain && !selectedPlayers.Contains(x)) || (!selectedPlayers.Contains(x) && (x.Position == PlayerCharacter.OnFieldPositions.DEFENSE || x.Position == PlayerCharacter.OnFieldPositions.ANY)))
                 .OrderByDescending(x => PlayerOverallCalculator.CalculateOverall(PlayerCharacter.OnFieldPositions.DEFENSE, x))
                 .FirstOrDefault();
-            if (fieldedPosition[i] != null) selectedPlayers.Add(fieldedPosition[i]);
-            fieldedPosition[i].Position = PlayerCharacter.OnFieldPositions.DEFENSE;
-        }
-        for (int i = NumberOfMidfielders() + numberAlreadyAssigned; i > numberAssignedPrev; i--)
-        {
-            fieldedPosition[i] = this.completeRoster
-                .Where(x => !selectedPlayers.Contains(x) && (x.Position == PlayerCharacter.OnFieldPositions.MIDFIELD || x.Position == PlayerCharacter.OnFieldPositions.ANY))
-                .OrderByDescending(x => PlayerOverallCalculator.CalculateOverall(PlayerCharacter.OnFieldPositions.MIDFIELD, x))
-                .FirstOrDefault();
-            if (fieldedPosition[i] != null) selectedPlayers.Add(fieldedPosition[i]);
-            fieldedPosition[i].Position = PlayerCharacter.OnFieldPositions.MIDFIELD;
+            if (lineup[i - 1] != null) selectedPlayers.Add(lineup[i - 1]);
+            lineup[i - 1].Position = PlayerCharacter.OnFieldPositions.DEFENSE;
+            numberAlreadyAssigned++;
         }
         numberAssignedPrev = numberAlreadyAssigned;
-        for (int i = NumberOfForwards() + numberAlreadyAssigned; i > numberAssignedPrev; i--)
+        for (int i = NumberOfMidfielders() + numberAlreadyAssigned - 1; i >= numberAssignedPrev; i--)
         {
-            fieldedPosition[1] = this.completeRoster
-                .Where(x => !selectedPlayers.Contains(x) && (x.Position == PlayerCharacter.OnFieldPositions.FORWARD || x.Position == PlayerCharacter.OnFieldPositions.ANY))
+            lineup[i] = this.completeRoster
+                .Where(x => (x.IsCaptain && !selectedPlayers.Contains(x)) || (!selectedPlayers.Contains(x) && (x.Position == PlayerCharacter.OnFieldPositions.MIDFIELD || x.Position == PlayerCharacter.OnFieldPositions.ANY)))
+                .OrderByDescending(x => PlayerOverallCalculator.CalculateOverall(PlayerCharacter.OnFieldPositions.MIDFIELD, x))
+                .FirstOrDefault();
+            if (lineup[i] != null) selectedPlayers.Add(lineup[i]);
+            lineup[i].Position = PlayerCharacter.OnFieldPositions.MIDFIELD;
+            numberAlreadyAssigned++;
+        }
+        numberAssignedPrev = numberAlreadyAssigned;
+        for (int i = NumberOfForwards() + numberAlreadyAssigned - 1; i >= numberAssignedPrev; i--)
+        {
+            lineup[i] = this.completeRoster
+                .Where(x => (x.IsCaptain && !selectedPlayers.Contains(x)) || (!selectedPlayers.Contains(x) && (x.Position == PlayerCharacter.OnFieldPositions.FORWARD || x.Position == PlayerCharacter.OnFieldPositions.ANY)))
                 .OrderByDescending(x => PlayerOverallCalculator.CalculateOverall(PlayerCharacter.OnFieldPositions.FORWARD, x))
                 .FirstOrDefault();
-            if (fieldedPosition[1] != null) selectedPlayers.Add(fieldedPosition[i]);
-            fieldedPosition[1].Position = PlayerCharacter.OnFieldPositions.FORWARD;
+            if (lineup[i] != null) selectedPlayers.Add(lineup[i]);
+            lineup[i].Position = PlayerCharacter.OnFieldPositions.FORWARD;
         }
     }
 

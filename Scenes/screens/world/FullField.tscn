@@ -3338,13 +3338,13 @@ position = Vector2(-53, 129)
 position = Vector2(359, 129)
 
 [node name="OffensePosition1" type="Node2D" parent="FullFieldActorsContainer/Spawns"]
-position = Vector2(144, 99)
+position = Vector2(144, 105)
 
 [node name="OffensePosition2" type="Node2D" parent="FullFieldActorsContainer/Spawns"]
-position = Vector2(102, 84)
+position = Vector2(102, 94)
 
 [node name="OffensePosition3" type="Node2D" parent="FullFieldActorsContainer/Spawns"]
-position = Vector2(180, 91)
+position = Vector2(180, 94)
 
 [node name="OffensePosition4" type="Node2D" parent="FullFieldActorsContainer/Spawns"]
 position = Vector2(-53, 86)
