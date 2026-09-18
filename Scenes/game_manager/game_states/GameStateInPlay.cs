@@ -46,8 +46,8 @@ public partial class GameStateInPlay : GameState
             }
 
             isTransitioningHalf = true;
-            var container = GetTree().CurrentScene.GetNodeOrNull<FullFieldActorsContainer>("FullFieldActorsContainer")
-                            ?? GetParent() as FullFieldActorsContainer;
+            var container = GetTree().CurrentScene.GetNodeOrNull<ArenaActorsContainer>("ArenaActorsContainer")
+                            ?? GetParent() as ArenaActorsContainer;
 
             if (container != null)
             {

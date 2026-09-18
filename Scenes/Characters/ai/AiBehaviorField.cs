@@ -205,8 +205,25 @@ public partial class AIBehaviorField : AIBehavior
             }
             else if (IsBallCarriedByTeammate())
             {
+                // Ã¢Åâ¦ HIGH AWARENESS = ANTICIPATE PASSES
+                if (player.GameAttributes.Awareness >= 70)
+                {
+                    // Check if ball carrier is looking toward this player
+                    Vector2 carrierHeading = ball.Carrier.heading;
+                    Vector2 toThisPlayer = ball.Carrier.Position.DirectionTo(player.Position);
+                    float alignment = carrierHeading.Dot(toThisPlayer);
+
+                    if (alignment > 0.6f) // Carrier facing this direction
+                    {
+                        // Ã¢Åâ¦ START RUNNING EARLY (before pass is even made)
+                        Vector2 runDestination = player.Position + player.heading * 60f;
+                        totalSteeringForce += player.Position.DirectionTo(runDestination) * 0.5f;
+                    }
+                }
+
                 totalSteeringForce += GetAssistFormationSteeringForce() * roleModifiers.OffensivePushMultiplier;
                 totalSteeringForce += GetIntelligentRunSteeringForce() * 0.6f;
+                totalSteeringForce += GetRolePositioningForce(); // Ã¢Åâ¦ ADD THIS
 
                 if (player.role == PlayerCharacter.OnFieldPositions.DEFENSE && ShouldAttemptOverlap())
                 {
@@ -225,6 +242,17 @@ public partial class AIBehaviorField : AIBehavior
                 {
                     if (IsBallPossessedByOpponent())
                     {
+                        // Ã¢Åâ¦ IMMEDIATE RETREAT for defenders
+                        if (player.role == PlayerCharacter.OnFieldPositions.DEFENSE)
+                        {
+                            float distanceFromSpawn = player.Position.DistanceTo(player.spawnPosition);
+                            if (distanceFromSpawn > 80f) // Too far forward
+                            {
+                                // Ã¢Åâ¦ OVERRIDE EVERYTHING - sprint back
+                                totalSteeringForce += GetSpawnSteeringForce() * 1.5f;
+                            }
+                        }
+
                         float distanceToBall = player.Position.DistanceTo(ball.Position);
 
                         // Ã¢ LAYERED DEFENSIVE LOGIC
@@ -1209,12 +1237,27 @@ public partial class AIBehaviorField : AIBehavior
     /// </summary>
     private Vector2 GetRolePositioningForce()
     {
-        if (IsInCorrectZone())
-            return Vector2.Zero;
+        if (!IsBallCarriedByTeammate())
+            return Vector2.Zero; // Ã¢Åâ¦ Only apply during teammate possession
 
-        // Player is too far forward for their role - pull them back
-        float pullStrength = 0.5f;
-        return player.Position.DirectionTo(player.spawnPosition) * pullStrength;
+        float pitchLength = Mathf.Abs(player.targetGoal.Position.Y - player.ownGoal.Position.Y);
+        float playerPositionNormalized = (player.Position.Y - player.ownGoal.Position.Y) / pitchLength;
+
+        if (player.ownGoal.Position.Y > player.targetGoal.Position.Y)
+            playerPositionNormalized = 1f - playerPositionNormalized;
+
+        var modifiers = GetRoleModifiers();
+
+        // Ã¢Åâ¦ PUSH FORWARDS UP, HOLD DEFENDERS BACK
+        if (playerPositionNormalized < modifiers.MaxPushUpLine - 0.1f) // 10% buffer
+        {
+            // Push forward toward their ideal attacking zone
+            float targetY = player.ownGoal.Position.Y + (player.targetGoal.Position.Y - player.ownGoal.Position.Y) * modifiers.MaxPushUpLine;
+            Vector2 targetPosition = new Vector2(player.Position.X, targetY);
+            return player.Position.DirectionTo(targetPosition) * 0.4f;
+        }
+
+        return Vector2.Zero;
     }
 
     public Vector2 GetOndutySteeringForce() =>
@@ -1230,15 +1273,25 @@ public partial class AIBehaviorField : AIBehavior
 
     public Vector2 GetAssistFormationSteeringForce()
     {
+        // Ã¢Åâ¦ PREDICT where ball carrier will be in 0.5 seconds
+        float predictionTime = 0.5f;
+        Vector2 predictedCarrierPosition = ball.Carrier.Position + ball.Carrier.Velocity * predictionTime;
+
+        // Ã¢Åâ¦ Use PREDICTED position instead of current position
         Vector2 spawnDifference = ball.Carrier.spawnPosition - player.spawnPosition;
-        Vector2 assistDestination = ball.Carrier.Position - spawnDifference * SPREAD_ASSIST_FACTOR;
+        Vector2 assistDestination = predictedCarrierPosition - spawnDifference * SPREAD_ASSIST_FACTOR;
+
         Vector2 direction = player.Position.DirectionTo(assistDestination);
 
-        // âœ… Apply Offense rating
         float offenseModifier = player.GameAttributes.Offense / 100f;
         float weight = GetBicircularWeight(player.Position, assistDestination, 30, 0.2f, 60, 1);
 
-        return weight * direction * offenseModifier;
+        // Ã¢Åâ¦ ADD FORWARD PUSH: Run toward opponent's goal during attacks
+        Vector2 toGoal = player.Position.DirectionTo(player.targetGoal.Position);
+        float forwardPush = 0.3f; // 30% of movement force pushes toward goal
+
+        // Ã¢Åâ¦ COMBINE positional assistance + forward momentum
+        return (weight * direction * offenseModifier) + (toGoal * forwardPush * offenseModifier);
     }
 
     public Vector2 GetBallProximitySteeringForce()

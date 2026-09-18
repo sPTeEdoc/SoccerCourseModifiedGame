@@ -226,6 +226,9 @@ public partial class ArenaActorsContainer : Node2D
     private void UpdateSquadSidePositions(List<PlayerCharacter> squad)
     {
         float halfwayY = 485f;
+        defenderAssigned = 0;
+        midfieldersAssigned = 0;
+        forwardsAssigned = 0;
 
         for (int i = 0; i < squad.Count; i++)
         {
